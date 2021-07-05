@@ -5,7 +5,7 @@
 
 \documentclass[biber]{nowfnt} % creates the journal version, needs biber version
 %wrapper for book and ebook are created automatically.
-
+\usepackage{imakeidx}
 \usepackage[utf8]{inputenc}
 
 \def\withcolors{1}
@@ -78,16 +78,13 @@ to highlight the unifying techniques.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{What is distribution testing?}
-
-\section{Formulation, and relation to Hypothesis Testing}
-\section{Why total variation distance?}
-\section{The road not taken: tolerant testing}
-\section{Historical notes}
+\input{chap-what}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Testing goodness-of-fit of univariate distributions}
+  \label{chap:identity}
 
 (In-depth chapter with derivation of many results. Focus on one-sample
 testing.)
@@ -184,5 +181,6 @@ Wright.
 \backmatter  % references, restarts sample
 
 \printbibliography
+% \printindex
 
 \end{document}

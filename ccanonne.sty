@@ -159,8 +159,8 @@
 
 % Sets and indicators
 \newcommand{\setOfSuchThat}[2]{ \left\{\; #1 \;\colon\; #2\; \right\} } 			% sets such as "{ elems | condition }"
-\newcommand{\indicSet}[1]{\mathds{1}_{#1}}                                              % indicator function
-\newcommand{\indic}[1]{\indicSet{\left\{#1\right\}}}                                             % indicator function
+\newcommand{\indicSet}[1]{\mathds{1}\mleft(#1\mright)}                                              % indicator function
+\newcommand{\indic}[1]{\mathds{1}\mleft\{#1\mright\}}                                             % indicator function
 \newcommand{\disjunion}{\amalg}%\coprod, \dotcup...
 
 % Distance
@@ -309,12 +309,14 @@
 \newcommand{\Paren}[1]{\mleft(#1\mright)}
 %\newcommand{\Brace}[1]{\left[#1\right]}
 
-\newcommand{\ns}{n} % Number of samples
-\newcommand{\ab}{k} % alphabet (domain) size
-\newcommand{\numbits}{\ell}
+\newcommand{\ns}{{\textcolor{purple}{n}}} % Number of samples
+\newcommand{\tc}{{\textcolor{ForestGreen}{t}}} % Time complexity
+\newcommand{\ab}{{\textcolor{cyan}{k}}} % alphabet (domain) size
+\newcommand{\errprob}{{\textcolor{pink!50!blue}{\delta}}} % alphabet (domain) size
+\newcommand{\numbits}{{\textcolor{orange}{\ell}}}
 \newcommand{\pbits}{s}
 \newcommand{\priv}{\varrho}
-\newcommand{\dst}{\eps}
+\newcommand{\dst}{\textcolor{red}{\eps}}
 \newcommand{\dims}{d}
 \newcommand{\zdims}{k}
 \newcommand{\prm}{p}
