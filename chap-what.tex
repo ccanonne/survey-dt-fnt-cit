@@ -1,0 +1,109 @@
+
+
+\paragraph{A note.} For simplicity, throughout this survey we will sweep under the rug many measure-theoretic subtleties, and assume probability distributions, probability density functions (pdf), and probability mass functions (pmf) exist whenever required, and are suitably well-behaved. We will also typically identify a probability distribution with its pdf or pmf, and by a slight abuse of notation use $\p$ indifferently for the distribution itself and its pdf. Most, if not all, of those subtleties can be handled by inserting the words ``Radon--Nikodym,'' ``measurable,'' and ``counting measure'' in suitable places and order.
+
+\section{Formulation, and relation to Hypothesis Testing}
+
+
+In what follows, $\ab\in\N$ will be used to parametrize the domain of the probability distributions: namely, $\distribs{\ab}$ will denote the set of probability distributions over a (known) domain $\domain_\ab$.
+
+We begin with the notion of distance we will be concerned about, the total variation distance (also known as \emph{statistical distance}):
+\begin{definition}[Total variation distance]
+  \label{def:tv}
+  The \emph{total variation distance} between two probability distributions $\p,\q\in\distribs{\ab}$ is given by
+  \[
+    \totalvardist{\p}{\q} = \sup_{S\subseteq \domain_\ab} (\p(S)-\q(S))\,.
+  \]
+  Given a subset $\class\subseteq\distribs{\ab}$ of distributions, we further define the distance from $\p\in\distribs{\ab}$ to $\class$ as $\totalvardist{\p}{\class} \eqdef \inf_{\q\in\class} \totalvardist{\p}{\q}$, and will say that $\p$ is \emph{$\dst$-far from $\class$} if $\totalvardist{\p}{\class}\geq \dst$.
+\end{definition}
+One can check that $\dtv$ defines a metric on $\distribs{\ab}$, and takes values in $[0,1]$.\exercise{Check it!} Noreover, the total variation distance exhibits several important properties, some of which will be detailed at length in~\cref{app:distances}; we recall a crucial one below. \todonote{Pinsker, postprocessing, relation to TV, etc.}
+
+Assuming that $\p,\q$ are absolutely continuous with respect to some dominating measure $\mu$,
+  \begin{equation}
+    \totalvardist{\p}{\q} = \frac{1}{2}\int \abs{\dv{\p}{\mu}-\dv{\q}{\mu}}\dd{\mu}
+  \end{equation}
+  In the discrete case where $\p,\q$ are both over $\N$ or a finite domain, this leads to
+  \begin{equation}
+    \label{eq:tv:l1}
+    \totalvardist{\p}{\q} = \frac{1}{2}\normone{\p-\q}
+  \end{equation}
+  that is, ``total variation is half the $\lp[1]$ distance between pmfs.'' This turns out to be a very useful connection, since $\lp[p]$ norms are quite well-studied beasts: we get to use our arsenal of geometric inequalities --- H\"older, Cauchy--Schwarz, and monotonicity of $\lp[p]$ norms, to name a few.\smallskip
+
+%nondecreasing in their first argument and nonincreasing in the last two
+One last piece of terminology: a \emph{property}\index{property} of distributions is a predicate we are interested in (\eg ``is the probability distribution unimodal?''). By identifying the predicate with the set of objects which satisfy it, we can equivalently view a property of distributions as a \emph{subset} of probability distributions (typically, with some interesting structure). Which is what we will do: throughout, a property is just an arbitrary subset of distributions we are interested in. With this in hand, we are ready to provide a formal definition of what a ``testing algorithm'' is.
+\begin{definition}[Testing algorithm]
+  \label{def:testing}
+Let $\property= \bigcup_{\ab=1}^\infty \property_\ab$ and $\class= \bigcup_{\ab=1}^\infty \class_\ab$ be two properties of probability distributions, where $\property_\ab, \class_\ab\subseteq \distribs{\ab}$ for all $\ab$; and $\ns\colon\N\times(0,1]\times(0,1]\to\N$, $\tc\colon\N\times(0,1]\times(0,1]\to\N$ be two functions. A \emph{testing algorithm for \property under $\class$ with sample complexity $\ns$ and time complexity $\tc$} is a (possibly randomised) algorithm $\Algo$ which, on input $\ab\in\N,\dst \in(0,1], \errprob\in(0,1]$, and a multiset $S$ of $\ns(\ab,\dst,\errprob)$ elements of $\domain_\ab$, runs in time at most $\tc(\ab,\dst,\errprob)$ and outputs $\mathbf{b} \in\{0,1\}$ such that the following holds.
+\begin{itemize}
+  \item If $S$ is \iid from some $\p\in\property_\ab$, then $\probaDistrOf{S,\Algo}{\mathbf{b}=1} \geq 1-\errprob$;
+  \item If $S$ is \iid from some $\p\in\class_\ab$ such that $\totalvardist{\p}{\property_\ab} \geq \dst$, then $\probaDistrOf{S,\Algo}{\mathbf{b}=0} \geq 1-\errprob$,
+\end{itemize}
+where in both cases the probability is over the draw of the \iid sample $S$ from the (unknown) $\p$, and the internal randomness of $\Algo$.
+\end{definition}
+A few remarks are in order. First, in most of our applications we will take $\class_\ab=\distribs{\ab}$, so that the unknown distribution $\p$ is \emph{a priori} arbitrary, and the goal is to check whether it belongs to the subset (property) of interest $\property_\ab$. However, this need not always be the case, and we may want to choose $\class_\ab$ differently to perform hypothesis testing \emph{under structural assumptions}: for instance, to test whether an unknown unimodal distribution is actually Binomial (in this case, $\property_\ab \subsetneq \class_\ab\subsetneq \distribs{\ab}$), or if say a log-concave distribution is monotone (in which case there is no inclusion relation between $\property_\ab$ and $\class_\ab$, and both are strict subsets of $\distribs{\ab}$).
+
+Another important point is that, while our main focus will be on \emph{discrete} distributions,~\cref{def:testing} allows for continuous distributions as well. Finally, the above definition is quite flexible, and can be seen to allow for testing \emph{multiple} distributions: for instance, taking $\domain_\ab=[\ab]\times[\ab]$, $\class_\ab \eqdef \setOfSuchThat{ \p\in\distribs{\ab} }{ \p=\p_1\otimes\p_2 }$ (product distributions), and $\property_\ab \eqdef \setOfSuchThat{\p_1\otimes\p_2 \in \class_\ab}{\p_1=\p_2}$, we obtain the question of two-sample testing (a.k.a.\ closeness testing), which asks to test whether two unknown distributions over $[\ab]$ are equal, or far from each other.
+
+\paragraph{Dependence on the error probability $\errprob$.} Our definition of testing algorithm leaves the error probability $\errprob$ as a free parameter; however, it is quite common in the distribution testing literature to set it as some arbitrary constant smaller than $1/2$ (usually $1/3$). Indeed, by a standard argument,\index{probability amplification} an error probability $1/3$ can be driven down to arbitrary $\errprob$ at the price of a $\bigO{\log(1/\errprob)}$ factor in the sample complexity. 
+\begin{lemma}[Error probability amplification]
+  Fix $\property$ and $\class$, and suppose there exists a testing algorithm $\Algo$ for $\property$ under $\class$ with sample complexity $\ns(\ab,\dst,1/3)$ and time complexity $\tc(\ab,\dst,1/3)$. Then there is a testing algorithm $\Algo'$ for $\property$ under $\class$ with sample and time complexities $\ns'(\ab,\dst,\errprob) \eqdef \ns(\ab,\dst,1/3)\clg{18\ln(1/\errprob)}$ and $\tc'(\ab,\dst,\errprob) \eqdef \bigO{ \tc(\ab,\dst,1/3) \log(1/\errprob)}$.\cmargin{Logarithm is binary!}
+\end{lemma}
+\begin{proof}[Proof sketch]
+Fix $\property$, $\class$, $\Algo$ as in the statement. Given $\ab,\dst$, and $\errprob\in(0,1]$, let $\Algo'$ be the algorithm which takes as input a multiset of $\ns'(\ab,\dst,\errprob)$ elements, partitions it (arbitrarily) in $m \eqdef \clg{18\ln(1/\errprob)}$ disjoint multisets $S_1,\dots, S_m$, runs $\Algo$ independently on those $m$ multisets with error probability $1/3$ to get $\mathbf{b}_1,\dots,\mathbf{b}_m$, and finally outputs the majority answer $\mathbf{b} \eqdef \indic{\sum_{i=1}^m \mathbf{b}_i \geq m/2}$. The running time is dominated by the $m$ executions, giving the claimed $\bigO{m\cdot \tc(\ab,\dst,1/3)}$ bound. Thus, it suffices to check that the output is correct with probability at least $1-\errprob$; this in turn follows from a Hoeffding bound (\cref{theo:hoeffding}). Indeed, by assumption, each $\mathbf{b}_i$ is independently correct with some probability $p\geq 2/3$. Letting $X_i \sim \bernoulli{p}$ be the indicator of the event ``{$\mathbf{b}_i$ is the correct output},'' we have
+\[
+  \probaOf{\mathbf{b} \text{ incorrect}} = \probaOf{ \frac{1}{m}\sum_{i=1}^m X_i  < \frac{1}{2} } \leq e^{-2(p-1/2)^2m} \leq e^{-m/18} \leq \errprob\,,
+\]
+where we used our setting of $m$ in the last inequality. 
+\end{proof}
+Importantly, this logarithmic dependence is not always the right one: as we will see in~\cref{chap:identity}, there exist natural problems for which the right dependence on the error probability only scales as $\sqrt{\log(1/\errprob)}$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Why total variation distance?}
+
+The standard formulation of distribution testing, as stated in~\cref{def:testing}, is tied to a specific metric between probability distribution: the total variation distance (\cref{def:tv}). It is natural to wonder of that choice is arbitrary, and, if not, what motivates it.
+
+\hl{todo}
+\begin{itemize}
+  \item Very stringent -- strong guarantee
+  \item Well-behaved: actual metric (triangle inequality), bounded
+  \item Data processing inequality: robust to post-processing
+  \item Relation to hypothesis testing
+\end{itemize}
+
+% Relation to hypothesis testing
+\begin{lemma}[Pearson--Neyman]
+  Any (possibly randomized) statistical test which distinguishes between $\p_0$ and $\p_1$ from a single sample must have Type~I (false positive) and Type-II (false negative) errors satisfying
+  \[
+      \text{Type~I} + \text{Type~II} \geq 1- \totalvardist{\p_0}{\p_1}
+  \]
+  Moreover, this is achieved by the test which outputs $1$ if, and only if, the sample belongs to the set $S^\ast \eqdef \setOfSuchThat{x}{\p_1(x) > \p_0(x)}$.
+\end{lemma}
+\begin{proof}
+Fix any test $\Algo$ distinguishing between two distributions $\p_0$ and $\p_1$, given a single observation. Letting $\alpha$ and $\beta$ denote the Type~I and Type-II errors of $\Algo$, we have
+\begin{align*}
+  \alpha+\beta 
+  &= \probaDistrOf{\p_0,R}{\Algo(X,R)=1} + \probaDistrOf{\p_1,R}{\Algo(X,R)=0} \\
+  &= \shortexpect_{R}[ \probaDistrOf{\p_0}{\Algo(X,R)=1} ] + \shortexpect_{\Algo}[ \probaDistrOf{\p_1}{\Algo(X,R)=0} ] \\
+  &= \shortexpect_{R}[ \probaDistrOf{\p_0}{\Algo(X,R)=1} + \probaDistrOf{\p_1}{\Algo(X,R)=0} ]
+%   \totalvardist{\p}{\q}
+\end{align*}
+where we denote by $R$ the internal randomness of $\Algo$. Since, for any fixed realization $r$ of this randomness $R$, the resulting test $\Algo(\cdot,r)$ is deterministic, we can define for any $r$ the \emph{acceptance region} $S_{\Algo,r} \eqdef \setOfSuchThat{x}{\Algo(x,r)=1}$, and write
+\begin{align*}
+  \alpha+\beta 
+  &= \shortexpect_{R}[ \probaDistrOf{\p_0}{X \in S_{\Algo,R}} + \probaDistrOf{\p_1}{X \notin S_{\Algo,R}} ] \\
+  &= 1+\shortexpect_{R}[ \p_0(S_{\Algo,R}) - \p_1(S_{\Algo,R}) ] \\
+  &\geq 1 + \inf_{S}(\p_0(S) - \p_1(S)) \\
+  &= 1 - \sup_{S}(\p_1(S) - \p_0(S)) \\
+  &= 1- \totalvardist{\p_0}{\p_1}\,,
+\end{align*}
+as claimed. Finally, it is immediate from the definition of total variation distance that the proposed test satisfies $\text{Type~I} + \text{Type~II} = 1 + \p_0(S^\ast) - \p_1(S^\ast) = 1- \totalvardist{\p_0}{\p_1}$.
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The road not taken: tolerant testing}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Historical notes}

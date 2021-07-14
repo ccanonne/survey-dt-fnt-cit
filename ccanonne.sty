@@ -101,7 +101,7 @@
 	\newcommand{\questionnote}[2][]{\todo[size=\tiny,color=blue!30]{#2}}
 	\newcommand{\todonotedone}[2][]{\todo[size=\scriptsize,color=green!40]{$\checkmark$ #2}}
 	\newcommand{\todonoteinline}[2][]{\todo[inline,size=\scriptsize,color=orange!40,#1]{#2}}  
-  \newcommand{\marginnote}[1]{\todo[color=white,linecolor=black]{{#1}}}
+%   \newcommand{\marginnote}[1]{\todo[color=white,linecolor=black]{{#1}}}
 \else
   \newcommand{\anote}[1]{}
   \newcommand{\cnote}[1]{}
@@ -110,7 +110,7 @@
 	\newcommand{\questionnote}[2][]{\ignore{#2}}
 	\newcommand{\todonotedone}[2][]{\ignore{#2}}
 	\newcommand{\todonoteinline}[2][]{\ignore{#2}}
-  \newcommand{\marginnote}[1]{\ignore{#1}}
+%   \newcommand{\marginnote}[1]{\ignore{#1}}
 \fi
 \newcommand{\ignore}[1]{\leavevmode\unskip} % eat unnecessary spaces before
 \newcommand{\amargin}[1]{\questionnote{\acolor{#1}}} % Jayadev
@@ -164,6 +164,7 @@
 \newcommand{\disjunion}{\amalg}%\coprod, \dotcup...
 
 % Distance
+% \newcommand{\dtv}{\operatorname{d}_{\rm TV}}
 \newcommand{\dtv}{\operatorname{d}_{\rm TV}}
 \newcommand{\hellinger}[2]{{\operatorname{d_{\rm{}H}}\mleft({#1, #2}\mright)}}
 \newcommand{\kolmogorov}[2]{{\operatorname{d_{\rm{}K}}\mleft({#1, #2}\mright)}}
