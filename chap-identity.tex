@@ -1,0 +1,308 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Uniformity testing}
+\cnote{Thorough presentation of the many algorithms for uniformity testing,
+with proofs, and relative advantages of each.}
+
+It is known~\citep{Paninski08} that the sample complexity of uniformity testing with distance parameter $\dst\in(0,1]$ is $\Theta(\sqrt{\ab}/\dst^2)$. That's nice. Now, \emph{how do we perform uniformity testing, though?} 
+There are several things to consider in a testing algorithm. For instance:
+\begin{description}
+  \item[Data efficiency:] does the algorithm achieve the optimal sample complexity $\Theta(\sqrt{\ab}/\dst^2)$?
+  \item[Time efficiency:] how fast is the algorithm to run (as a function of $\ab,\dst$, and the number of samples $\ns$)?
+  \item[Memory efficiency:] how much memory does the algorithm require (as a function of $\ab,\dst$, and $\ns$)?
+  \item[Simplicity:] is the algorithm simple to describe and implement?
+  \item[``Simplicity'':] is the algorithm simple to \emph{analyze}?
+  \item[Robustness:] how \emph{tolerant} is the algorithm to breaches of the promise? That is, does it accept distributions which are not \emph{exactly} uniform as well, or is it very brittle?
+  \item[Elegance:] That's, like, your opinion, man.
+  \item[Generalizable:] Does the algorithm have other features that might be desirable in other settings?
+\end{description}
+
+\cref{tab:summary:uniformity:testing} summarizes a few of those criteria.
+\begin{table}[ht]\centering\footnotesize
+  \def\arraystretch{1.25}%  1 is the default, change whatever you need
+% %   \begin{adjustwidth}{0in}{0in}% adjust the L and R margins by 1 inch
+  \begin{tabularx}{\textwidth}{|Y|Y|Y|Y|}
+  \hline
+     & \bf Sample complexity & \bf Notes & \bf References \\\hline
+    \bf Collision-based & $\dfrac{\ab^{1/2}}{\dst^2}$ & Tricky & \cite{GoldreichR00,DiakonikolasGPP19} \\\hline
+    \bf Unique elements & $\dfrac{\ab^{1/2}}{\dst^2}$ & $\dst \gg 1/\ab^{1/4}$ & \cite{Paninski08} \\\hline
+    \bf Modified $\chi^2$ & $\dfrac{\ab^{1/2}}{\dst^2}$ & (None) & \cite{ValiantV17,AcharyaDK15,DiakonikolasKN15} \\\hline
+    \bf Empirical distance to uniform & $\dfrac{\ab^{1/2}}{\dst^2}$ & Biased & \cite{DiakonikolasGPP18} \\\hline
+    \bf Random binary hashing & $\dfrac{\ab}{\dst^2}$ & Fun (+ fast, small space) & \cite{AcharyaCT19b} \\\hline
+    \bf Bipartite collisions & $\dfrac{\ab^{1/2}}{\dst^2}$ & $\dst \gg 1/\ab^{1/10}$ & \cite{DiakonikolasGKR19} \\\hline
+    \bf Empirical subset weighting & $\dfrac{\ab^{1/2}}{\dst^2}$ & $\dst \gg 1/\ab^{1/4}$ &  \\\hline
+  \end{tabularx}
+% %   \end{adjustwidth}
+  \caption{\label{tab:summary:uniformity:testing}The current landscape of uniformity testing, based on the algorithms I know of. For ease of reading, we omit the $O(\cdot)$, $\Theta(\cdot)$, and $\Omega(\cdot)$'s from the table: all results should be read as asymptotic with regard to the parameters, up to absolute constants.}
+\end{table}
+
+A key insight, that underlies a lot of the algorithms above, is that here \emph{$\lp[2]$ distance is a good proxy for total variation distance}:
+\begin{equation}
+  \label{eq:relation:l1:l2:cs}
+  \totalvardist{\p}{\uniform_k} = \frac{1}{2}\normone{\p-\uniform_\ab} \leq \frac{\sqrt{\ab}}{2}\normtwo{\p-\uniform_\ab}
+\end{equation}
+the inequality being Cauchy--Schwarz. So if $\totalvardist{\p}{\uniform_k}>\dst$, then $\normtwo{\p-\uniform_\ab}^2 > 4\dst^2/\ab$ (and, well, if $\totalvardist{\p}{\uniform_k}=0$ then $\normtwo{\p-\uniform_\ab}^2=0$ too, of course). Moreover, we have the very convenient fact, specific to the distance to uniform: for any distribution $\p$ over $[\ab]$,
+\begin{equation}
+  \label{eq:relation:collisionprob:distance:uniform}
+  \normtwo{\p-\uniform_\ab}^2 = \sum_{i=1}^\ab (\p(i)-1/\ab)^2  = \sum_{i=1}^\ab \p(i)^2-1/\ab = \normtwo{\p}^2-1/\ab\,,
+\end{equation}
+so combining the two we get that $\totalvardist{\p}{\uniform_k}>\dst$ implies $\normtwo{\p}^2 > (1+4\dst^2)/\ab$.
+
+\begin{remark}
+  \label{rk:collision:probability}
+  The quantity $\normtwo{\p}^2$ is commonly known as the \emph{collision probability}\index{collision probability} of $\p$, due to the following easy fact: if $X,Y$ are \iid random variables distributed according to $\p$, then
+  \begin{equation}
+      \probaOf{X=Y} = \sum_{i\in\domain} \probaOf{X=i, Y=i} = \sum_{i\in\domain} \p(i)^2 = \normtwo{\p}^2
+  \end{equation}
+  (this generalizes to higher-order collisions, with $\norm{\p}_j^j$). It is easy to see, from~\cref{eq:relation:collisionprob:distance:uniform}, that among all probability distributions over a given support size $\ab$ the collision probability is minimized for the uniform distribution: indeed, $\normtwo{\p}^2 = \frac{1}{\ab}+ \normtwo{\p-\uniform_\ab}^2 \geq \frac{1}{\ab}$. \todonote{Discuss R\'enyi entropy? Exercise, historical notes?}
+%   Moreover, the collision probability is related to the \emph{R\'enyi entropy of order $2$}, $H_2(\p)$, via the identity
+%   $
+%     H_2(\p) = -2\log\normtwo{\p}
+%   $.
+\end{remark}
+
+\begin{remark}
+  \label{rk:relation:l1:l2}
+  \cref{eq:relation:l1:l2:cs} provides an upper bound on the total variation distance in terms of the $\lp[2]$ distance. Recalling further that $\lp[p]$ norms are monotone (non-increasing) in $p$,\exercise{Prove it. (Exercise sthg)} we further get that $\normone{x}\geq \normtwo{x}$ for any $x\in\R^d$, and therefore
+\begin{equation}
+  \label{eq:relation:l1:l2:overall}
+  \frac{1}{2}\normtwo{\p-\q} \leq \totalvardist{\p}{\q} \leq \frac{\sqrt{\ab}}{2}\normtwo{\p-\q}
+\end{equation}
+for any two $\p,\q\in\distribs{\ab}$. Although loose by a factor $\sqrt{\ab}$ (where $\ab$ is the domain size), this relation turns out to be surprisingly useful in many occasions.
+\end{remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Collision-based} In view of~\cref{eq:relation:collisionprob:distance:uniform}, a very natural idea is to estimate $\normtwo{\p}^2$, in order to distinguish between (i)~$\normtwo{\p}^2 = 1/\ab$ (uniform) and (ii)~$\normtwo{\p}^2 > (1+4\dst^2)/\ab$ ($\dst$-far from uniform). How to do that? Upon recalling~\cref{rk:collision:probability}, the probability that two independent samples from $\p$ take the same value (a ``collision'') is exactly $\normtwo{\p}^2$. Thus, 
+an obvious approach is to take $\ns$ samples $X_1,\dots,X_\ns$, count the number of pairs that show a collision, and use that as an unbiased estimator $Z_1$ for $\normtwo{\p}^2$:
+\begin{equation}
+  \label{eq:def:z1}
+    Z_1 = \frac{1}{\binom{\ns}{2}} \sum_{1\leq s < t \leq \ns} \indic{X_s=X_t}\,.
+\end{equation}
+By the above, $\expect{Z_1} = \normtwo{\p}^2$. If we threshold $Z_1$ somewhere between (i) and (ii), at say $\tau\eqdef (1+2\dst^2)/\ab$, we should be able to distinguish between our two cases and get a valid tester. But how large must $\ns$ be for this to work? 
+
+Intuitively, we expect the test to work as long as the standard deviation of $Z_1$ (the ``noise'') is smaller than the gap between the expectations in our two cases (the ``signal''); that is,
+\[
+      \sqrt{\Var[Z_1]} \ll \Delta \expect{Z_1} = \frac{4\dst^2}{\ab}
+\]
+as this is the condition for the random fluctuations of our statistic $Z_1$ not to ``cross'' our threshold too often and lead to a wrong answer.
+
+To make this quantitative, we can use Chebyshev's inequality, which requires us to bound $\Var[Z_1]$. This is where things get tricky, since $Z_1$ is the sum of $\binom{\ns}{2}$ random variables which are \emph{not} pairwise independent.\footnote{Namely, the summands $\indic{X_s=X_t}$ in the definition of $Z_1$ are \emph{positively correlated}: $\cov(\indic{X_s=X_t},\indic{X_{s'}=X_{t'}}) \geq 0$, and are only independent if $s,s',t,t'$ are all distinct.} 
+
+We first show how to derive a (suboptimal) bound $\ns=\bigO{\sqrt{\ab}/\dst^4}$:
+\begin{align*}
+  \Var[Z_1] 
+   &= \bEE{Z_1^2} - \bEE{Z_1}^2\\
+   &= \frac{1}{\binom{\ns}{2}^2} \sum_{1\leq s < t \leq \ns}\sum_{1\leq s' < t' \leq \ns} \bEE{\indic{X_s=X_t}\indic{X_{s'}=X_{t'}}} - \normtwo{\p}^4
+\end{align*}
+To handle this last sum despite the lack of independence of the summands, we will break it in 3 groups depending on the cardinality of $\{s,t,s',t'\}$, which can be either 4 (all indices are distinct), 3 (one index is common to the two pairs), or 2 (both pairs of indices are the same).
+\begin{itemize}
+  \item In the first case, we have independence of the two indicator random variables, and 
+  \[
+    \bEE{\indic{X_s=X_t}\indic{X_{s'}=X_{t'}}} = \bEE{\indic{X_s=X_t}}\bEE{\indic{X_{s'}=X_{t'}}} = \normtwo{\p}^4.
+  \]
+  \item In the third case, the two indicator random variables are the same, and since $\indic{}^2=\indic{}$ we get
+  \[
+    \bEE{\indic{X_s=X_t}\indic{X_{s'}=X_{t'}}} = \bEE{\indic{X_s=X_t}} = \normtwo{\p}^2.
+  \]
+  \item The second case is the messier one; still, one can verify that in this case $\indic{X_s=X_t}\indic{X_{s'}=X_{t'}}$ is 1 if, and only if, the three distinct samples corresponding to the 3 distinct indices among $s,t,s',t'$ take the same value, from which
+  \[
+    \bEE{\indic{X_s=X_t}\indic{X_{s'}=X_{t'}}} = \norm{\p}_3^3.
+  \]
+\end{itemize}
+It remains to count how many summands of each type we have. Clearly, we have exactly $\binom{\ns}{2}$ summands of the third type; it is also not too hard to see that we have $\binom{\ns}{2}\binom{\ns-2}{2} = 6\binom{\ns}{4}$ summands of the first, and $6\binom{\ns}{3}$ of the second. (As a sanity check, $6\binom{\ns}{4}+6\binom{\ns}{3}+\binom{\ns}{2} = \binom{\ns}{2}^2$, so all our summands are accounted for.)
+
+Getting back to our variance computation, this yields
+\begin{align}
+  \Var[Z_1] 
+   &= \frac{1}{\binom{\ns}{2}^2} \Paren{ 6\binom{\ns}{4}\normtwo{\p}^4+6\binom{\ns}{3}\norm{\p}_3^3+\binom{\ns}{2}\normtwo{\p}^2 } - \normtwo{\p}^4 \notag\\
+   &= \frac{1}{\binom{\ns}{2}^2} \Paren{ \Paren{6\binom{\ns}{4} - \binom{\ns}{2}^2}\normtwo{\p}^4+6\binom{\ns}{3}\norm{\p}_3^3+\binom{\ns}{2}\normtwo{\p}^2 } \label{eq:collisionbased:loose}\\
+   &\leq \frac{4}{\ns}\norm{\p}_3^3+\frac{4}{\ns^2}\normtwo{\p}^2 \notag\\
+   &\leq \frac{4}{\ns}\bEE{Z_1}^{3/2}+\frac{4}{\ns^2}\bEE{Z_1}  \notag
+\end{align}
+first using that $6\binom{\ns}{4} < \binom{\ns}{2}^2$ to discard a negative term, then that $\ns \geq 2$ to get a simpler-looking upper bound on binomial coefficients, and finally writing $\norm{\p}_3 \leq \normtwo{\p}$ by monotonicity of $\lp[p]$ norms.
+
+In the uniform case (often called the \emph{completeness}\index{completeness} case for historical reasons), we seek to control the probability that $Z_1$ crosses our threshold $\tau \eqdef \frac{1+2\dst^2}{\ab}$, that is
+\[
+    \bPr{Z_1 \geq \tau} = \bPr{Z_1 \geq (1+2\dst^2)\bEE{Z_1}} \leq \bPr{Z_1 \geq (1+\dst^2)\bEE{Z_1}}
+\]
+while in the ``far'' case (often called the \emph{soundness}\index{soundness} case), we want to control
+\[
+    \bPr{Z_1 < \tau} \leq \bPr{Z_1 < \frac{(1-\dst^2)(1+4\dst^2)}{\ab}} \leq \bPr{Z_1 < (1-\dst^2)\bEE{Z_1}}
+\]
+using first that $(1-\dst^2)(1+4\dst^2) \geq 1+2\dst^2$ (for $\dst\leq 1/2$), and then the fact that in the ``far'' case $\bEE{Z_1} > \frac{1+4\dst^2}{\ab}$.
+
+To control our probability of error in both cases, it is thus sufficient to upper bound $\bPr{\abs{Z_1-\bEE{Z_1}} \geq \dst^2\bEE{Z_1}}$; by Chebyshev's inequality (\cref{theo:chebyshev}), this is at most
+\begin{align*}
+    \bPr{\abs{Z_1-\bEE{Z_1}} \geq \dst^2\bEE{Z_1}}
+    &\leq \frac{\Var[Z_1] }{\dst^4\bEE{Z_1}^2} \\
+    &\leq \frac{4}{\dst^4\ns\bEE{Z_1}^{1/2}}+\frac{4}{\dst^4\ns^2\bEE{Z_1}} \\
+    &\leq \frac{4\sqrt{\ab}}{\dst^4\ns}+\frac{4\ab}{\dst^4\ns^2}
+\end{align*}
+which is at most $1/3$, as desired, for $\ns \geq \frac{13\sqrt{\ab}}{\dst^4}$. (For the third inequality, we relied on the fact that $\bEE{Z_1} = \normtwo{\p}^2 \geq 1/\ab$ (\cf \cref{rk:collision:probability}).) \qed\medskip
+
+The above argument establishes that the collision-based tester has sample complexity $O(\sqrt{\ab}/\dst^4)$. This is not the best one can get; in fact, by being (much) more careful one can show that this tester achieves the optimal sample complexity (as a function of $\ab$ and $\dst$)!
+\begin{theorem}
+The collision-based tester (\cref{algo:collision-based}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$.
+\end{theorem}
+\begin{proof}
+  Clearly, if we are to prove this tighter bound, we have to be less heavy-handed in one of the steps of the previous analysis, specifically in bounding the variance. An obvious candidate is the first step featuring an inequality instead of an equality, just after~\cref{eq:collisionbased:loose}: there, we discarded a term since its coefficient $6\binom{\ns}{4} - \binom{\ns}{2}^2$ was negative.
+  
+  Maybe we should not have. Starting again at~\cref{eq:collisionbased:loose} and recalling the relation
+  $
+    \binom{\ns}{2}^2 = 6\binom{\ns}{4} + 6\binom{\ns}{3} + \binom{\ns}{2}
+  $ we saw earlier, we have 
+  \begin{align}
+  \binom{\ns}{2}^2\Var[Z_1]
+   &= \Paren{6\binom{\ns}{4} - \binom{\ns}{2}^2}\normtwo{\p}^4+6\binom{\ns}{3}\norm{\p}_3^3+\binom{\ns}{2}\normtwo{\p}^2 \notag\\
+   &= \binom{\ns}{2}\normtwo{\p}^2(1-\normtwo{\p}^2) + 6\binom{\ns}{3}(\norm{\p}_3^3-\normtwo{\p}^4)
+  \end{align}
+  A detour: this quite interesting! The first term is exactly the variance we would get had we had independent summands (this is exactly the variance of a Binomial with parameters $\binom{\ns}{2}$ and $\normtwo{\p}^2$), while the second is the ``positive correlation'' term. Indeed, one can see that the second term is always nonegative, as
+  \[
+      \normtwo{\p}^4 %= \Paren{\sum_{i} \p(i)^2 }^2
+      = \Paren{\sum_{i} \p(i)^{3/2} \p(i)^{1/2} }^2
+      \leq \sum_{i} \p(i)^{3} \sum_{i}\p(i) = \norm{\p}_3^3
+  \]
+  by Cauchy--Schwarz (with equality if, and only if, $\p$ is uniform on its support). Going back to our variance analysis, we will simplify a little the RHS above for the sake of conciseness, leading to
+  \begin{align}
+    \label{eq:good:variance}
+  \Var[Z_1]
+   &\leq \frac{4}{\ns^2}\normtwo{\p}^2 + \frac{4}{\ns}(\norm{\p}_3^3-\normtwo{\p}^4)
+  \end{align}
+  at the cost of some small constant factors (and assuming without loss of generality that $\ns \geq 2$).
+  
+  \begin{itemize}
+    \item In the uniform case, we have $\norm{\uniform_\ab}_3^3=\normtwo{\uniform_\ab}^4$ and~\cref{eq:good:variance} gives $\Var[Z_1] \leq \frac{4}{\ns^2\ab}$, and similarly as before
+    \[
+    \bPr{Z_1 \geq \tau} = \bPr{Z_1 \geq (1+2\dst^2)\bEE{Z_1}} \leq \frac{\Var[Z_1]}{4\dst^4\bEE{Z_1}^2}
+    \leq \frac{\ab}{\dst^4\ns^2}
+    \]
+    by Chebyshev's inequality, and using $\bEE{Z_1}=1/\ab$. This in turn is less than $1/3$ as long as $\ns \geq \sqrt{3\ab}/\dst^2$.
+    \item In the ``far'' case, we will be a little more careful. Let $\alpha^2 \eqdef \ab\normtwo{\p-\uniform_\ab}^2 \geq 4\dst^2$, so that $\bEE{Z_1} = \frac{1+\alpha^2}{\ab}$. The probability that our tester errs in this case is
+    \begin{align*}
+      \bPr{Z_1 < \tau} 
+      &= \bPr{Z_1 < \frac{1+2\dst^2}{1+\alpha^2}\bEE{Z_1}} \\
+      &= \bPr{Z_1 < \Paren{1-\frac{\alpha^2-2\dst^2}{1+\alpha^2}}\bEE{Z_1}} \\
+      &\leq \bPr{Z_1 < \Paren{1-\frac{\alpha^2}{2(1+\alpha^2)}}\bEE{Z_1}} \\
+      &\leq \frac{4(1+\alpha^2)^2}{\alpha^4}\cdot \frac{\Var[Z_1]}{\bEE{Z_1}^2} \\
+      &\leq \frac{16(1+\alpha^2)^2}{\alpha^4\ns^2\normtwo{\p}^2} + \frac{16(1+\alpha^2)^2}{\alpha^4\ns}\cdot \frac{\norm{\p}_3^3-\normtwo{\p}^4}{\normtwo{\p}^4}
+    \end{align*}
+    the first inequality using $\alpha^2 \geq 4\dst^2$, the second being Chebyshev's, and the third being~\cref{eq:good:variance}. The first term is relatively familiar: since $\normtwo{\p}^2 = (1+\alpha^2)/\ab$ by definition of $\alpha$, we have
+    \begin{equation}
+      \label{eq:annoying:collision:soundness:firstterm}
+        \frac{16(1+\alpha^2)^2}{\alpha^4\ns^2\normtwo{\p}^2} = \frac{16(1+\alpha^2)\ab}{\alpha^4\ns^2} \leq \frac{5\ab}{\dst^4\ns^2}
+    \end{equation}
+    the inequality since $x>0 \mapsto \frac{1+x}{x^2}$ is decreasing and $\alpha^2\geq 4\dst^2$ (and $\dst \leq 1$ to write $1+4\dst^2 \leq 5$). 
+    
+    To handle the second, we write $\p=(\p-\uniform_\ab)+\uniform_\ab$ and expand:%we use monotonicity of $x>0 \mapsto \frac{(1+x)^2}{x^2}$ to simplify a little the bound, then go on as follows:
+    \begin{align*}
+        \norm{\p}_3^3-\normtwo{\p}^4
+        &\leq \norm{\p-\uniform_\ab+\uniform_\ab}_3^3-\frac{1}{\ab^2} \\
+        &= \norm{\p-\uniform}_3^3 + \frac{3}{\ab}\normtwo{\p-\uniform}^2 \\
+        &\leq \normtwo{\p-\uniform}^3 + \frac{3}{\ab}\normtwo{\p-\uniform}^2\\
+        &= \frac{\alpha^{3}}{\ab^{3/2}} + \frac{3\alpha^2}{\ab^2}
+    \end{align*}
+    where the first inequality uses $\normtwo{\p}^2 \geq 1/\ab$, the equality follows from expanding the cubes in $\sum_i ((\p(i)-\uniform_\ab(i))+\uniform_\ab(i))^3$ and observing the cancellations, the second inequality is monotonicity of $\lp[p]$ norms, and the last equality stems from the definition of $\alpha$. This gives
+    \begin{align}
+        \frac{16(1+\alpha^2)^2}{\alpha^4\ns}\cdot \frac{\norm{\p}_3^3-\normtwo{\p}^4}{\normtwo{\p}^4}
+        &= \frac{16\ab^2}{\alpha^4\ns}\cdot (\norm{\p}_3^3-\normtwo{\p}^4) \notag\\
+        &\leq \frac{16\sqrt{\ab}}{\alpha\ns}+ \frac{48}{\alpha^2\ns} \notag\\
+        &\leq \frac{16\sqrt{\ab}}{\alpha\ns}+ \frac{48}{\alpha^2\ns} \notag\\
+        &\leq \frac{8\sqrt{\ab}}{\dst\ns}+ \frac{12}{\dst^2\ns}\,. \label{eq:annoying:collision:soundness:secondterm}
+    \end{align}
+    Combining~\cref{eq:annoying:collision:soundness:firstterm,eq:annoying:collision:soundness:secondterm}, we get
+    \[
+        \bPr{Z_1 < \tau} \leq \frac{5\ab}{\dst^4\ns^2} + \frac{8\sqrt{\ab}}{\dst\ns}+ \frac{12}{\dst^2\ns}
+        \leq \frac{5\ab}{\dst^4\ns^2} + \frac{20\sqrt{\ab}}{\dst^2\ns}
+    \]
+    which is less than $1/3$ for $\ns \geq 64\sqrt{\ab}/\dst^2$.
+  \end{itemize}
+  Combining the uniform and far cases proves the theorem, showing that $\ns = O(\sqrt{\ab}/\dst^2)$ samples suffice for the collision-based tester to be correct with probability at least $2/3$ in both cases.
+\end{proof}
+
+%%to get the optimal bound $O(\sqrt{\ab}/\dst^2)$ instead of an (easier to obtain) $O(\sqrt{\ab}/\dst^4)$, the analysis of the variance has to be quite intricate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unique elements} Another idea? Count the number of elements that appear exactly \emph{once} among the $\ns$ samples taken. Why is that a good idea? The uniform distribution will have the fewer collisions, so, equivalently, will have the maximum number of unique elements. In this case, the estimator $Z_2$ (the number of unique elements) has expectation
+\begin{equation}
+  \expect{Z_2} = \ns \sum_{i=1}^\ab \p(i)(1-\p(i))^{\ns-1}
+\end{equation}
+which is\dots{} a thing? Note that under the uniform distribution $\uniform_\ab$, this is exactly $\ns (1-1/\ab)^{\ns-1}\approx \ns - \frac{\ns^2}{\ab}$, and under arbitrary $\p$ this is (making a bunch of approximations not always valid) $\approx \ns \sum_{i=1}^\ab \p(i)(1-\ns\p(i)) = \ns - \ns^2\normtwo{\p}^2$. So the gap in expectation between the two cases ``should'' be around $4\dst^2\ns^2/\ab$, and, if the variance goes well and the stars align (and they do), we will be able to use Chebyshev and argue that we can distinguish the two for $\ns=\Theta(\sqrt{\ab}/\dst^2)$.
+
+Now, the annoying issue is that we count the number of \emph{distinct} elements, and it's quite unlikely there can ever be more than $\ab$ of them if the domain size is $\ab$. That explains, intuitively, the condition for the test to work: we need $\ns$ (the number of samples taken) to be smaller than $\ab$ (the maximum number of distinct elements one can ever hope to see), which gives, since we'll get $\ns = \Theta(\sqrt{\ab}/\dst^2)$, the condition $\dst \gg 1/\ab^{1/4}$. (A slight bummer.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modified $\chi^2$} If you are a statistician, or just took Stats 101, or just got lost on Wikipedia at some point and randomly ended up on the wrong page, you may know of Pearson's $\chi^2$ test for goodness-of-fit: for every element $i$ of the domain, count how many times it appeared in the samples, $N_i$. Compute $\sum_{i} \frac{(N_i-\ns/\ab)^2}{\ns/\ab}$. Relax. 
+To analyze that easily, it's helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, as it greatly simplifies the analysis. Then the $N_i$'s become independent, with $N_i\sim\poisson{\ns\p(i)}$ (that not magic, it's Poissonization).
+
+The bad news is that it does not actually lead to the optimal sample complexity: Poissonization introduces a bit more variance, and so the variance of this $\chi^2$ test can be too big due to the elements we only expect to see zero or once (so, most of them). The \emph{good} news is that a simple correction of that test, of the form
+\begin{equation}
+    Z_3 = \sum_{i=1}^\ab \frac{(N_i-\ns/\ab)^2- N_i}{\ns/\ab}
+\end{equation}
+\emph{does} have a much smaller variance, and a threshold test of the form ``$Z_3 > \tau$?'' leads to the right sample complexity. The expectation of $Z_3$ is then just 
+\[
+    \expect{Z_3} = \ns\ab \normtwo{\p-\uniform_k}^2
+\]
+which is perfect. Analyzing this test just boils down, again, to bounding the variance of $Z_3$ and invoking Chebyshev's inequality\dots{} It's a good exercise, and under the Poissonization assumption not that hard. (Try \emph{without} removing $N_i$ in the numerator, though, and see what you get\dots)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Empirical distance to uniform} Let's take a break from $\lp[2]$ and consider another, very natural thing to consider: the \emph{plugin estimator}. Since we have $\ns$ samples from $\p$, we can compute the empirical estimator of the distribution, $\hat{\p}$. Now, we want to test whether $\totalvardist{\p}{\uniform_\ab}=0$ v. $\totalvardist{\p}{\uniform_\ab}>\dst$? Why not consider 
+\begin{equation}
+    Z_4 = \totalvardist{\hat{\p}}{\uniform_\ab}
+\end{equation}
+the empirical distance to uniform? A reason might be: \emph{this sounds like a terrible idea.} Unless $\ns = \Omega(\ab)$ (which is much more than what we want), the empirical distribution $\hat{\p}$ will be at distance $1-o(1)$ from uniform, \emph{even} if $\p$ is actually uniform. 
+
+That's the thing, though: hell is in the $o(1)$ details. Sure, $\expect{Z_4}$ will be \emph{almost} $1$ whether $\p$ is uniform or far from it unless $\ns = \Omega(\ab)$. But this ``almost'' will be different in the two cases! Carefully analyzing this tiny gap in expectation, and showing that $Z_4$ concentrates well enough around its expectation to preserve this tiny gap, amazingly leads to a tester with optimal sample complexity $\ns = \Theta(\sqrt{\ab}/\dst^2)$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Random binary hashing} Now for a tester that is \emph{not} sample-optimal (but has other advantages, and is relatively cute). If there is one thing we know how to do optimally, it's estimating the bias of a coin. We don't have a coin (Bernoulli) here, we have a glorious $(\ab-1)$-dimensional object.
+Hell, let's just randomly make it a coin, shall we? Pick your favourite ($4$-wise independent) hash function $h\colon[\ab]\to\{0,1\}$, thus randomly partitioning the domain $[\ab]$ in two sets $S_0,S_1$. Hash all the $\ns$ samples you got: \emph{now} we have a random coin!
+
+Let's estimate its bias then: we know exactly what this should be under the uniform distribution: $\uniform_\ab(S_0)$. If only we could argue that $\p(S_0)$ noticeably differs from $\uniform_\ab(S_0)$ (with high probability over the random choice of the hash function) whenever $\p$ is $\dst$-far from uniform, we'd be good. Turns out\dots it is the case:
+\begin{equation}
+    \probaDistrOf{S\subseteq [\ab]}{ |\p(S)-\uniform_\ab(S)| = \Omega(\dst/\sqrt{\ab}) } = \Omega(1)
+\end{equation}
+So we can just do exactly this: we need to estimate the bias $\p(S_0)$ up to an additive $\alpha \asymp \dst/\sqrt{\ab}$. This can be done with $\ns = \Theta(1/\alpha^2)= \Theta(\ab/\dst^2)$ samples, as desired.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bipartite collisions} In the collision-based tester above, we took a multiset $S$ of $\ns$ samples from $\p$, and looked at the number of ``collisions'' in $S$ to define our statistic $Z_1$. That is fine, but requires to keep in memory all the samples observed so far. One related idea would be to instead take \emph{two} multisets $S_1,S_2$ of $\ns_1$ and $\ns_2$ samples, and only count ``bipartite collisions,'' i.e., collisions between a sample of $S_1$ and one of $S_2$:
+\begin{equation}
+    Z_5 = \frac{1}{\ns_1 \ns_2}\sum_{(x,y)\in S_1\times S_2} \indic{x=y}
+\end{equation}
+One can check that $\expect{Z_5} = \normtwo{\p}^2$. Back to $\lp[2]$ as proxy! Compared to the ``vanilla'' collision-based test, this is more flexible ($S_1,S_2$ need not be of the same size), and thus lends itself to some settings where a tradeoff between $\ns_1$ and $\ns_2$ is desirable (roughly speaking, one needs $\ns_1\ns_2 \gtrsim \ab/\dst^4$, and the sample complexity is $\ns=\ns_1+\ns_2$). For the case $\ns_1=\ns_2$, this retrieves the optimal $\ns \asymp \sqrt{\ab}/\dst^2$, with some extra technical condition stemming from the analysis, unfortunately: one needs $\dst = \Omega(1/\ab^{1/10})$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Empirical subset weighting} That one, I really like. It's adaptive, it's weird, and (I think) it's new. Fix a parameter $1\leq s \leq \ns$. Take $\ns$ samples from $\p$, and consider the set $S$ (not multiset) induced by the first $s$ samples you get. One can check that
+\begin{equation}
+    \expect{\p(S)} = \sum_{i=1}^\ab \p(i) (1-(1-\p(i))^s)
+\end{equation}
+which should be roughly (making a bunch of approximations) $\expect{\p(S)}\approx s\normtwo{\p}^2$. Under the uniform distribution, this is exactly $(1-(1-1/\ab)^s)\approx s/\ab$, where the approximation is valid for $s\ll \ab$.
+
+Great: we have a new estimator for (roughly) the $\lp[2]$ norm! Now, assuming things went well, as the end of this first stage we have a set $S$ such that $\p(S)$ is approximately either $s/\ab$ or $s\normtwo{\p}^2\geq s(1+\Omega(\dst^2))/\ab$ (we just argued that this is what things happen \emph{in expectation}).\footnote{Some more details are required to argue that $\p(S)$ does concentrate enough around its expectation.} So, let's do a second stage! Take the next $\ns-s$ samples, and just count the number of them which fall in $S$: this is allows you to estimate $\p(S)$  up to an additive $s\dst^2/\ab$, as long as
+\[
+      \ns - s \gtrsim \frac{\ab}{s\dst^4}
+\]
+(exercise: check that). Optimizing, we get that for $s=\ns/2$ this leads to $\ns \asymp \sqrt{\ab}/\dst^2$: optimal sample complexity! Only drawback: we need $s\ll \ab$ for our approximations to be valid (after that, $\expect{\p(S)}$ cannot be approximately $s\normtwo{\p}^2$ anymore; same issue as with the ``unique elements'' algorithm), so we get the condition $\dst \gg 1/\ab^{1/4}$. Slight bummer.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Identity testing}
+\cnote{Discuss the instance-optimal setting as well, and the relation to unifor-
+mity testing.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Historical notes}
+\cite{Ingster??}
+\cite{GoldreichR00}
+\cite{Batu++}
+\cite{Paninski08}
+\cite{ChanDVV14}
+\cite{AcharyaDK15}
+\cite{DiakonikolasGPP18}
+\cite{BlaisCG17}
+\cite{HuangM13}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Exercises}
+Prove the monotonicity of $\lp[p]$ norms
