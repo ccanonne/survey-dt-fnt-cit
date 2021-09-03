@@ -1,4 +1,9 @@
+This survey serves as an introduction and detailed overview of some topics in (probability) distribution testing, an area of theoretical computer science which falls under the general umbrella of \emph{property testing}, and sits at the intersection of computational learning, statistical learning and hypothesis testing, information theory, and (depending whom one asks) the theory of machine learning. Broadly speaking, distribution testing is concerned with the following type of questions: 
+\begin{framed}
+ Given a \textbf{small} number of independent data points from some blackbox random source, can we \textbf{efficiently} decide whether the distribution of the data follows some purported model (``property''), or is statistically far from doing so?
+\end{framed}
 
+\tbc
 
 \paragraph{A note.} For simplicity, throughout this survey we will sweep under the rug many measure-theoretic subtleties, and assume probability distributions, probability density functions (pdf), and probability mass functions (pmf) exist whenever required, and are suitably well-behaved. We will also typically identify a probability distribution with its pdf or pmf, and by a slight abuse of notation use $\p$ indifferently for the distribution itself and its pdf. Most, if not all, of those subtleties can be handled by inserting the words ``Radon--Nikodym,'' ``measurable,'' and ``counting measure'' in suitable places and order.
 
@@ -33,10 +38,10 @@ Assuming that $\p,\q$ are absolutely continuous with respect to some dominating 
 One last piece of terminology: a \emph{property}\index{property} of distributions is a predicate we are interested in (\eg ``is the probability distribution unimodal?''). By identifying the predicate with the set of objects which satisfy it, we can equivalently view a property of distributions as a \emph{subset} of probability distributions (typically, with some interesting structure). Which is what we will do: throughout, a property is just an arbitrary subset of distributions we are interested in. With this in hand, we are ready to provide a formal definition of what a ``testing algorithm'' is.
 \begin{definition}[Testing algorithm]
   \label{def:testing}
-Let $\property= \bigcup_{\ab=1}^\infty \property_\ab$ and $\class= \bigcup_{\ab=1}^\infty \class_\ab$ be two properties of probability distributions, where $\property_\ab, \class_\ab\subseteq \distribs{\ab}$ for all $\ab$; and $\ns\colon\N\times(0,1]\times(0,1]\to\N$, $\tc\colon\N\times(0,1]\times(0,1]\to\N$ be two functions. A \emph{testing algorithm for \property under $\class$ with sample complexity $\ns$ and time complexity $\tc$} is a (possibly randomised) algorithm $\Algo$ which, on input $\ab\in\N,\dst \in(0,1], \errprob\in(0,1]$, and a multiset $S$ of $\ns(\ab,\dst,\errprob)$ elements of $\domain_\ab$, runs in time at most $\tc(\ab,\dst,\errprob)$ and outputs $\mathbf{b} \in\{0,1\}$ such that the following holds.
+Let $\property= \bigcup_{\ab=1}^\infty \property_\ab$ and $\class= \bigcup_{\ab=1}^\infty \class_\ab$ be two properties of probability distributions, where $\property_\ab, \class_\ab\subseteq \distribs{\ab}$ for all $\ab$; and $\ns\colon\N\times(0,1]\times(0,1]\to\N$, $\tc\colon\N\times(0,1]\times(0,1]\to\N$ be two functions. A \emph{testing algorithm for \property under $\class$ with sample complexity $\ns$ and time complexity $\tc$} is a (possibly randomised) algorithm $\Algo$ which, on input $\ab\in\N,\dst \in(0,1], \errprob\in(0,1]$, and a multiset $S$ of $\ns(\ab,\dst,\errprob)$ elements of $\domain_\ab$, runs in time at most $\tc(\ab,\dst,\errprob)$ and outputs $\mathbf{b} \in\{\reject,\accept\}$ such that the following holds.
 \begin{itemize}
-  \item If $S$ is \iid from some $\p\in\property_\ab$, then $\probaDistrOf{S,\Algo}{\mathbf{b}=1} \geq 1-\errprob$;
-  \item If $S$ is \iid from some $\p\in\class_\ab$ such that $\totalvardist{\p}{\property_\ab} \geq \dst$, then $\probaDistrOf{S,\Algo}{\mathbf{b}=0} \geq 1-\errprob$,
+  \item If $S$ is \iid from some $\p\in\property_\ab$, then $\probaDistrOf{S,\Algo}{\mathbf{b}=\accept} \geq 1-\errprob$;
+  \item If $S$ is \iid from some $\p\in\class_\ab$ such that $\totalvardist{\p}{\property_\ab} \geq \dst$, then $\probaDistrOf{S,\Algo}{\mathbf{b}=\reject} \geq 1-\errprob$,
 \end{itemize}
 where in both cases the probability is over the draw of the \iid sample $S$ from the (unknown) $\p$, and the internal randomness of $\Algo$.
 \end{definition}
@@ -63,7 +68,7 @@ Importantly, this logarithmic dependence is not always the right one: as we will
 
 The standard formulation of distribution testing, as stated in~\cref{def:testing}, is tied to a specific metric between probability distribution: the total variation distance (\cref{def:tv}). It is natural to wonder of that choice is arbitrary, and, if not, what motivates it.
 
-\hl{todo}
+\tbc
 \begin{itemize}
   \item Very stringent -- strong guarantee
   \item Well-behaved: actual metric (triangle inequality), bounded

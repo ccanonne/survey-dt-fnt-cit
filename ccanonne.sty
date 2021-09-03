@@ -11,6 +11,38 @@
 \usepackage{thm-restate}
 \usepackage{dsfont} % For the indicator symbol
 
+\makeatletter
+\def\cleartheorem#1{%
+    \expandafter\let\csname#1\endcsname\relax
+    \expandafter\let\csname c@#1\endcsname\relax
+}
+% define this in the preamble in between \makeatletter and \makeatother
+\def\clearthms#1{ \@for\tname:=#1\do{\cleartheorem\tname} }
+\makeatother
+
+\clearthms{theorem,lemma,corollary,proposition,remark,definition,example}
+\theoremstyle{now}
+\ifbool{@nowfntplain}
+{\newtheorem{theorem}{Theorem}[section]
+ \newtheorem{lemma}[theorem]{Lemma}
+ \newtheorem{corollary}[theorem]{Corollary}
+ \newtheorem{proposition}{Proposition}[section]
+ \newtheorem{remark}{Remark}[section]
+ \newtheorem{definition}{Definition}[section]
+ \newtheorem{example}{Example}[section]
+ \newtheorem{claim}{Claim}[section] % New
+ }
+{
+ \newtheorem{theorem}{Theorem}[chapter]
+ \newtheorem{lemma}[theorem]{Lemma}
+ \newtheorem{corollary}[theorem]{Corollary}
+ \newtheorem{proposition}{Proposition}[chapter]
+ \newtheorem{remark}{Remark}[chapter]
+ \newtheorem{definition}{Definition}[chapter]
+ \newtheorem{example}{Example}[chapter]
+ \newtheorem{claim}{Claim}[chapter] % New
+}
+
 % Algorithm environment
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
@@ -50,7 +82,7 @@
   \usepackage[colorinlistoftodos,textsize=scriptsize]{todonotes}
 \fi
 
-% Resizable parentheses that work (without the space between \left(#1\right)
+% Resizable parentheses that work (without the space between \mleft(#1\mright)
 \usepackage{mleftright} % \mleft( #1 \mright)
 
 \RequirePackage{pgfplots, tikz, pgflibraryplotmarks}
@@ -88,7 +120,7 @@
 
 \ifnum\withnotes=1
   \newcommand{\anote}[1]{\par\acolor{\textbf{J: }\sf #1}} % Jayadev
-  \newcommand{\cnote}[1]{\par\ccolor{\textbf{C: }\sf #1}} % Clement
+  \newcommand{\cnote}[1]{\colorbox{gray!20!white}{\parbox{\textwidth}{\ccolor{\sf #1}}}} % Clement
   \newcommand{\hnote}[1]{\par\hcolor{\textbf{H: }\sf #1}} % Himanshu
   \newcommand{\znote}[1]{\par\zcolor{\textbf{Z: }\sf #1}} % Ziteng
   
@@ -129,9 +161,9 @@
 %\newcommand{\eqdef}{\stackrel{\rm def}{=}}
 \newcommand{\eqdef}{:=}
 \newcommand{\eqlaw}{\stackrel{\mathcal{L}}{=}}
-\newcommand{\accept}{\textsf{accept}\xspace}
+\newcommand{\accept}{1\xspace}
 \newcommand{\fail}{\textsf{fail}\xspace}
-\newcommand{\reject}{\textsf{reject}\xspace}
+\newcommand{\reject}{0\xspace}
 \newcommand{\opt}{{\textsc{opt}}\xspace}
 \newcommand{\half}{\frac{1}{2}}
 \newcommand{\domain}{\ensuremath{\mathcal{X}}\xspace} % Domain of a distribution (default notation)
@@ -158,7 +190,7 @@
 \providecommand{\poly}{\operatorname*{poly}}
 
 % Sets and indicators
-\newcommand{\setOfSuchThat}[2]{ \left\{\; #1 \;\colon\; #2\; \right\} } 			% sets such as "{ elems | condition }"
+\newcommand{\setOfSuchThat}[2]{ \mleft\{\; #1 \;\colon\; #2\; \mright\} } 			% sets such as "{ elems | condition }"
 \newcommand{\indicSet}[1]{\mathds{1}\mleft(#1\mright)}                                              % indicator function
 \newcommand{\indic}[1]{\mathds{1}\mleft\{#1\mright\}}                                             % indicator function
 \newcommand{\disjunion}{\amalg}%\coprod, \dotcup...
@@ -184,8 +216,8 @@
 \newcommand{\probaCond}[2]{\proba\mleft[\, #1 \;\middle\vert\; #2\, \mright]}
 \newcommand{\probaDistrOf}[2]{\proba_{#1}\mleft[\, #2\, \mright]}
 \newcommand{\probaDistrOfCond}[3]{\proba_{#1}\mleft[\, #2 \;\middle\vert\; #3\, \mright]}
-\newcommand{\bPr}[1]{\Pr\left(#1\right)}
-\newcommand{\bP}[2]{\Pr_{#1}\left(#2\right)}
+\newcommand{\bPr}[1]{\Pr\mleft[#1\mright]}
+\newcommand{\bP}[2]{\Pr_{#1}\mleft[#2\mright]}
 \newcommand{\bPP}[1]{P_{#1}}
 \newcommand{\bQQ}[1]{Q_{#1}}
 
@@ -196,7 +228,7 @@
 \newcommand{\expect}[1]{\mathbb{E}\mleft[#1\mright]}
 \newcommand{\expectCond}[2]{\mathbb{E}\mleft[\, #1 \;\middle\vert\; #2\, \mright]}
 \newcommand{\shortexpect}{\mathbb{E}}
-\newcommand{\var}{\operatorname{Var}}
+\newcommand{\Var}{\operatorname{Var}}
 \newcommand{\cov}{\operatorname{Cov}}
 \newcommand{\bE}[2]{\shortexpect_{#1}{\mleft[#2\mright]}}
 \newcommand{\bEE}[1]{\bE{}{#1}}
@@ -223,16 +255,16 @@
 \newcommand{\normone}[1]{{\norm{#1}}_1}
 \newcommand{\normtwo}[1]{{\norm{#1}}_2}
 \newcommand{\norminf}[1]{{\norm{#1}}_\infty}
-\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\abs}[1]{\mleft\lvert #1 \mright\rvert}
 \newcommand{\dabs}[1]{\lvert #1 \rvert}
-\newcommand{\dotprod}[2]{ \left\langle #1,\xspace #2 \right\rangle } 			% <a,b>
+\newcommand{\dotprod}[2]{ \mleft\langle #1,\xspace #2 \mright\rangle } 			% <a,b>
 \newcommand{\ip}[2]{\dotprod{#1}{#2}} 			% shortcut
 
 \newcommand{\vect}[1]{\mathbf{#1}} 			% shortcut
 
 % Ceiling and floor
-\newcommand{\clg}[1]{\left\lceil #1 \right\rceil}
-\newcommand{\flr}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\clg}[1]{\mleft\lceil #1 \mright\rceil}
+\newcommand{\flr}[1]{\mleft\lfloor #1 \mright\rfloor}
 
 % Common sets
 \newcommand{\R}{\ensuremath{\mathbb{R}}\xspace}
@@ -305,10 +337,11 @@
 
 \newcommand{\eg}{\textit{e.g.},\xspace}
 \newcommand{\ie}{\textit{i.e.},\xspace}
+\newcommand{\cf}{\textit{cf.}\xspace}
 
 
 \newcommand{\Paren}[1]{\mleft(#1\mright)}
-%\newcommand{\Brace}[1]{\left[#1\right]}
+%\newcommand{\Brace}[1]{\mleft[#1\mright]}
 
 \newcommand{\ns}{{\textcolor{purple}{n}}} % Number of samples
 \newcommand{\tc}{{\textcolor{ForestGreen}{t}}} % Time complexity

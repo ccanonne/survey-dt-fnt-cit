@@ -80,10 +80,27 @@ an obvious approach is to take $\ns$ samples $X_1,\dots,X_\ns$, count the number
 \end{equation}
 By the above, $\expect{Z_1} = \normtwo{\p}^2$. If we threshold $Z_1$ somewhere between (i) and (ii), at say $\tau\eqdef (1+2\dst^2)/\ab$, we should be able to distinguish between our two cases and get a valid tester. But how large must $\ns$ be for this to work? 
 
+\begin{algorithm}[ht!]
+  \begin{algorithmic}[1]
+    \Require Multiset of $\ns$ samples $x_1,\dots,x_\ns \in \domain$, parameters $\dst\in(0,1]$ and $\ab = \abs{\domain}$
+    \State Set $\tau \gets \frac{1+2\dst^2}{\ab}$
+    \State Compute \Comment{Can be done in $O(\ns)$ time if $\domain$ is known, $O(\ns\log\ns)$ if only $\ab$ is.}
+    \[
+        Z_1 = \frac{1}{\binom{\ns}{2}} \sum_{1\leq s < t \leq \ns} \indic{x_s=x_t} = \frac{1}{\binom{\ns}{2}} \sum_{j\in\domain} \binom{\ns_j}{2}
+    \] where $\ns_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
+    \If{ $Z_1 \geq \tau$ } \Return \reject \Comment{Not uniform}
+    \Else\ 
+      \Return \accept \Comment{Uniform}
+    \EndIf
+  \end{algorithmic}
+  \caption{\label{algo:collision-based}\sc Collision-Based Tester}
+\end{algorithm}
+
 Intuitively, we expect the test to work as long as the standard deviation of $Z_1$ (the ``noise'') is smaller than the gap between the expectations in our two cases (the ``signal''); that is,
-\[
+\begin{equation}
+  \label{eq:signal:to:noise}
       \sqrt{\Var[Z_1]} \ll \Delta \expect{Z_1} = \frac{4\dst^2}{\ab}
-\]
+\end{equation}
 as this is the condition for the random fluctuations of our statistic $Z_1$ not to ``cross'' our threshold too often and lead to a wrong answer.
 
 To make this quantitative, we can use Chebyshev's inequality, which requires us to bound $\Var[Z_1]$. This is where things get tricky, since $Z_1$ is the sum of $\binom{\ns}{2}$ random variables which are \emph{not} pairwise independent.\footnote{Namely, the summands $\indic{X_s=X_t}$ in the definition of $Z_1$ are \emph{positively correlated}: $\cov(\indic{X_s=X_t},\indic{X_{s'}=X_{t'}}) \geq 0$, and are only independent if $s,s',t,t'$ are all distinct.} 
@@ -142,7 +159,7 @@ which is at most $1/3$, as desired, for $\ns \geq \frac{13\sqrt{\ab}}{\dst^4}$. 
 
 The above argument establishes that the collision-based tester has sample complexity $O(\sqrt{\ab}/\dst^4)$. This is not the best one can get; in fact, by being (much) more careful one can show that this tester achieves the optimal sample complexity (as a function of $\ab$ and $\dst$)!
 \begin{theorem}
-The collision-based tester (\cref{algo:collision-based}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$.
+The collision-based tester (\cref{algo:collision-based}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$ and time complexity $O(\ns)$.
 \end{theorem}
 \begin{proof}
   Clearly, if we are to prove this tighter bound, we have to be less heavy-handed in one of the steps of the previous analysis, specifically in bounding the variance. An obvious candidate is the first step featuring an inequality instead of an equality, just after~\cref{eq:collisionbased:loose}: there, we discarded a term since its coefficient $6\binom{\ns}{4} - \binom{\ns}{2}^2$ was negative.
@@ -222,23 +239,200 @@ The collision-based tester (\cref{algo:collision-based}) is a testing algorithm 
 %%to get the optimal bound $O(\sqrt{\ab}/\dst^2)$ instead of an (easier to obtain) $O(\sqrt{\ab}/\dst^4)$, the analysis of the variance has to be quite intricate.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Unique elements} Another idea? Count the number of elements that appear exactly \emph{once} among the $\ns$ samples taken. Why is that a good idea? The uniform distribution will have the fewer collisions, so, equivalently, will have the maximum number of unique elements. In this case, the estimator $Z_2$ (the number of unique elements) has expectation
+\subsection{Unique elements} Another idea: count the number of elements that appear exactly \emph{once} among the $\ns$ samples taken. Why is that a sensible thing to do? We have seen that the uniform distribution will have the fewer collisions, so, equivalently, will have the maximum number of unique elements. In this case, the estimator $Z_2$ (the number of unique elements) is defined as
 \begin{equation}
-  \expect{Z_2} = \ns \sum_{i=1}^\ab \p(i)(1-\p(i))^{\ns-1}
+  \label{eq:def:z2}
+    Z_2 = \frac{1}{\ns} \sum_{j\in\domain} \indic{\ns_j=1}\,,
 \end{equation}
-which is\dots{} a thing? Note that under the uniform distribution $\uniform_\ab$, this is exactly $\ns (1-1/\ab)^{\ns-1}\approx \ns - \frac{\ns^2}{\ab}$, and under arbitrary $\p$ this is (making a bunch of approximations not always valid) $\approx \ns \sum_{i=1}^\ab \p(i)(1-\ns\p(i)) = \ns - \ns^2\normtwo{\p}^2$. So the gap in expectation between the two cases ``should'' be around $4\dst^2\ns^2/\ab$, and, if the variance goes well and the stars align (and they do), we will be able to use Chebyshev and argue that we can distinguish the two for $\ns=\Theta(\sqrt{\ab}/\dst^2)$.
+again with $\ns_j \eqdef \sum_{t=1}^\ns \indic{X_t=j}$. It is a simple matter to verify that this statistic has expectation\exercise{Do it!}
+\begin{equation}
+  \label{eq:z2:expectation}
+  \expect{Z_2} = \sum_{i\in\domain} \p(i)(1-\p(i))^{\ns-1}
+\end{equation}
+which is\dots{} a thing? Note that under the uniform distribution $\uniform_\ab$, this is exactly $(1-1/\ab)^{\ns-1}\approx 1 - \frac{\ns}{\ab}$, and under arbitrary $\p$ this is (making a few approximations not always valid) $\approx \sum_{i=1}^\ab \p(i)(1-\ns\p(i)) = 1 - \ns\normtwo{\p}^2$. So the gap in expectation between the two cases ``should'' be around $4\dst^2\ns/\ab$, and, if the variance analysis goes well and the stars align, we will be able to use Chebyshev's inequality and argue that we can distinguish the two for $\ns$ large enough.
 
-Now, the annoying issue is that we count the number of \emph{distinct} elements, and it's quite unlikely there can ever be more than $\ab$ of them if the domain size is $\ab$. That explains, intuitively, the condition for the test to work: we need $\ns$ (the number of samples taken) to be smaller than $\ab$ (the maximum number of distinct elements one can ever hope to see), which gives, since we'll get $\ns = \Theta(\sqrt{\ab}/\dst^2)$, the condition $\dst \gg 1/\ab^{1/4}$. (A slight bummer.)
+\begin{algorithm}[ht!]
+  \begin{algorithmic}[1]
+    \Require Multiset of $\ns$ samples $x_1,\dots,x_\ns \in \domain$, parameters $\dst\in(0,1]$ and $\ab = \abs{\domain}$ such that $\dst \geq \frac{??}{\ab^{1/4}}$
+    \State Set $\tau \gets (1-\frac{1}{\ab})^{\ns-1}-\frac{\ns\dst^2}{8\ab}$ \Comment{This is $\bE{\uniform_\ab}{Z_2} - \frac{\ns\dst^2}{8\ab}$}
+    \State Compute \Comment{Can be done in $O(\ns)$ time if $\domain$ is known, $O(\ns\log\ns)$ if only $\ab$ is.}
+    \[
+        Z_2 = \frac{1}{\ns} \sum_{j\in\domain} \indic{\ns_j=1}
+    \] where $\ns_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
+    \If{ $Z_1 \leq \tau$ } \Return \reject \Comment{Not uniform}
+    \Else\ 
+      \Return \accept \Comment{Uniform}
+    \EndIf
+  \end{algorithmic}
+  \caption{\label{algo:unique-elements}\sc Unique-Elements Tester}
+\end{algorithm}
+
+Now, before we actually delve into this analysis, it is worth mentioning a limitation of this tester, which is that we only expect it to work for $\ns \ll \ab$. Indeed, we count the number of \emph{distinct} elements, and there will never ever be more than $\ab$ of them if the domain size is $\ab$.\footnote{More quantitatively, for $\ns \to \infty$ the approximations made in the above discussion completely break down; and we will instead get $\expect{Z_2} \to 0$ in both the uniform and the far cases.} That explains, intuitively, the condition for the test to work: we need $\ns$ (the number of samples taken) to be smaller than $\ab$ (the maximum number of distinct elements one can ever hope to see), which gives, since we will eventually get $\ns = \Theta(\sqrt{\ab}/\dst^2)$, the condition $\dst \gg 1/\ab^{1/4}$.
+
+Our first step is to make our back-of-the-envelope computation above rigorous, and lower bound the gap $\Delta(\p) \eqdef \bE{\uniform_\ab}{Z_2} - \bE{\p}{Z_2}$ between the far and uniform cases.
+\begin{lemma}
+  \label{lemma:gap:z2}
+If $\ns \leq \ab$, we have
+\[
+    \bE{\uniform_\ab}{Z_2} - \bE{\p}{Z_2} \geq \frac{\ns}{16\ab}\totalvardist{\p}{\uniform_\ab}^2\,.
+\]
+\end{lemma}
+\begin{proof}
+Denote this gap by $\Delta(\p)$. 
+From~\eqref{eq:z2:expectation}, we can explicitly write
+\begin{align*}
+  \Delta(\p) 
+  &= \Paren{1-1/\ab}^{\ns-1} - \sum_{i\in\domain} \p(i)(1-\p(i))^{\ns-1} \\
+  &= \sum_{i\in\domain} \p(i)\Paren{ \Paren{1-1/\ab}^{\ns-1} - (1-\p(i))^{\ns-1} } \\
+  &= \Paren{1-1/\ab}^{\ns-1}\sum_{i\in\domain} \p(i)\Paren{ 1 - \Paren{\frac{1-\p(i)}{1-1/\ab}}^{\ns-1} }
+\end{align*}
+where in the second line we used $\sum_i \p(i)=1$ to ``hide $1$.'' Defining $f\colon[0,1]\to\R$ by 
+\[
+  f(x) = x\Paren{ 1 - \Paren{\frac{1-x}{1-1/\ab}}^{\ns-1} }
+\] and using the fact that $\ns \leq \ab$  to write $(1-1/\ab)^{\ns-1} \geq (1-1/\ab)^{\ab} \geq 1/4$ (as $\ab \geq 2$), we are left with
+$
+  \Delta(\p) \geq \frac{1}{4}\sum_{i\in\domain} f(\p(i))
+$. At this point, we would like to rely on tools from our arsenal (convexity or concavity for Jensen's inequality, monotonicity, etc.); unfortunately, the function $f$ is not very well-behaved, and is neither concave, convex, or monotone. It does satisfy $f(0)=f(1/\ab)=0$, $f(1)=1$, but that is not quite enough. Instead, we will find a ``good'' lower bound $g$ on $f$, which will allow us to reason more easily: specifically, we will set, for $x\in[0,1]$,
+\[
+    g(x) = \frac{\ns-1}{\ab-1}\cdot (x-1/\ab) + \frac{\ns-1}{2(1-1/\ab)}(x-1/\ab)^2\indic{x\leq 1/\ab}\,.
+\]
+Let us demystify this choice a little. The first coefficient is simply $f'\Paren{1/\ab}$, while the second has been chosen as the largest possible value such that $g'(0)\geq 0$.\footnote{While we will not require it, this ensures $g$ is nondecreasing, which is nice.} Moreover, when summing $\sum_i g(\p(i))$, the linear term will just cancel out and we will be left with a quadratic term of the form $\sum_i g(\p(i)) \asymp \sum_i (\p(i)-1/\ab)^2\indic{\p(i)\leq 1/\ab}$, which we can hope to relate to $\normtwo{\p-\uniform_\ab}^2$ (the same thing, without the indicator). An illustration of $f$ and $g$ is given in~\cref{fig:z2:fg}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Modified $\chi^2$} If you are a statistician, or just took Stats 101, or just got lost on Wikipedia at some point and randomly ended up on the wrong page, you may know of Pearson's $\chi^2$ test for goodness-of-fit: for every element $i$ of the domain, count how many times it appeared in the samples, $N_i$. Compute $\sum_{i} \frac{(N_i-\ns/\ab)^2}{\ns/\ab}$. Relax. 
-To analyze that easily, it's helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, as it greatly simplifies the analysis. Then the $N_i$'s become independent, with $N_i\sim\poisson{\ns\p(i)}$ (that not magic, it's Poissonization).
+\begin{figure}[ht]\centering
+  \includegraphics[width=1.0\textwidth]{figures/fig-uniformity-z2-fg}
+  \caption{\label{fig:z2:fg}Our choice of $g$, here depicted for $\ab=8$, $\ns=7$.}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The bad news is that it does not actually lead to the optimal sample complexity: Poissonization introduces a bit more variance, and so the variance of this $\chi^2$ test can be too big due to the elements we only expect to see zero or once (so, most of them). The \emph{good} news is that a simple correction of that test, of the form
+To continue our analysis, we will rely on the following technical claim, whose proof is calculus and left to the reader.\exercise{You are the reader.}
+\begin{claim}
+Fix $\alpha\in(0,1)$ and $\beta \geq 1$ such that $\frac{\alpha\beta}{1-\alpha} \leq 1$; and define $f_{\alpha,\beta},g_{\alpha,\beta}\colon [0,1]\to\R$ by
+$
+f_{\alpha,\beta}(x) = x\Paren{1-\Paren{\frac{1-x}{1-\alpha}}^\beta}$ and 
+\[
+g_{\alpha,\beta}(x) = \frac{\alpha\beta}{1-\alpha}(x-\alpha) + \frac{\beta}{2(1-\alpha)} (x-\alpha)^2 \indic{x\leq \alpha}\,.
+\]
+Then $g_{\alpha,\beta}$ is nondecreasing, and $f_{\alpha,\beta}\geq g_{\alpha,\beta}$.
+\end{claim}
+Applying this to $\alpha\eqdef 1/\ab$ and $\beta \eqdef \ns-1$ (which, since $\ns\leq \ab$, satisfy the assumptions) leads to
+\begin{align*}
+  \Delta(\p) 
+  &%\geq \frac{1}{4}\sum_{i\in\domain} f(\p(i)) 
+  \geq \frac{1}{4}\sum_{i\in\domain} g(\p(i)) \\
+  &= \frac{\ns-1}{8(1-1/\ab)} \sum_{i\in\domain} (\p(i)-1/\ab)^2\indic{\p(i)\leq 1/\ab} \\
+  &\geq \frac{\ns-1}{8(\ab-1)} \Paren{\sum_{i\in\domain} \abs{\p(i)-1/\ab}\indic{\p(i)\leq 1/\ab}}^2 \\
+  &= \frac{\ns-1}{8(\ab-1)} \totalvardist{\p}{\uniform_\ab}^2\,,
+\end{align*}
+where the first line uses $f\geq g$, the second from cancellation of the linear term of $g$, the third is Cauchy--Schwarz, and the last follows from the definition of total variation distance. Using $\ns \geq 2$ to write $\frac{\ns-1}{\ab-1}\geq \frac{\ns}{2\ab}$ concludes the proof.
+\end{proof}
+At this point, we have half of the puzzle: it remains to get a handle on the variance of $Z_2$ in both the far and uniform cases. We start by providing an exact (albeit unwieldy) expression for it.%, which we will then massage to obtain a usable bound in the uniform case.
+\begin{align*}
+\Var[Z_2] 
+&= \frac{1}{\ns^2}\sum_{i,j\in\domain} \bEE{\indic{\ns_i=1}\indic{\ns_j=1}} - \bEE{Z_2}^2  \\
+&= \frac{1}{\ns^2}\sum_{i\in\domain} \bEE{\indic{\ns_i=1}} + \frac{1}{\ns^2}\sum_{i\neq j} \bEE{\indic{\ns_i=1}\indic{\ns_j=1}} - \bEE{Z_2}^2 \\
+&= \frac{1}{\ns}\bEE{Z_2}- \bEE{Z_2}^2 + \frac{\ns-1}{\ns}\sum_{i\neq j} \p(i)\p(j)(1-(\p(i)+\p(j)))^{\ns-2}\,, %\label{eq:var:z2}
+\end{align*}
+where the last line relied on~\cref{eq:def:z2} to recognize $\bEE{Z_2}$ in the first term, and on the fact that $\bEE{\indic{\ns_i=1}\indic{\ns_j=1}} = \ns(\ns-1)\p(i)\p(j)(1-(\p(i)+\p(j)))^{\ns-2}$ for $i\neq j$. (Indeed, $\indic{\ns_i=1}\indic{\ns_j=1}$ is equal to one if, and only if, out of the $\ns$ samples two fall on $i$ and $j$, respectively, and the $\ns-2$ others hit $\domain\setminus\{i,j\}$.)
+
+This looks quite unwieldy; however, we can rearrange the term $\bEE{Z_2}^2$ to obtain the nicer expression
+\begin{align}
+\Var[Z_2] 
+&= \frac{\bEE{Z_2}(1-\bEE{Z_2})}{\ns} + \frac{\ns-1}{\ns}\Paren{\sum_{i\neq j} \p(i)\p(j)(1-\p(i)-\p(j))^{\ns-2} - \bEE{Z_2}^2 } \notag\\
+&\leq \frac{1-\bEE{Z_2}}{\ns} + \sum_{i\neq j} \p(i)\p(j)(1-\p(i)-\p(j))^{\ns-2} - \bEE{Z_2}^2 \label{eq:var:z2}
+\end{align}
+For the uniform case,~\cref{eq:var:z2} simplifies quite a bit, and we get
+\begin{align}
+\Var_{\uniform_{\ab}}[Z_2] 
+%&\leq \frac{1}{\ns} \Paren{ 1-\Paren{1-\frac{1}{\ab}}^{\ns-1} } + \frac{\ab-1}{\ab}\Paren{1-\frac{2}{\ab}}^{\ns-2} - \Paren{1-\frac{1}{\ab}}^{2(\ns-1)} \notag\\
+&\leq \frac{1}{\ns} \Paren{ 1-\Paren{1-\frac{1}{\ab}}^{\ns-1} } + \Paren{1-\frac{2}{\ab}}^{\ns-2} - \Paren{1-\frac{1}{\ab}}^{2(\ns-1)} \notag\\
+&\leq \frac{\ns-1}{\ns\ab} + \Paren{1-\frac{1}{\ab}}^{2(\ns-2)} - \Paren{1-\frac{1}{\ab}}^{2(\ns-1)} \notag\\
+&\leq \frac{1}{\ab} + \Paren{1-\frac{1}{\ab}}^{2(\ns-2)} \Paren{ 1 - \Paren{1-\frac{1}{\ab}}^{2} } \notag\\
+&= \frac{1}{\ab} + \frac{2}{\ab}\Paren{1-\frac{1}{\ab}}^{2(\ns-2)} \Paren{ 1-\frac{1}{2\ab} } \leq \frac{3}{\ab}
+\label{eq:var:z2:unif}
+\end{align}
+where the second inequality follows from $1-2x \leq (1-x)^2$, and $\Paren{1-x}^{m} \geq 1-mx$ for $m\geq 1$ and $x \leq 1$. (As a side note, we proved along the way that $\frac{1}{\ns}\Paren{1-\bE{\uniform_{\ab}}{Z_2}} \leq \frac{1}{\ab}$, which will come in handy.)
+
+This looks great! We just proved that, at least in the uniform case, $\Var_{\uniform_{\ab}}[Z_2] \leq 3/\ab$. By the same rule of thumb as in the previous argument (\cref{eq:signal:to:noise}), we expect our test to work as long as the standard deviation (the ``noise'') of our statistic is smaller than the gap in expectations (the ``signal''), which by~\cref{lemma:gap:z2} gives the condition
+\[
+   \Var_{\uniform_{\ab}}[Z_2] \leq \frac{3}{\ab} \ll \frac{\dst^4\ns^2}{16\ab^2} \leq \Delta(\p)^2\,.
+\]
+Reorganizing, this yields the condition $\ns \gg \sqrt{\ab}/\dst^2$, which is exactly what we want to prove. The problem, of course, is that we so far only have bounded the variance in one of the two cases; to conclude, we need the last quarter of the puzzle.
+
+To do so, we will invoke the following:
+\begin{lemma}
+  \label{lemma:technical:distinct:elements}
+Fix $m \geq 1$ and $\ab \in \N$. For any $x_1,\dots,x_\ab \geq 0$ such that $\sum_{i=1}^\ab x_i = 1$, we have
+\[
+    \frac{m\sum_{1\leq i < j \leq \ab} x_i x_j \Paren{ (1-x_i - x_j)^{m-1} - (1-x_i)^m(1-x_j)^m} }{\sum_{i=1}^\ab x_i (1-(1-x_i)^m)} \leq 1
+\]
+\end{lemma}
+Unfortunately, there is not much intuition we can provide about \emph{why} this inequality holds; and we defer its proof to the end of the chapter (\cref{sec:deferred:chap:identity}), focusing for now on how it will provide us with the last piece of said puzzle. In view of resuming from~\cref{eq:var:z2}, we expand $\bEE{Z_2}^2$ to write
+\begin{align*}
+\sum_{i\neq j} &\p(i)\p(j)(1-\p(i)-\p(j))^{\ns-2} - \bEE{Z_2}^2  \\
+&= \sum_{i\neq j} \p(i)\p(j)(1-\p(i)-\p(j))^{\ns-2} - \sum_{i,j} \p(i)\p(j)(1-\p(i))^{\ns-1}(1-\p(j))^{\ns-1} \\
+&\leq \sum_{i\neq j} \p(i)\p(j)\Paren{ (1-\p(i)-\p(j))^{\ns-2} - (1-\p(i))^{\ns-1}(1-\p(j))^{\ns-1} } \\
+&\leq \frac{1}{\ns-1} \sum_{i=1}^\ab \p(i) (1-(1-\p(i))^{\ns-1}) = \frac{1-\bEE{Z_2}}{\ns-1}
+\end{align*}
+where the last inequality is~\cref{lemma:technical:distinct:elements} applied with $m=\ns-1$ and $x_i = \p(i)$. Then, using this in~~\cref{eq:var:z2} (and bounding $1/(\ns-1) \leq 2/\ns$) leads to 
+\begin{align}
+\Var[Z_2]
+&\leq 3\cdot \frac{1-\bE{\p}{Z_2}}{\ns} 
+= 3\Paren{ \frac{1-\bE{\uniform_{\ab}}{Z_2}}{\ns} + \frac{\bE{\uniform_{\ab}}{Z_2}-\bE{\p}{Z_2}}{\ns} }  \notag\\
+&\leq 3\Paren{ \frac{1}{\ab} + \frac{\Delta(\p)}{\ns} }\,. \label{eq:var:z2:final}
+\end{align}
+Before invoking Chebyshev's inequality, let us see why this is wonderful news. The first term of the bound, $3/\ab$, is the same as in the uniform case, and we have discussed before how it would by itself lead to the desired sufficient condition $\ns \gg \sqrt{\ab}/\dst^2$. The second is new; by the same rule of thumb, it will lead to the condition
+\[
+    \frac{3\Delta(\p)}{\ns} \ll \Delta(\p)^2
+\]
+where one $\Delta(\p)$ crucially cancels out, leaving us with $\Delta(\p) \gg 1/\ns$. Since $\Delta(\p)\geq \frac{\dst^2\ns}{16\ab}$, a sufficient condition then becomes $\frac{\dst^2\ns}{\ab} \gg \frac{1}{\ns}$, which then will be satisfied as soon as $\ns \gg \sqrt{\ab}/\dst$.
+
+Now that we have all the pieces of the puzzle, let us establish the main result of this subsection:
+\begin{theorem}
+  \label{theo:uniformity:unique:elements}
+The unique-elements tester (\cref{algo:unique-elements}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$ and time complexity $O(\ns)$, provided that $\dst \geq 15/\ab^{1/4}$.
+\end{theorem}
+\begin{proof}
+For any $\p\in\distribs{\ab}$, let as before $\Delta(\p) = \bE{\uniform_\ab}{Z_2} - \bE{\p}{Z_2}$. Of course, if $\p=\uniform_\ab$ then $\Delta(\p)=0$, and we know from~\cref{lemma:gap:z2} that $\Delta(\p) \geq \Delta \eqdef \frac{\ns\dst^2}{16\ab}$ whenever $\totalvardist{\p}{\uniform_\ab} \geq \dst$.\footnote{We assume throughout $\ns \leq \ab$, and will enforce this at the end.} We also obtained earlier (in~\cref{eq:var:z2:unif,eq:var:z2:final}) a bound in the variance of $Z_2$ in both the uniform and ``far'' cases, so we have all the ingredients we need. Define our threshold
+\[
+    \tau \eqdef \bE{\uniform_\ab}{Z_2} - \frac{\Delta}{2}
+\]
+as in~\cref{algo:unique-elements}.
+\begin{itemize}
+    \item In the uniform case, the probability to output \reject (and thus make a mistake) is bounded as
+    \[
+    \bPr{Z_2 \leq \tau} = \bPr{Z_2 \leq \bE{\uniform_\ab}{Z_2} - \frac{\Delta}{2} } \leq \frac{4\Var_{\uniform_\ab}[Z_2]}{\Delta^2}
+    \leq \frac{3072\ab}{\dst^4\ns^2}
+    \]
+    by Chebyshev's inequality, using $\Var_{\uniform_\ab}[Z_2] \leq 3/\ab$ and the definition of $\Delta$. This in turn is less than $1/3$ as long as $\ns \geq 96\sqrt{\ab}/\dst^2$.
+    \item In the ``far'' case, since $\bE{\p}{Z_2} = \bE{\uniform_\ab}{Z_2} - \Delta(\p)$ and $\Delta(\p) \geq \Delta$ the probability to err by outputting \accept is
+    \begin{align*}
+        \bPr{Z_2 > \tau} &= \bPr{Z_2 > \bE{\p}{Z_2} + \frac{\Delta(\p)}{2} + \frac{\Delta(\p)-\Delta}{2} } \\       
+        &\leq \bPr{Z_2 > \bE{\p}{Z_2} + \frac{\Delta(\p)}{2} } \\
+        &\leq \frac{4\Var_{\p}[Z_2]}{\Delta(\p)^2} 
+        \leq \frac{12}{\ab \Delta(\p)^2} + \frac{12}{\ns \Delta(\p)} \\
+        &\leq \frac{3072\ab}{\dst^4\ns^2} + \frac{192\ab}{\dst^2\ns^2} \leq \frac{3264\ab}{\dst^4\ns^2}
+    \end{align*}
+    using $\Var_{\p}[Z_2] \leq 3/\ab+3\Delta(\p)/\ns$. The resulting bound is then less than $1/3$ for $\ns \geq 99\sqrt{\ab}/\dst^2$.
+  \end{itemize}
+  The above analysis shows that both errors are less than $1/3$ for, say, $\ns = \lceil{99\sqrt{\ab}/\dst^2}\rceil$. However, we did rely on~\cref{lemma:gap:z2}, which requires $\ns \leq \ab$; given our choice of $\ns$, this in turns imposes a condition on $\dst$ (for instance, one can check that $\dst \geq 15/\ab^{1/4}$ suffices).
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modified $\chi^2$} If you are a statistician, or just took a Statistics class, or even got lost on Wikipedia at some point and ended up on the wrong page at the wrong time, you may know of Pearson's $\chi^2$ test for goodness-of-fit: for every element $i$ of the domain, count how many times it appeared in the samples, $N_i$. Compute $\sum_{i} \frac{(N_i-\ns/\ab)^2}{\ns/\ab}$. Compare the result to a predetermined threshold. This very natural idea, maybe not surprisingly, works well! In particular, since $N_i \sim \binomial{\ns}{\p(i)}$, it is not hard to see that
+\[
+\bEE{ \sum_{i=1}^\ab \frac{(N_i-\ns/\ab)^2}{\ns/\ab} } = \frac{\ab}{\ns}\sum_{i=1}^\ab \bEE{ \Paren{N_i-\frac{\ns}{\ab}}^2 } = \ab(\ns-1)\normtwo{\p-\uniform_\ab}^2 + \ab-1
+\]
+using moments of a Binomial random variable and~\cref{eq:relation:collisionprob:distance:uniform}.\exercise{Check it!} This does look like a reasonable way to estimate the distance to uniformity \emph{via} the $\lp[2]$ distance again\dots{} unfortunately, the variance will be slightly annoying, due to the correlated between terms of the sums.
+
+
+To make the task easier, it is helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, which will greatly simplifies the analysis. Then, under this (slightly different) sampling model the $N_i$'s become independent, with $N_i\sim\poisson{\ns\p(i)}$: this is called \emph{Poissonization}\index{Poissonization}, and can be done more or less without loss of generality since a $\poisson{\ns}$ random variable will be between $0.99\ns$ and $1.01\ns$ with overwhelming probability. (See~\cref{sec:poissonization} for more on Poissonization).
+
+The bad news is that it does not actually lead to the optimal sample complexity: Poissonization introduces a bit more variance (as we introduce extra randomness ourselves by taking a random number of samples), and so the variance of this $\chi^2$ test can be too big due to the elements we only expect to see zero or once (so, most of them). The \emph{good} news is that a simple correction of that test, of the form
 \begin{equation}
     Z_3 = \sum_{i=1}^\ab \frac{(N_i-\ns/\ab)^2- N_i}{\ns/\ab}
 \end{equation}
-\emph{does} have a much smaller variance, and a threshold test of the form ``$Z_3 > \tau$?'' leads to the right sample complexity. The expectation of $Z_3$ is then just 
+\emph{does} have a much smaller variance, and a threshold test of the form ``$Z_3 > \tau$?'' will yield the right sample complexity.\footnote{In the multinomial (``non-Poissonized'') case, substracting $N_i$ was not necessary, since that would correspond to removing overall $\frac{\ab}{\ns}\sum_{i=1}^\ab N_i = \ab$, a constant term. In the Poissonized case, however, $\sum_{i=1}^\ab N_i\sim\poisson{\ns}$, and $\frac{\ab}{\ns}\sum_{i=1}^\ab N_i$ is not a constant -- it is a random variable with expectation $\ab$ and (large) variance $\ab^2/\ns$.} Recalling that $N_i\sim\poisson{\ns\p(i)}$ for all $i$, the expectation of $Z_3$ is then just 
 \[
     \expect{Z_3} = \ns\ab \normtwo{\p-\uniform_k}^2
 \]
@@ -306,3 +500,85 @@ mity testing.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exercises}
 Prove the monotonicity of $\lp[p]$ norms
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Deferred proof}
+  \label{sec:deferred:chap:identity}
+\begin{lemma}[\cref{lemma:technical:distinct:elements}, restated]
+Fix $m \geq 1$ and $\ab \in \N$. For any $x_1,\dots,x_\ab \geq 0$ such that $\sum_{i=1}^\ab x_i = 1$, we have
+\[
+    \frac{m\sum_{1\leq i < j \leq \ab} x_i x_j \Paren{ (1-x_i - x_j)^{m-1} - (1-x_i)^m(1-x_j)^m} }{\sum_{i=1}^\ab x_i (1-(1-x_i)^m)} \leq 1
+\]
+\end{lemma}
+\begin{proof}
+Define $(y_i)_{1\leq i\leq \ab}$ by $y_i \eqdef 1-(1-x_i)^m$, and note that Bernoulli's inequality implies that $y_i \leq m x_i$ for all $i$. In particular, $\sum_{i=1}^\ab y_i \leq m$. Further, since $x_i + x_j \leq 1$ for all $i\neq j$, we have $0 \leq 1-x_i -x_j \leq (1-x_i)(1-x_j)$, which implies $(1-x_i -x_j)^{m-1} \leq (1-x_i)^{m-1}(1-x_j)^{m-1}$.
+
+This lets us bound the numerator as
+\begin{align*}
+m\sum_{i < j} &x_i x_j \Paren{ (1-x_i - x_j)^{m-1} - (1-x_i)^m(1-x_j)^m} \\
+&= \frac{m}{2}\sum_{i \neq j} x_i x_j \Paren{ (1-x_i - x_j)^{m-1} - (1-x_i)^m(1-x_j)^m} \\
+&\leq \frac{m}{2}\sum_{i \neq j} x_i x_j (1-x_i)^{m-1}(1-x_j)^{m-1} \Paren{ 1 - (1-x_i)(1-x_j)} \\
+&\leq \frac{m}{2}\sum_{i, j} x_i x_j (1-x_i)^{m-1}(1-x_j)^{m-1} \Paren{x_i+x_j}
+\end{align*}
+To relate this to the denominator, which can be rewritten as $\sum_{i=1}^\ab x_i y_i$, we rely on the following inequality: for every $x\in[0,1]$
+\[
+1-(1-x)^m = m\int_{0}^x (1-u)^{m-1} \dd{m} \geq m x (1-x)^{m-1}
+\]
+and so $x_i (1-x_i)^{m-1} \leq \frac{1}{m}y_i$ for all $i$. It follows that
+\begin{align*}
+m\sum_{i < j} &x_i x_j \Paren{ (1-x_i - x_j)^{m-1} - (1-x_i)^m(1-x_j)^m} \\
+&\leq \frac{1}{2m}\sum_{i, j} y_i y_j \Paren{x_i+x_j} 
+= \frac{1}{m}\sum_{i=1}^\ab x_i y_i \sum_{j=1}^\ab y_j \\
+&\leq \sum_{i=1}^\ab x_i y_i\,,
+\end{align*}
+concluding the proof.
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bgroup\color{black!50!purple}
+\paragraph{The variance analysis from~\citet{Paninski08}.}
+The proof of~\cref{theo:uniformity:unique:elements} presented in this survey departs from the original one from~\citet{Paninski08}. The argument analyzing the expectation gap (\cref{lemma:gap:z2}) is similar, although we tried to make it a little simpler and intuitive (which, admittedly, is very subjective). The main difference is in bounding the variance in the ``far'' case; indeed, while~\cite{Paninski08} relies for this on the Efron--Stein inequality, the proof he presents is flawed, and the claimed variance bound does not follow.
+
+Specifically, the proof of~\citet[Lemma~2]{Paninski08} claims the bound
+\[
+  \Var_{\p}[Z_2] \leq \ns \sum_{i=1}^\ab p(i)(1-(1-\p(i))^{\ns-1})
+\]
+which, if true, would imply (after renormalizing to match our notation)
+\[
+  \Var_{\uniform_\ab}[Z_2] \leq \frac{1}{\ns}(1-(1-1/\ab)^{\ns-1}) \operatorname*{\sim}_{\ab\to \infty} \frac{1}{\ab}
+\]
+while the (exact) variance in this case is
+\begin{align*}
+\Var_{\uniform_\ab}[Z_2]
+&= \frac{\bE{\uniform_\ab}{Z_2}(1-\bE{\uniform_\ab}{Z_2})}{\ns} + \frac{\ns-1}{\ns}\Paren{ \frac{\ab-1}{\ab}\Paren{1-\frac{2}{\ab}}^{\ns-2} - \bE{\uniform_\ab}{Z_2}^2} \\
+&\operatorname*{\sim}_{\ab\to \infty} \frac{2}{\ab}
+\end{align*}
+This shows that the former upper bound cannot hold as stated. Looking into the proof, the issue appears to be at the first step in bounding 
+the quantity $\frac{1}{2} \sum_{t=1}^\ns \bEE{(S-S^{(t)})^2}$~\cite[p.3, top of right column]{Paninski08}, as $|S-S^{(i)}|$ can take values 0, 1,or 4 (not just 0 or 1), and some events leading to these have been forgotten. As an example: the case $(n_i,n_j)=(0,1)$ on $\ns-1$ samples leads to a difference of 2 when the remaining sample falls on $i$ in one case and $j$ in the other (as it gives 2 unique elements in one case, and 0 in the other), and is thus different from say the case $(n_i,n_j)=(0,2)$ which leads to a difference of 1 when the remaining sample falls on $i$ in one case and $j$ in the other (as it gives 1 unique elements in one case, and 0 in the other). The current analysis omits this distinction, and some other cases; it is not clear to us how to fix their proof, which is why we chose to provide an alternative argument to bound the variance.
+
+\paragraph{More details.} Specifically, after using the Efron--Stein inequality,~\citet{Paninski08} bounds the expected squared difference between $S$ and $S'$ (the number of unique elements observed on $\ns$ samples, where $S$ and $S'$ differ only one one single sample: i.e., $S=S(X_1,\dots,X_{\ns-1}, X_\ns)$ and $S=S(X_1,\dots,X_{\ns-1}, X'_\ns)$, with $X_\ns,X'_\ns$ i.i.d.) as
+\[
+  \bEE{(S-S')^2} = \sum_{1\leq i,j\leq \ab} \p(i)\p(j) \bE{X_1,\dots,X_{\ns-1}}{ \indic{\ns_i=0, \ns_j>0} + \indic{\ns_j=0, \ns_i>0} }
+\]
+by considering what $X_\ns,X'_\ns$ take, and the contribution to $(S-S')^2$ this makes (where $\ns_i$ denotes the number of occurrences of $i$ among $X_1,\dots,X_{\ns-1}$).
+However, accounting for all the ways $(S-S')^2$ could differ shows that there are 6 terms, not just 2: instead of 
+\begin{equation}
+  \label{eq:pan:bound}
+\indic{\ns_i=0, \ns_j>0} + \indic{\ns_j=0, \ns_i>0} 
+\end{equation}
+one should have
+\begin{align*}
+& 4\cdot \textcolor{red}{\indic{\ns_i=0, \ns_j=1}} + \textcolor{red}{\indic{\ns_i=0, \ns_j>1}} + \indic{\ns_i=1, \ns_j>1} \\
+&+ 4\cdot \textcolor{red}{\indic{\ns_j=0, \ns_i=1}} + \textcolor{red}{\indic{\ns_j=0, \ns_i>1}} + \indic{\ns_j=1, \ns_i>1} 
+\end{align*}
+and while~\eqref{eq:pan:bound} (up to a factor 4) can be used to upper bound the sum of 4 of those 6 terms (those in red), there remain 2 unaccounted for:
+$
+\indic{\ns_i=1, \ns_j>1}
+$
+and 
+$
+\indic{\ns_j=1, \ns_i>1}
+$. As mentioned above, it is not clear to us how to bound the contribution of those extra two terms (while the other 4 ``red'' terms, of course, would follow from the original argument, losing a factor 4 only in the bound).
+\egroup
