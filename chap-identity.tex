@@ -1,11 +1,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Uniformity testing}
+  \label{sec:uniformity}
 \cnote{Thorough presentation of the many algorithms for uniformity testing,
 with proofs, and relative advantages of each.}
 
-It is known~\citep{Paninski08} that the sample complexity of uniformity testing with distance parameter $\dst\in(0,1]$ is $\Theta(\sqrt{\ab}/\dst^2)$. That's nice. Now, \emph{how do we perform uniformity testing, though?} 
-There are several things to consider in a testing algorithm. For instance:
+It is known~\citep{Paninski08} that the sample complexity of uniformity testing with distance parameter $\dst\in(0,1]$ is $\Theta(\sqrt{\ab}/\dst^2)$, which is, for a large range of parameters, significantly smaller than the domain size $\ab$. This means that we can reliably infer interesting properties of the distribution after observing only a tiny fraction of the domain elements! That's nice. Now, \emph{how do we perform uniformity testing?}  And what should we keep in mind while doing so?
+
+There are several things to consider in a testing algorithm. To name a few:
 \begin{description}
   \item[Data efficiency:] does the algorithm achieve the optimal sample complexity $\Theta(\sqrt{\ab}/\dst^2)$?
   \item[Time efficiency:] how fast is the algorithm to run (as a function of $\ab,\dst$, and the number of samples $\ns$)?
@@ -13,7 +15,7 @@ There are several things to consider in a testing algorithm. For instance:
   \item[Simplicity:] is the algorithm simple to describe and implement?
   \item[``Simplicity'':] is the algorithm simple to \emph{analyze}?
   \item[Robustness:] how \emph{tolerant} is the algorithm to breaches of the promise? That is, does it accept distributions which are not \emph{exactly} uniform as well, or is it very brittle?
-  \item[Elegance:] That's, like, your opinion, man.
+  \item[Elegance:] This is somewhat subjective, and each of us might have a different view of what it means. If you have strong feelings about this, however, know that you are not alone.
   \item[Generalizable:] Does the algorithm have other features that might be desirable in other settings?
 \end{description}
 
@@ -39,14 +41,14 @@ There are several things to consider in a testing algorithm. For instance:
 A key insight, that underlies a lot of the algorithms above, is that here \emph{$\lp[2]$ distance is a good proxy for total variation distance}:
 \begin{equation}
   \label{eq:relation:l1:l2:cs}
-  \totalvardist{\p}{\uniform_k} = \frac{1}{2}\normone{\p-\uniform_\ab} \leq \frac{\sqrt{\ab}}{2}\normtwo{\p-\uniform_\ab}
+  \totalvardist{\p}{\uniform_\ab} = \frac{1}{2}\normone{\p-\uniform_\ab} \leq \frac{\sqrt{\ab}}{2}\normtwo{\p-\uniform_\ab}
 \end{equation}
-the inequality being Cauchy--Schwarz. So if $\totalvardist{\p}{\uniform_k}>\dst$, then $\normtwo{\p-\uniform_\ab}^2 > 4\dst^2/\ab$ (and, well, if $\totalvardist{\p}{\uniform_k}=0$ then $\normtwo{\p-\uniform_\ab}^2=0$ too, of course). Moreover, we have the very convenient fact, specific to the distance to uniform: for any distribution $\p$ over $[\ab]$,
+the inequality being Cauchy--Schwarz. So if $\totalvardist{\p}{\uniform_\ab}>\dst$, then $\normtwo{\p-\uniform_\ab}^2 > 4\dst^2/\ab$ (and, well, if $\totalvardist{\p}{\uniform_\ab}=0$ then $\normtwo{\p-\uniform_\ab}^2=0$ too, of course). Moreover, we have the very convenient fact, specific to the distance to uniform: for any distribution $\p$ over $[\ab]$,
 \begin{equation}
   \label{eq:relation:collisionprob:distance:uniform}
   \normtwo{\p-\uniform_\ab}^2 = \sum_{i=1}^\ab (\p(i)-1/\ab)^2  = \sum_{i=1}^\ab \p(i)^2-1/\ab = \normtwo{\p}^2-1/\ab\,,
 \end{equation}
-so combining the two we get that $\totalvardist{\p}{\uniform_k}>\dst$ implies $\normtwo{\p}^2 > (1+4\dst^2)/\ab$.
+so combining the two we get that $\totalvardist{\p}{\uniform_\ab}>\dst$ implies $\normtwo{\p}^2 > (1+4\dst^2)/\ab$.
 
 \begin{remark}
   \label{rk:collision:probability}
@@ -253,13 +255,13 @@ which is\dots{} a thing? Note that under the uniform distribution $\uniform_\ab$
 
 \begin{algorithm}[ht!]
   \begin{algorithmic}[1]
-    \Require Multiset of $\ns$ samples $x_1,\dots,x_\ns \in \domain$, parameters $\dst\in(0,1]$ and $\ab = \abs{\domain}$ such that $\dst \geq \frac{??}{\ab^{1/4}}$
+    \Require Multiset of $\ns$ samples $x_1,\dots,x_\ns \in \domain$, parameters $\dst\in(0,1]$ and $\ab = \abs{\domain}$ such that $\dst \geq \frac{15}{\ab^{1/4}}$
     \State Set $\tau \gets (1-\frac{1}{\ab})^{\ns-1}-\frac{\ns\dst^2}{8\ab}$ \Comment{This is $\bE{\uniform_\ab}{Z_2} - \frac{\ns\dst^2}{8\ab}$}
     \State Compute \Comment{Can be done in $O(\ns)$ time if $\domain$ is known, $O(\ns\log\ns)$ if only $\ab$ is.}
     \[
         Z_2 = \frac{1}{\ns} \sum_{j\in\domain} \indic{\ns_j=1}
     \] where $\ns_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
-    \If{ $Z_1 \leq \tau$ } \Return \reject \Comment{Not uniform}
+    \If{ $Z_2 \leq \tau$ } \Return \reject \Comment{Not uniform}
     \Else\ 
       \Return \accept \Comment{Uniform}
     \EndIf
@@ -393,7 +395,7 @@ Now that we have all the pieces of the puzzle, let us establish the main result 
 The unique-elements tester (\cref{algo:unique-elements}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$ and time complexity $O(\ns)$, provided that $\dst \geq 15/\ab^{1/4}$.
 \end{theorem}
 \begin{proof}
-For any $\p\in\distribs{\ab}$, let as before $\Delta(\p) = \bE{\uniform_\ab}{Z_2} - \bE{\p}{Z_2}$. Of course, if $\p=\uniform_\ab$ then $\Delta(\p)=0$, and we know from~\cref{lemma:gap:z2} that $\Delta(\p) \geq \Delta \eqdef \frac{\ns\dst^2}{16\ab}$ whenever $\totalvardist{\p}{\uniform_\ab} \geq \dst$.\footnote{We assume throughout $\ns \leq \ab$, and will enforce this at the end.} We also obtained earlier (in~\cref{eq:var:z2:unif,eq:var:z2:final}) a bound in the variance of $Z_2$ in both the uniform and ``far'' cases, so we have all the ingredients we need. Define our threshold
+For any $\p\in\distribs{\ab}$, let as before $\Delta(\p) \eqdef \bE{\uniform_\ab}{Z_2} - \bE{\p}{Z_2}$. Of course, if $\p=\uniform_\ab$ then $\Delta(\p)=0$, and we know from~\cref{lemma:gap:z2} that $\Delta(\p) \geq \Delta \eqdef \frac{\ns\dst^2}{16\ab}$ whenever $\totalvardist{\p}{\uniform_\ab} \geq \dst$.\footnote{We assume throughout $\ns \leq \ab$, and will enforce this at the end.} We also obtained earlier (in~\cref{eq:var:z2:unif,eq:var:z2:final}) a bound in the variance of $Z_2$ in both the uniform and ``far'' cases, so we have all the ingredients we need. Define our threshold
 \[
     \tau \eqdef \bE{\uniform_\ab}{Z_2} - \frac{\Delta}{2}
 \]
@@ -426,26 +428,137 @@ as in~\cref{algo:unique-elements}.
 using moments of a Binomial random variable and~\cref{eq:relation:collisionprob:distance:uniform}.\exercise{Check it!} This does look like a reasonable way to estimate the distance to uniformity \emph{via} the $\lp[2]$ distance again\dots{} unfortunately, the variance will be slightly annoying, due to the correlated between terms of the sums.
 
 
-To make the task easier, it is helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, which will greatly simplifies the analysis. Then, under this (slightly different) sampling model the $N_i$'s become independent, with $N_i\sim\poisson{\ns\p(i)}$: this is called \emph{Poissonization}\index{Poissonization}, and can be done more or less without loss of generality since a $\poisson{\ns}$ random variable will be between $0.99\ns$ and $1.01\ns$ with overwhelming probability. (See~\cref{sec:poissonization} for more on Poissonization).
+To make the task easier, it is helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, which will greatly simplifies the analysis. Then, under this (slightly different) sampling model the $N_i$'s become independent, with $N_i\sim\poisson{\ns\p(i)}$: this is called \emph{Poissonization}\index{Poissonization}, and can be done more or less without loss of generality since a $\poisson{\ns}$ random variable will be between $0.99\ns$ and $1.01\ns$ with overwhelming probability. (See~\cref{sec:poissonization} for more on Poissonization, and why we can use it ``without loss of generality'').
+
+\begin{algorithm}[ht!]
+  \begin{algorithmic}[1]
+    \Require Multiset of $\ns$ samples $x_1,\dots,x_\ns \in \domain$, parameters $\dst\in(0,1]$ and $\ab = \abs{\domain}$
+    \Comment{Assumes Poissonization}
+    \State Set $\tau \gets 2\ns\dst^2$
+    \State Compute \Comment{Can be done in $O(\ns)$ time if $\domain$ is known, $O(\ns\log\ns)$ if only $\ab$ is.}
+    \[
+        Z_3 = \sum_{j\in\domain} \frac{(\ns_j-\ns/\ab)^2-\ns_j}{\ns/\ab}
+    \] where $\ns_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
+    \If{ $Z_3 \geq \tau$ } \Return \reject \Comment{Not uniform}
+    \Else\ 
+      \Return \accept \Comment{Uniform}
+    \EndIf
+  \end{algorithmic}
+  \caption{\label{algo:chisquare}\sc Chi-Square Tester}
+\end{algorithm}
 
 The bad news is that it does not actually lead to the optimal sample complexity: Poissonization introduces a bit more variance (as we introduce extra randomness ourselves by taking a random number of samples), and so the variance of this $\chi^2$ test can be too big due to the elements we only expect to see zero or once (so, most of them). The \emph{good} news is that a simple correction of that test, of the form
 \begin{equation}
     Z_3 = \sum_{i=1}^\ab \frac{(N_i-\ns/\ab)^2- N_i}{\ns/\ab}
 \end{equation}
-\emph{does} have a much smaller variance, and a threshold test of the form ``$Z_3 > \tau$?'' will yield the right sample complexity.\footnote{In the multinomial (``non-Poissonized'') case, substracting $N_i$ was not necessary, since that would correspond to removing overall $\frac{\ab}{\ns}\sum_{i=1}^\ab N_i = \ab$, a constant term. In the Poissonized case, however, $\sum_{i=1}^\ab N_i\sim\poisson{\ns}$, and $\frac{\ab}{\ns}\sum_{i=1}^\ab N_i$ is not a constant -- it is a random variable with expectation $\ab$ and (large) variance $\ab^2/\ns$.} Recalling that $N_i\sim\poisson{\ns\p(i)}$ for all $i$, the expectation of $Z_3$ is then just 
+\emph{does} have a much smaller variance, and a threshold test of the form ``$Z_3 > \tau$?'' will yield the right sample complexity.\footnote{In the multinomial (``non-Poissonized'') case, substracting $N_i$ was not necessary, since that would correspond to removing overall $\frac{\ab}{\ns}\sum_{i=1}^\ab N_i = \ab$, a constant term. In the Poissonized case, however, $\sum_{i=1}^\ab N_i\sim\poisson{\ns}$, and $\frac{\ab}{\ns}\sum_{i=1}^\ab N_i$ is not a constant -- it is a random variable with expectation $\ab$ and (large) variance $\ab^2/\ns$.} Recalling that $N_i\sim\poisson{\ns\p(i)}$ for all $i$, the expectation of $Z_3$ will then just be 
+\begin{equation}
+  \label{eq:expectation:z3}
+    \expect{Z_3} = \ns\ab \normtwo{\p-\uniform_\ab}^2
+\end{equation}
+which is perfect. Analyzing this test boils down, again, to bounding the variance of $Z_3$ and invoking Chebyshev's inequality\dots{} Before doing so, we will make an innocuous change, but which will come quite handy in~\cref{sec:identity} when generalizing beyond the uniform distribution: let us rewrite
 \[
-    \expect{Z_3} = \ns\ab \normtwo{\p-\uniform_k}^2
+    Z_3 = \sum_{i=1}^\ab \frac{(N_i-\ns\uniform_\ab(i))^2- N_i}{\ns\uniform_\ab(i)}
 \]
-which is perfect. Analyzing this test just boils down, again, to bounding the variance of $Z_3$ and invoking Chebyshev's inequality\dots{} It's a good exercise, and under the Poissonization assumption not that hard. (Try \emph{without} removing $N_i$ in the numerator, though, and see what you get\dots)
+where, of course, $\uniform_\ab(i) = 1/\ab$ for all $i\in[\ab]$. Recalling that, by Poissonization, all the $N_i$'s are independent Poisson random variables, we will invoke the following two technical claims, which follow from (somewhat tedious, but straightforward) computations involving the moments of Poisson random variables:\exercise{Prove this claim!}
+\begin{claim}
+  Let $\mu, \lambda \geq 0$. If $X\sim\poisson{\lambda}$, then 
+  $
+  \bEE{(X-\mu)^2-X} = (\lambda-\mu)^2
+  $
+  and 
+  $
+  \bEE{((X-\mu)^2-X)^2} = (\lambda-\mu)^4 + 2\lambda^2 + 4\lambda(\lambda-\mu)^2
+  $.
+\end{claim}
+Given this, by linearity of expectation we immediately get
+\begin{align}
+    \bEE{Z_3} 
+    &= \sum_{i=1}^\ab \frac{\bEE{(N_i-\ns\uniform_\ab(i))^2- N_i}}{\ns\uniform_\ab(i)}
+    = \ns\sum_{i=1}^\ab \frac{(\p(i)-\uniform_\ab(i))^2}{\uniform_\ab(i)} \notag\\
+    &= \ns\cdot\chisquare{\p}{\uniform_\ab} \label{eq:expectation:z3:chisquare}
+\end{align}
+which here can further be simplified by $\chisquare{\p}{\uniform_\ab} = \ab\normtwo{\p-\uniform_\ab}^2$, as the denominator is constant and equal to $1/\ab$; this establishes~\cref{eq:expectation:z3}.
+
+Turning to the variance, we want to relate $\Var[Z_3]$ to known quantities, and in particular $\bEE{Z_3}$. To do so, we use independence of the $N_i$'s followed by the second part of the above claim to get
+\begin{align}
+    \Var[Z_3]
+    &= \sum_{i=1}^\ab \frac{\Var[(N_i-\ns\uniform_\ab(i))^2- N_i]}{\ns^2\uniform_\ab(i)^2} \notag\\
+    &= \sum_{i=1}^\ab \frac{2\ns^2\p(i)^2 + 4\ns^3\p(i)(\p(i)-\uniform_\ab(i))^2}{\ns^2\uniform_\ab(i)^2} \notag\\
+    &= 2\sum_{i=1}^\ab \frac{\p(i)^2}{\uniform_\ab(i)^2}+4\ns\sum_{i=1}^\ab \frac{\p(i)(\p(i)-\uniform_\ab(i))^2}{\uniform_\ab(i)^2}\notag\\
+    &\leq 2\sum_{i=1}^\ab \frac{\p(i)^2}{\uniform_\ab(i)^2}+4\ns\sqrt{\sum_{i=1}^\ab \frac{\p(i)^2}{\uniform_\ab(i)^2}}\cdot\sqrt{\sum_{i=1}^\ab \frac{(\p(i)-\uniform_\ab(i))^4}{\uniform_\ab(i)^2}}\notag\\
+    &\leq 2\sum_{i=1}^\ab \frac{\p(i)^2}{\uniform_\ab(i)^2}+4\ns\sqrt{\sum_{i=1}^\ab \frac{\p(i)^2}{\uniform_\ab(i)^2}}\cdot\sum_{i=1}^\ab \frac{(\p(i)-\uniform_\ab(i))^2}{\uniform_\ab(i)}\notag\\
+    &= 2\sum_{i=1}^\ab \frac{\p(i)^2}{\uniform_\ab(i)^2} + 4\sqrt{\sum_{i=1}^\ab \frac{\p(i)^2}{\uniform_\ab(i)^2}}\bEE{Z_3} \label{eq:z3:var:interm}\,,
+\end{align}
+where the first inequality is Cauchy--Schwarz, and the second is monotonicity of $\lp[p]$ norms: namely, $\lp[2] \leq \lp[1]$. In order to proceed further, we need to bound the quantity $\sum_{i=1}^\ab \frac{\p(i)^2}{\uniform_\ab(i)^2}$. The trick here will be to write, using $(a+b)^2 \leq 2a^2+2b^2$, 
+\[
+    \p(i)^2 = ((\p(i)-\uniform_\ab(i))+\uniform_\ab(i))^2 \leq 2(\p(i)-\uniform_\ab(i))^2 + 2\uniform_\ab(i)^2\,,
+\]
+since then we have
+\begin{align*}
+    \sum_{i=1}^\ab \frac{\p(i)^2}{\uniform_\ab(i)^2}
+    &\leq 2\ab + 2\sum_{i=1}^\ab \frac{(\p(i)-\uniform_\ab(i))^2}{\uniform_\ab(i)^2}  
+    = 2\ab + 2\ab\sum_{i=1}^\ab \frac{(\p(i)-\uniform_\ab(i))^2}{\uniform_\ab(i)} \\
+    &= 2\ab\Paren{ 1 + \frac{\bEE{Z_3}}{\ns}  }\,.
+\end{align*}
+Putting this back in~\cref{eq:z3:var:interm}, we get
+\begin{equation}
+    \Var[Z_3]
+    \leq 4\ab\Paren{ 1 + \frac{\bEE{Z_3}}{\ns}  } + 4\sqrt{2}\ab^{1/2}\bEE{Z_3}+4\sqrt{2}\frac{\ab^{1/2}}{\ns^{1/2}} \bEE{Z_3}^{3/2} \label{eq:z3:var}
+\end{equation}
+In particular, in the uniform case $\bE{\uniform_\ab}{Z_3} = 0$, and so $\Var_{\uniform_\ab}[Z_3] \leq 4\ab$. Before formally analyzing the resulting sample complexity via (once more) Chebyshev's inequality, let us do the usual check and compare standard deviation (noise) to expected gap (signal), and see if things look promising. The gap in expectation will be, given~\cref{eq:expectation:z3:chisquare}, at least $\Delta \eqdef \ns\ab \cdot \frac{4\dst^2}{\ab} = 4\ns\dst^2$; so, in the uniform case, we need
+$\Var_{\uniform_\ab}[Z_3] \ll \Delta^2$ which, given the above, is satisfied as long as $\ns \gg \sqrt{\ab}/{\dst^2}$, since then
+\[
+    \Var_{\uniform_\ab}[Z_3] \leq 2\ab \ll 16\ns^2\dst^4 \leq \Delta^2\,.
+\]
+In the ``far'' case, for $\p$ at total variation distance at least $\dst$ from uniform, the condition $\Var_\p[Z_3] \ll \Delta(\p)^2 = \bE{\p}{Z_3}^2$, which by~\cref{eq:z3:var} will require
+\[
+    \max\Paren{\ab, \frac{\ab}{\ns}\bE{\p}{Z_3}, \ab^{1/2}\bE{\p}{Z_3} , \frac{\ab^{1/2}}{\ns^{1/2}}\bE{\p}{Z_3}^{3/2} } \ll \bE{\p}{Z_3}^2\,.
+\]
+Considering each term separately, simplifying, and recalling that $\bE{\p}{Z_3} \geq 4\ns\dst^2$, we see that this will also hold as long as $\ns \gg \sqrt{\ab}/{\dst^2}$.
+
+We will make this formal, and show the following:
+\begin{theorem}
+The $\chi^2$-based tester (\cref{algo:chisquare}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$ and time complexity $O(\ns)$ in the Poissonized setting.
+\end{theorem}
+\begin{proof}
+For any $\p\in\distribs{\ab}$, let as before $\Delta(\p) \eqdef \bE{\p}{Z_3}$. By~\cref{eq:expectation:z3}, we know that if $\p=\uniform_\ab$ then $\Delta(\p)=0$, and that $\Delta(\p) \geq \Delta \eqdef 4\ns\dst^2$ whenever $\totalvardist{\p}{\uniform_\ab} \geq \dst$ (recalling~\cref{eq:relation:l1:l2:cs}). We also have our variance bound from~\cref{eq:z3:var}. Define our threshold
+\[
+    \tau \eqdef \frac{\Delta}{2}
+\]
+as in~\cref{algo:chisquare}.
+\begin{itemize}
+    \item In the uniform case, where $\bE{\uniform_\ab}{Z_3}=0$, the probability to output \reject (and thus make a mistake) is bounded as
+    \[
+    \bPr{Z_3 \geq \tau} \leq \frac{4\Var_{\uniform_\ab}[Z_3]}{\Delta^2}
+    \leq \frac{\ab}{\dst^4\ns^2}
+    \]
+    by Chebyshev's inequality, using $\Var_{\uniform_\ab}[Z_3] \leq 4\ab$ and the definition of $\Delta$. This in turn is less than $1/3$ as long as $\ns \geq \sqrt{3\ab}/\dst^2$.
+    \item In the ``far'' case, since $\bE{\p}{Z_3} \geq \Delta$ the probability to err by outputting \accept is
+    \begin{align*}
+        \bPr{Z_3 < \tau} %&= \bPr{Z_3 < \frac{\Delta(\p)}{2}  } \\       
+        &\leq \bPr{\abs{Z_3 - \bE{\p}{Z_3}} > \frac{\Delta(\p)}{2} } \\
+        &\leq \frac{4\Var_{\p}[Z_3]}{\Delta(\p)^2} \\
+        &\leq \frac{16\ab\Paren{ 1 + \frac{\bEE{Z_3}}{\ns}  } + 16\sqrt{2}\ab^{1/2}\bEE{Z_3}+16\sqrt{2}\frac{\ab^{1/2}}{\ns^{1/2}} \bEE{Z_3}^{3/2}}{\bEE{Z_3}^2} \\
+        %&= \frac{16\ab}{\bEE{Z_3}^2} + \frac{16\ab}{\ns\bEE{Z_3}^{\vphantom{2}}} + \frac{16\sqrt{2}\ab^{1/2}}{\bEE{Z_3}^{\vphantom{2}}}+\frac{16\sqrt{2}\ab^{1/2}}{\ns^{1/2}\bEE{Z_3}^{1/2}} \\
+        &\leq \frac{\ab}{\ns^2\dst^4} + \frac{4\ab}{\ns^2\dst^2} + \frac{4\sqrt{2}\ab^{1/2}}{\ns\dst^2}+\frac{8\sqrt{2}\ab^{1/2}}{\ns\dst} \\
+        &\leq \frac{5\ab}{\ns^2\dst^4} + \frac{12\sqrt{2}\ab^{1/2}}{\ns\dst^2}
+    \end{align*}
+    first using~\cref{eq:z3:var}, simplifying, then $\bEE{Z_3}\geq \ns\dst^2$. By solving the inequality $5x^2 + 12\sqrt{2}x \leq 1/3$, we see that the result is at most $1/3$ for $\ns \geq 52\sqrt{\ab}/\dst^2$.
+  \end{itemize}
+  The above analysis shows that both errors are less than $1/3$ for, say, $\ns = \lceil{52\sqrt{\ab}/\dst^2}\rceil$; this concludes the proof.
+\end{proof}
+
+% It's a good exercise, and under the Poissonization assumption not that hard. (Try \emph{without} removing $N_i$ in the numerator, though, and see what you get\dots)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Empirical distance to uniform} Let's take a break from $\lp[2]$ and consider another, very natural thing to consider: the \emph{plugin estimator}. Since we have $\ns$ samples from $\p$, we can compute the empirical estimator of the distribution, $\hat{\p}$. Now, we want to test whether $\totalvardist{\p}{\uniform_\ab}=0$ v. $\totalvardist{\p}{\uniform_\ab}>\dst$? Why not consider 
+\subsection{Empirical distance to uniform} Let us take a break from $\lp[2]$ and consider another, very natural thing to try: the \emph{plugin estimator}. Since we have $\ns$ samples from $\p$, we can compute the empirical estimator of the distribution, $\hat{\p}_\ns$, based on these $\ns$ samples. Now, we want to test $\totalvardist{\p}{\uniform_\ab}=0$ vs. $\totalvardist{\p}{\uniform_\ab}>\dst$? Why not consider 
 \begin{equation}
-    Z_4 = \totalvardist{\hat{\p}}{\uniform_\ab}
+    Z_4 \eqdef \totalvardist{\hat{\p}}{\uniform_\ab}
 \end{equation}
-the empirical distance to uniform? A reason might be: \emph{this sounds like a terrible idea.} Unless $\ns = \Omega(\ab)$ (which is much more than what we want), the empirical distribution $\hat{\p}$ will be at distance $1-o(1)$ from uniform, \emph{even} if $\p$ is actually uniform. 
+the empirical distance to uniform? A reason might be: \emph{this sounds like a terrible idea.} Unless $\ns = \Omega(\ab)$ (which is much more than what we want), we will not have observed most of the domain elements even once, and the empirical distribution $\hat{\p}_\ns$ will be at distance $1-o(1)$ from uniform, \emph{even} if $\p$ is actually uniform. 
 
-That's the thing, though: hell is in the $o(1)$ details. Sure, $\expect{Z_4}$ will be \emph{almost} $1$ whether $\p$ is uniform or far from it unless $\ns = \Omega(\ab)$. But this ``almost'' will be different in the two cases! Carefully analyzing this tiny gap in expectation, and showing that $Z_4$ concentrates well enough around its expectation to preserve this tiny gap, amazingly leads to a tester with optimal sample complexity $\ns = \Theta(\sqrt{\ab}/\dst^2)$.
+That's the thing, though: the devil is in the $o(1)$ details. Sure, $\expect{Z_4}$ will be \emph{almost} $1$ whether $\p$ is uniform or far from it unless $\ns = \Omega(\ab)$. But this ``almost'' will be different in the two cases! Carefully analyzing this tiny gap in expectation, and showing that $Z_4$ concentrates well enough around its expectation to preserve this tiny gap, amazingly leads to a tester with optimal sample complexity $\ns = \Theta(\sqrt{\ab}/\dst^2)$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Random binary hashing} Now for a tester that is \emph{not} sample-optimal (but has other advantages, and is relatively cute). If there is one thing we know how to do optimally, it's estimating the bias of a coin. We don't have a coin (Bernoulli) here, we have a glorious $(\ab-1)$-dimensional object.
@@ -480,6 +593,7 @@ Great: we have a new estimator for (roughly) the $\lp[2]$ norm! Now, assuming th
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Identity testing}
+  \label{sec:identity}
 \cnote{Discuss the instance-optimal setting as well, and the relation to unifor-
 mity testing.}
 
