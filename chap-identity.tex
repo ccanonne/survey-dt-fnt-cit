@@ -558,7 +558,106 @@ as in~\cref{algo:chisquare}.
 \end{equation}
 the empirical distance to uniform? A reason might be: \emph{this sounds like a terrible idea.} Unless $\ns = \Omega(\ab)$ (which is much more than what we want), we will not have observed most of the domain elements even once, and the empirical distribution $\hat{\p}_\ns$ will be at distance $1-o(1)$ from uniform, \emph{even} if $\p$ is actually uniform. 
 
-That's the thing, though: the devil is in the $o(1)$ details. Sure, $\expect{Z_4}$ will be \emph{almost} $1$ whether $\p$ is uniform or far from it unless $\ns = \Omega(\ab)$. But this ``almost'' will be different in the two cases! Carefully analyzing this tiny gap in expectation, and showing that $Z_4$ concentrates well enough around its expectation to preserve this tiny gap, amazingly leads to a tester with optimal sample complexity $\ns = \Theta(\sqrt{\ab}/\dst^2)$.
+That's the thing, though: the devil is in the $o(1)$ details. Sure, $\expect{Z_4}$ will be \emph{almost} $1$ whether $\p$ is uniform or far from it unless $\ns = \Omega(\ab)$. But this ``almost'' will be different in the two cases! Carefully analyzing this tiny gap in expectation, and showing that $Z_4$ concentrates well enough around its expectation to preserve this tiny gap, amazingly leads to a tester with optimal sample complexity $\ns = \Theta(\sqrt{\ab}/\dst^2)$. Let us see how.
+
+For simplicity of exposition, we focus here on the case $\ns \leq \ab$, though the analysis of the test can be performed for extended to all parameter regimes -- see~\citet{DiakonikolasGPP18} for the full general case. The argument proceeds in two steps: first, computing and bounding the expectation of $Z_4$ under the uniform and the far cases separately is not going to really work, so instead we will bound the expectation gap $\Delta(\p)\eqdef \bE{\p}{Z_4}-\bE{\uniform_{\ab}}{Z_4}$ directly (a little like in the case of the unique elements-based tester). Then, once the gap in expectation is established, we will not argue concentration of $Z_4$ as usual by a variance-based (Chebyshev's inequality) argument, but instead by invoking a more powerful (and slightly fancier) concentration inequality.\todonote{Revisit this.}
+
+\paragraph{The expectation gap $\Delta(\p)$.} From the definition of total variation distance, we can rewrite
+\[
+    Z_4 = \sum_{i=1}^\ab \Paren{\hat{\p}_\ns(i) - \frac{1}{\ab}}\indic{\hat{\p}_\ns(i) > 1/\ab}
+    = \frac{1}{\ns} \sum_{i=1}^\ab \Paren{\ns_i - \frac{\ns}{\ab} }_+
+\]
+where as previously $\ns_i$ denotes the number of samples falling on element $i$, and $x_+ \eqdef \max(x,0)$. For the same of the analysis, we will introduce the multivariate function
+\begin{equation}
+  \label{eq:empirical:S}
+  S(x_1,\dots,x_\ns) \eqdef \frac{1}{\ns} \sum_{i=1}^\ab \Paren{\ns_i(x_1,\dots,x_\ns) - \frac{\ns}{\ab} }_+
+\end{equation}
+and the function $\mu\colon\distribs{\ab}\to \R$ given by
+\[
+ \mu(\p) \eqdef \bE{\p}{S(X_1,\dots,X_\ns)}\,.
+\] 
+(Note that $\bE{\p}{Z_4} = \mu(\p)$.) Then, since $\ns_i\sim\binomial{\ns}{\p(i)}$ under $\p$, we have the exact expression
+\begin{align*}
+ \mu(\p) 
+    &= \frac{1}{\ns} \sum_{i=1}^\ab \sum_{\ell=0}^\ns \binom{\ns}{\ell} \p(i)^\ell (1-\p(i))^{\ns-\ell} \Paren{\ell - \frac{\ns}{\ab} }_+ \\
+    &= \frac{1}{\ns} \sum_{i=1}^\ab \sum_{\ell=1}^\ns \binom{\ns}{\ell} \p(i)^\ell (1-\p(i))^{\ns-\ell} \Paren{\ell - \frac{\ns}{\ab} }
+\end{align*}
+since $\Paren{\ell - \ns/\ab }_+ > 0$ for $\ell \geq \clg{\ns/\ab}=1$ (recall that we assume $\ns \leq \ab$). Using the facts that
+$
+    \sum_{\ell=0}^\ns \binom{\ns}{\ell} \p(i)^\ell (1-\p(i))^{\ns-\ell} = 1
+$
+and
+$
+    \sum_{\ell=0}^\ns \ell \binom{\ns}{\ell} \p(i)^\ell (1-\p(i))^{\ns-\ell} = \ns\p(i)
+$, the inner sum considerably simplifies and we get
+\begin{align}
+  \label{eq:empirical:tv:mu}
+ \mu(\p) 
+    &= \frac{1}{\ab} \sum_{i=1}^\ab (1-\p(i))^{\ns}
+\end{align}
+Since our goal is to lower bound $\Delta(\p) = \mu(\p) - \mu(\uniform_\ab)$, the view of $\mu$ as a multivariate function suggests a Taylor expansion around $\mu(\uniform_\ab)$. Namely, for any $\p\in\distribs{\ab}$, we can write by Taylor's theorem
+\[
+    \mu(\p) = \mu(\uniform_\ab) + \grad{\mu(\uniform_\ab)}^\top (\p-\uniform_\ab) + \frac{1}{2} (\p-\uniform_\ab)^\top \mathbf{H}(\q) (\p-\uniform_\ab)
+\]
+where $\q = (1-\theta)\uniform_\ab+\theta\p$ for some $\theta\in[0,1]$, and $\mathbf{H}$ is the Hessian of $\mu$: $\mathbf{H}_{i,j}(\q) = \pdv{\mu}{x_i}{x_j}\-(\q)$.  Given~\cref{eq:empirical:tv:mu}, we can compute explicitly both the gradient and the Hessian: first, denoting by $\mathbf{1}_{\ab}$ the all-one vector,
+\[
+    \grad{\mu(\uniform_\ab)} = \Paren{\pdv{\mu}{x_1}\-(\uniform_\ab),\dots,\pdv{\mu}{x_\ab}\-(\uniform_\ab) } = -\frac{\ns}{\ab}\Paren{ 1-\frac{1}{\ab} }^{\ns-1} \mathbf{1}_{\ab}
+\]
+so  
+$
+\grad{\mu(\uniform_\ab)}^\top (\p-\uniform_\ab) = -\frac{\ns}{\ab}(1-\frac{1}{\ab})^{\ns-1} \sum_{i=1}^\ab (\p(i)-\frac{1}{\ab}) = 0
+$. Then, as $\mu$ is separable, $\mathbf{H}$ will be diagonal: $\mathbf{H}_{i,j}(\q) = 0$ for $i\neq j$, while
+\[
+    \mathbf{H}_{i,i}(\q) = \frac{\ns(\ns-1)}{\ab}(1-\q(i))^{\ns-2}
+\]
+for all $i\in[\ab]$. Recalling our Taylor expansion, this means that
+\begin{align}
+    \Delta(\p) 
+    &= \frac{1}{2} (\p-\uniform_\ab)^\top \mathbf{H}(\q) (\p-\uniform_\ab) \notag\\
+    &= \frac{\ns(\ns-1)}{2\ab}\sum_{i=1}^\ab (1-\q(i))^{\ns-2} \Paren{\p(i)-\frac{1}{\ab}}^2
+\end{align}
+where again $\q$ is a probability distribution such that $\q = (1-\theta)\uniform_\ab+\theta\p$ for some $\theta\in[0,1]$. To proceed, a natural idea is to restrict the sum to indices for which we can non-trivially bound $(1-\q(i))^{\ns-2}$; in particular, focusing on the indices $i$ for which $\p(i) < 1/\ab$ will do, since for those we must have $\q(i) \leq 1/\ab$ as well. This leads to writing
+\begin{align}
+    \Delta(\p) 
+    &\geq \frac{\ns(\ns-1)}{2\ab}\sum_{i=1}^\ab (1-\q(i))^{\ns-2} \Paren{\p(i)-\frac{1}{\ab}}^2 \indic{\p(i) < 1/\ab} \notag\\
+    &\geq \frac{\ns(\ns-1)}{2\ab}\Paren{1-\frac{1}{\ab}}^{\ns-2} \sum_{i=1}^\ab \Paren{\p(i)-\frac{1}{\ab}}^2 \indic{\p(i) < 1/\ab} \notag\\
+    &\geq \frac{\ns(\ns-1)}{2\ab}\Paren{1-\frac{1}{\ab}}^{\ns-2} \frac{1}{\ab}\Paren{\sum_{i=1}^\ab \Paren{\frac{1}{\ab}-\p(i)} \indic{\p(i) < 1/\ab}}^2 \notag\\
+    &\geq \frac{\ns(\ns-1)}{2\ab^2}\Paren{1-\frac{1}{\ab}}^{\ab-2} \dst^2 
+    \geq \frac{\ns^2\dst^2}{4e\ab^2}
+\end{align}
+where the third inequality is Cauchy--Schwarz, the fourth is the definition of total variation distance along with $\totalvardist{\p}{\uniform_\ab}\geq \dst$ (and, in the exponent, $\ns \leq \ab$), and the last is $\Paren{1-1/\ab}^{\ab-2} \geq 1/e$ for $\ab \geq 2$.
+
+Before turning to proving concentration of $Z_4$ (that is, showing that the expectation gap, our signal, is not drowned by the random fluctations of $Z_4$ around its expectation), we will make an observation which will help in the analysis. Since we restricted ourselves to the regime $\ns/\ab\leq 1$, the $i$-th summand of $S$ in~\cref{eq:empirical:S} is non-zero only when $\ns_i\geq 1$, and thus we can rewrite
+\begin{align}
+  Z_4
+  &= \frac{1}{\ns} \sum_{i=1}^\ab \Paren{ \Paren{ \ns_i - \frac{\ns}{\ab} } +  \frac{\ns}{\ab} \indic{\ns_i = 0} } \notag\\
+  &= \frac{1}{\ns} \sum_{i=1}^\ab \Paren{ \ns_i - \frac{\ns}{\ab} } + \frac{1}{\ab} \sum_{i=1}^\ab \indic{\ns_i = 0} \notag\\
+  &= \frac{1}{\ab} \sum_{i=1}^\ab \indic{\ns_i = 0} \label{eq:empirical:S:alt}
+\end{align}
+where the last equality follows from $\sum_{i=1}^\ab \ns_i = \ns$. 
+That is, in this regime, $Z_4$ is exactly the fraction of \emph{unseen elements} of the domain; this readily allows one to retrieve~\cref{eq:empirical:tv:mu}.
+
+\paragraph{Concentration of $Z_4$.} As you may have guessed, we will show that $Z_4$ concentrates around its expectation via Chebyshev's inequality, which requires us to bound $\Var[Z_4]$ in both the uniform and ``far'' cases. In order to diversify our toolkit, we will do so by invoking the \emph{Efron--Stein inequality}\index{Efron--Stein inequality}, which allows us to bound the variance of a function of $\ns$ independent random variables by the expected quadratic change of this function when only one sample is re-randomized: for a function $f$ of $\ns$ variables,
+\begin{align}
+    \Var[ f(X)]  \leq \frac{1}{2} \sum_{t=1}^\ns \bEE{ \Paren{ f(X) - f(X^{(t)}) }^2 }
+\end{align}
+where $X=(X_1\dots,X_\ns)$ and $X^{(t)} = (X_1,\dots, X'_t, \dots, X_\ns)$, with $X'_t$ being an independent copy of $X_t$.
+
+We apply this to $Z_4$, \ie the function $S$ defined in~\cref{eq:empirical:S}; given that $S$ is symmetric and that all $X_t$'s are \iid and distributed according to $\p$, we get
+\begin{align*}
+  \Var[Z_4] 
+  &\leq \frac{\ns}{2}  \bE{\p}{ \Paren{ S(X_1,\dots, X_{\ns-1}, X_\ns) - S(X_1,\dots, X_{\ns-1}, X'_\ns) }^2 } \\
+  &= \frac{\ns}{2\ab^2} \bE{\p}{ \Paren{ \sum_{i=1}^\ab \Paren{ \indic{N_i = 0} - \indic{N_i' = 0} } }^2 }
+\end{align*}
+where we wrote $N_i \eqdef \ns_i(\ns_i(X_1,\dots, X_{\ns-1}, X_\ns)$ and $N_i' \eqdef \ns_i(X_1,\dots, X_{\ns-1}, X'_\ns)$, and used the expression of $S$ from~\cref{eq:empirical:S:alt}. To handle this quantity, observe that since only the $\ns$-th sample changes, $\sum_{i=1}^\ab \abs{  \indic{N_i = 0} - \indic{N_i' = 0}  }$ is at most $1$: and this happens when $X_\ns$ falls on an element $i$ not yet observed in the first $\ns-1$ samples while $X'_\ns$ falls on an element $j$ already observed, or vice-versa. That is, we can write
+\begin{align*}
+  \Var[Z_4] 
+  &\leq  \frac{\ns}{\ab^2} \sum_{i\neq j} \p(i)\p(j) \bPr{\ns_i(X_1,\dots, X_{\ns-1})=0, \ns_j(X_1,\dots, X_{\ns-1}) \geq 1 } \\
+  &= \frac{\ns}{\ab^2} \sum_{i\neq j} \p(i)\p(j) \Paren{ (1-\p(i))^{\ns-1} - (1-\p(i)-\p(j))^{\ns-1} }\\
+  &\leq \frac{\ns}{\ab^2} \sum_{i, j} \p(i)\p(j) \Paren{ 1 - (1-\p(j))^{\ns-1} }\\
+  &= \frac{\ns}{\ab^2} \Paren{ 1 - \sum_{j=1}^\ab \p(j) (1-\p(j))^{\ns-1} }
+\end{align*}
+where the first inequality follows the above discussion, taking the expectation over $X_\ns,X'_\ns$ and using symmetry between the two cases mentioned; the second inequality uses monotonicity of the function $y\mapsto (1-x)^m - (1-x-y)^m$ on $[0,x]$, and adds back the diagonal terms $i=j$ to the sum afterwards; and the last equality uses $\sum_i \p(i)=1$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Random binary hashing} Now for a tester that is \emph{not} sample-optimal (but has other advantages, and is relatively cute). If there is one thing we know how to do optimally, it's estimating the bias of a coin. We don't have a coin (Bernoulli) here, we have a glorious $(\ab-1)$-dimensional object.
@@ -672,7 +771,7 @@ while the (exact) variance in this case is
 This shows that the former upper bound cannot hold as stated. Looking into the proof, the issue appears to be at the first step in bounding 
 the quantity $\frac{1}{2} \sum_{t=1}^\ns \bEE{(S-S^{(t)})^2}$~\cite[p.3, top of right column]{Paninski08}, as $|S-S^{(i)}|$ can take values 0, 1,or 4 (not just 0 or 1), and some events leading to these have been forgotten. As an example: the case $(n_i,n_j)=(0,1)$ on $\ns-1$ samples leads to a difference of 2 when the remaining sample falls on $i$ in one case and $j$ in the other (as it gives 2 unique elements in one case, and 0 in the other), and is thus different from say the case $(n_i,n_j)=(0,2)$ which leads to a difference of 1 when the remaining sample falls on $i$ in one case and $j$ in the other (as it gives 1 unique elements in one case, and 0 in the other). The current analysis omits this distinction, and some other cases; it is not clear to us how to fix their proof, which is why we chose to provide an alternative argument to bound the variance.
 
-\paragraph{More details.} Specifically, after using the Efron--Stein inequality,~\citet{Paninski08} bounds the expected squared difference between $S$ and $S'$ (the number of unique elements observed on $\ns$ samples, where $S$ and $S'$ differ only one one single sample: i.e., $S=S(X_1,\dots,X_{\ns-1}, X_\ns)$ and $S=S(X_1,\dots,X_{\ns-1}, X'_\ns)$, with $X_\ns,X'_\ns$ i.i.d.) as
+\paragraph{More details.} Specifically, after using the Efron--Stein inequality,~\citet{Paninski08} bounds the expected squared difference between $S$ and $S'$ (the number of unique elements observed on $\ns$ samples, where $S$ and $S'$ differ only one one single sample: i.e., $S=S(X_1,\dots,X_{\ns-1}, X_\ns)$ and $S=S(X_1,\dots,X_{\ns-1}, X'_\ns)$, with $X_\ns,X'_\ns$ \iid) as
 \[
   \bEE{(S-S')^2} = \sum_{1\leq i,j\leq \ab} \p(i)\p(j) \bE{X_1,\dots,X_{\ns-1}}{ \indic{\ns_i=0, \ns_j>0} + \indic{\ns_j=0, \ns_i>0} }
 \]
