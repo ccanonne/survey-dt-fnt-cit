@@ -18,8 +18,10 @@
 
 
 \usepackage{physics} %% <- redefines var
-\usepackage{marginnote}
-\newcommand{\exercise}[1]{\marginnote{\scriptsize\textbf{E:} #1}}
+\usepackage[fulladjust]{marginnote}
+\renewcommand*{\marginfont}{\scriptsize}
+\setlength{\marginparwidth}{18mm}
+\newcommand{\exercise}[1]{\marginnote{\textbf{E:} #1}}
 
 \newcommand{\tbc}{\noindent\hl{\sc{}to be continued}\xspace}
 

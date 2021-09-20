@@ -13,10 +13,10 @@ There are several things to consider in a testing algorithm. To name a few:
   \item[Time efficiency:] how fast is the algorithm to run (as a function of $\ab,\dst$, and the number of samples $\ns$)?
   \item[Memory efficiency:] how much memory does the algorithm require (as a function of $\ab,\dst$, and $\ns$)?
   \item[Simplicity:] is the algorithm simple to describe and implement?
-  \item[``Simplicity'':] is the algorithm simple to \emph{analyze}?
+  \item[``Simplicity'':] is the algorithm simple to \emph{analyze}? This is not just a one-time thing: adapting and building upon a given algorithm will be much easier if the analysis does not require a long succession of technical, very specific, and complex steps.
   \item[Robustness:] how \emph{tolerant} is the algorithm to breaches of the promise? That is, does it accept distributions which are not \emph{exactly} uniform as well, or is it very brittle?
   \item[Elegance:] This is somewhat subjective, and each of us might have a different view of what it means. If you have strong feelings about this, however, know that you are not alone.
-  \item[Generalizable:] Does the algorithm have other features that might be desirable in other settings?
+  \item[Generalizable:] Does the algorithm have other features that might be desirable in other settings? For instance, if the algorithm has low sensitivity (in the Lipschitz sense), then it will be more resilient to adversarial perturbations of some of the samples -- this is great for, \eg differential privacy applications. 
 \end{description}
 
 \cref{tab:summary:uniformity:testing} summarizes a few of those criteria.
@@ -26,11 +26,11 @@ There are several things to consider in a testing algorithm. To name a few:
   \begin{tabularx}{\textwidth}{|Y|Y|Y|Y|}
   \hline
      & \bf Sample complexity & \bf Notes & \bf References \\\hline
-    \bf Collision-based & $\dfrac{\ab^{1/2}}{\dst^2}$ & Tricky & \cite{GoldreichR00,DiakonikolasGPP19} \\\hline
+    \bf Collision-based & $\dfrac{\ab^{1/2}}{\dst^2}$ & ``Natural'' & \cite{GoldreichR00,DiakonikolasGPP19} \\\hline
     \bf Unique elements & $\dfrac{\ab^{1/2}}{\dst^2}$ & $\dst \gg 1/\ab^{1/4}$ & \cite{Paninski08} \\\hline
     \bf Modified $\chi^2$ & $\dfrac{\ab^{1/2}}{\dst^2}$ & (None) & \cite{ValiantV17,AcharyaDK15,DiakonikolasKN15} \\\hline
-    \bf Empirical distance to uniform & $\dfrac{\ab^{1/2}}{\dst^2}$ & Biased & \cite{DiakonikolasGPP18} \\\hline
-    \bf Random binary hashing & $\dfrac{\ab}{\dst^2}$ & Fun (+ fast, small space) & \cite{AcharyaCT19b} \\\hline
+    \bf Empirical distance to uniform & $\dfrac{\ab^{1/2}}{\dst^2}$ & Low sensitivity & \cite{DiakonikolasGPP18} \\\hline
+    \bf Random binary hashing & $\dfrac{\ab}{\dst^2}$ & Suboptimal, but fast & \cite{AcharyaCT19b} \\\hline
     \bf Bipartite collisions & $\dfrac{\ab^{1/2}}{\dst^2}$ & $\dst \gg 1/\ab^{1/10}$ & \cite{DiakonikolasGKR19} \\\hline
     \bf Empirical subset weighting & $\dfrac{\ab^{1/2}}{\dst^2}$ & $\dst \gg 1/\ab^{1/4}$ &  \\\hline
   \end{tabularx}
@@ -38,7 +38,7 @@ There are several things to consider in a testing algorithm. To name a few:
   \caption{\label{tab:summary:uniformity:testing}The current landscape of uniformity testing, based on the algorithms I know of. For ease of reading, we omit the $O(\cdot)$, $\Theta(\cdot)$, and $\Omega(\cdot)$'s from the table: all results should be read as asymptotic with regard to the parameters, up to absolute constants.}
 \end{table}
 
-A key insight, that underlies a lot of the algorithms above, is that here \emph{$\lp[2]$ distance is a good proxy for total variation distance}:
+A key insight, which underlies a lot of the algorithms we will cover, is that here \emph{$\lp[2]$ distance is a good proxy for total variation distance}:
 \begin{equation}
   \label{eq:relation:l1:l2:cs}
   \totalvardist{\p}{\uniform_\ab} = \frac{1}{2}\normone{\p-\uniform_\ab} \leq \frac{\sqrt{\ab}}{2}\normtwo{\p-\uniform_\ab}
@@ -241,7 +241,8 @@ The collision-based tester (\cref{algo:collision-based}) is a testing algorithm 
 %%to get the optimal bound $O(\sqrt{\ab}/\dst^2)$ instead of an (easier to obtain) $O(\sqrt{\ab}/\dst^4)$, the analysis of the variance has to be quite intricate.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Unique elements} Another idea: count the number of elements that appear exactly \emph{once} among the $\ns$ samples taken. Why is that a sensible thing to do? We have seen that the uniform distribution will have the fewer collisions, so, equivalently, will have the maximum number of unique elements. In this case, the estimator $Z_2$ (the number of unique elements) is defined as
+\subsection{Unique elements}
+  \label{sec:uniformity:unique} Another idea: count the number of elements that appear exactly \emph{once} among the $\ns$ samples taken. Why is that a sensible thing to do? We have seen that the uniform distribution will have the fewer collisions, so, equivalently, will have the maximum number of unique elements. In this case, the estimator $Z_2$ (the number of unique elements) is defined as
 \begin{equation}
   \label{eq:def:z2}
     Z_2 = \frac{1}{\ns} \sum_{j\in\domain} \indic{\ns_j=1}\,,
@@ -560,14 +561,38 @@ the empirical distance to uniform? A reason might be: \emph{this sounds like a t
 
 That's the thing, though: the devil is in the $o(1)$ details. Sure, $\expect{Z_4}$ will be \emph{almost} $1$ whether $\p$ is uniform or far from it unless $\ns = \Omega(\ab)$. But this ``almost'' will be different in the two cases! Carefully analyzing this tiny gap in expectation, and showing that $Z_4$ concentrates well enough around its expectation to preserve this tiny gap, amazingly leads to a tester with optimal sample complexity $\ns = \Theta(\sqrt{\ab}/\dst^2)$. Let us see how.
 
-For simplicity of exposition, we focus here on the case $\ns \leq \ab$, though the analysis of the test can be performed for extended to all parameter regimes -- see~\citet{DiakonikolasGPP18} for the full general case. The argument proceeds in two steps: first, computing and bounding the expectation of $Z_4$ under the uniform and the far cases separately is not going to really work, so instead we will bound the expectation gap $\Delta(\p)\eqdef \bE{\p}{Z_4}-\bE{\uniform_{\ab}}{Z_4}$ directly (a little like in the case of the unique elements-based tester). Then, once the gap in expectation is established, we will not argue concentration of $Z_4$ as usual by a variance-based (Chebyshev's inequality) argument, but instead by invoking a more powerful (and slightly fancier) concentration inequality.\todonote{Revisit this.}
+\begin{algorithm}[ht!]
+  \begin{algorithmic}[1]
+    \Require Multiset of $\ns$ samples $x_1,\dots,x_\ns \in \domain$, parameters $\dst\in(0,1]$ and $\ab = \abs{\domain}$
+    \LineComment{Set the threshold $\tau$, depending on the parameter regime.}
+    \If{ $\ns \leq \ab$ }
+        \State $\tau \gets \frac{\ns^2\dst^2}{32e\ab^2}$
+    \ElsIf{$\ab < \ns \leq \ab/\dst^2$}
+        \State $\tau \gets c_1\cdot \dst^2\sqrt{\ns/\ab}$ \Comment{$c_1>0$ is some absolute constant.}
+    \Else
+        \State $\tau \gets c_2\cdot\dst$ \Comment{$c_2>0$ is some absolute constant.}
+    \EndIf
+    \State Compute \Comment{Can be done in $O(\ns)$ time if $\domain$ is known, $O(\ns\log\ns)$ if only $\ab$ is.}
+    \[
+        Z_4 = \totalvardist{\hat{\p}}{\uniform_\ab} = \frac{1}{2} \sum_{j=1}^\ab \abs{\frac{\ns_j}{\ns} - \frac{1}{\ab} }
+    \] where $\ns_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
+    \If{ $Z_4 \geq \bE{\uniform_\ab}{Z_4} + \tau$ } \Return \reject \Comment{Not uniform}
+    \Else\ 
+      \Return \accept \Comment{Uniform}
+    \EndIf
+  \end{algorithmic}
+  \caption{\label{algo:empirical:plugin}\sc Empirical Distance Tester}
+\end{algorithm}
+
+For simplicity of exposition, we focus here on the case $\ns \leq \ab$, though the analysis of the test can be performed for extended to all parameter regimes -- see~\citet{DiakonikolasGPP18} for the full general case. The argument proceeds in two steps: first, computing and bounding the expectation of $Z_4$ under the uniform and the far cases separately is not going to really work, so instead we will bound the expectation gap $\Delta(\p)\eqdef \bE{\p}{Z_4}-\bE{\uniform_{\ab}}{Z_4}$ directly (a little like in the case of the unique elements-based tester). Then, once the gap in expectation is established, we will once again argue concentration of $Z_4$ as usual by a variance-based (Chebyshev's inequality) argument~--~but this time diversifying our toolkit and using a different tool, the Efron--Stein lemma, to bound the variance.\todonote{Revisit this.}
+%instead by invoking a more powerful (and slightly fancier) concentration inequality.\todonote{Revisit this.}
 
 \paragraph{The expectation gap $\Delta(\p)$.} From the definition of total variation distance, we can rewrite
 \[
     Z_4 = \sum_{i=1}^\ab \Paren{\hat{\p}_\ns(i) - \frac{1}{\ab}}\indic{\hat{\p}_\ns(i) > 1/\ab}
     = \frac{1}{\ns} \sum_{i=1}^\ab \Paren{\ns_i - \frac{\ns}{\ab} }_+
 \]
-where as previously $\ns_i$ denotes the number of samples falling on element $i$, and $x_+ \eqdef \max(x,0)$. For the same of the analysis, we will introduce the multivariate function
+where as previously $\ns_i$ denotes the number of samples falling on element $i$, and $x_+ \eqdef \max(x,0)$. For the sake of the analysis, we will introduce the multivariate function
 \begin{equation}
   \label{eq:empirical:S}
   S(x_1,\dots,x_\ns) \eqdef \frac{1}{\ns} \sum_{i=1}^\ab \Paren{\ns_i(x_1,\dots,x_\ns) - \frac{\ns}{\ab} }_+
@@ -623,7 +648,7 @@ where again $\q$ is a probability distribution such that $\q = (1-\theta)\unifor
     &\geq \frac{\ns(\ns-1)}{2\ab}\Paren{1-\frac{1}{\ab}}^{\ns-2} \sum_{i=1}^\ab \Paren{\p(i)-\frac{1}{\ab}}^2 \indic{\p(i) < 1/\ab} \notag\\
     &\geq \frac{\ns(\ns-1)}{2\ab}\Paren{1-\frac{1}{\ab}}^{\ns-2} \frac{1}{\ab}\Paren{\sum_{i=1}^\ab \Paren{\frac{1}{\ab}-\p(i)} \indic{\p(i) < 1/\ab}}^2 \notag\\
     &\geq \frac{\ns(\ns-1)}{2\ab^2}\Paren{1-\frac{1}{\ab}}^{\ab-2} \dst^2 
-    \geq \frac{\ns^2\dst^2}{4e\ab^2}
+    \geq \frac{\ns^2\dst^2}{4e\ab^2} \label{eq:empirical:expectation:gap}
 \end{align}
 where the third inequality is Cauchy--Schwarz, the fourth is the definition of total variation distance along with $\totalvardist{\p}{\uniform_\ab}\geq \dst$ (and, in the exponent, $\ns \leq \ab$), and the last is $\Paren{1-1/\ab}^{\ab-2} \geq 1/e$ for $\ab \geq 2$.
 
@@ -635,7 +660,7 @@ Before turning to proving concentration of $Z_4$ (that is, showing that the expe
   &= \frac{1}{\ab} \sum_{i=1}^\ab \indic{\ns_i = 0} \label{eq:empirical:S:alt}
 \end{align}
 where the last equality follows from $\sum_{i=1}^\ab \ns_i = \ns$. 
-That is, in this regime, $Z_4$ is exactly the fraction of \emph{unseen elements} of the domain; this readily allows one to retrieve~\cref{eq:empirical:tv:mu}.
+That is, in this regime, $Z_4$ is exactly the fraction of \emph{unseen elements} of the domain; this readily allows one to retrieve~\cref{eq:empirical:tv:mu}, and also lets us relate $Z_4$ to the ``unique elements'' statistic $Z_2$ from~\cref{sec:uniformity:unique}.\footnote{Again, this relation only holds in the specific regime $\ns \leq \ab$; while we do nto cover the case $\ns > \ab$ here, the guarantees of $Z_4$ extend to this other regime; the identity~\cref{eq:empirical:S:alt}, however, does not.}
 
 \paragraph{Concentration of $Z_4$.} As you may have guessed, we will show that $Z_4$ concentrates around its expectation via Chebyshev's inequality, which requires us to bound $\Var[Z_4]$ in both the uniform and ``far'' cases. In order to diversify our toolkit, we will do so by invoking the \emph{Efron--Stein inequality}\index{Efron--Stein inequality}, which allows us to bound the variance of a function of $\ns$ independent random variables by the expected quadratic change of this function when only one sample is re-randomized: for a function $f$ of $\ns$ variables,
 \begin{align}
@@ -647,21 +672,189 @@ We apply this to $Z_4$, \ie the function $S$ defined in~\cref{eq:empirical:S}; g
 \begin{align*}
   \Var[Z_4] 
   &\leq \frac{\ns}{2}  \bE{\p}{ \Paren{ S(X_1,\dots, X_{\ns-1}, X_\ns) - S(X_1,\dots, X_{\ns-1}, X'_\ns) }^2 } \\
-  &= \frac{\ns}{2\ab^2} \bE{\p}{ \Paren{ \sum_{i=1}^\ab \Paren{ \indic{N_i = 0} - \indic{N_i' = 0} } }^2 }
+  &= \frac{\ns}{2\ab^2} \bE{\p}{ \Big( \sum_{i=1}^\ab \Paren{ \indic{N_i = 0} - \indic{N_i' = 0} } \Big)^2 }
 \end{align*}
 where we wrote $N_i \eqdef \ns_i(\ns_i(X_1,\dots, X_{\ns-1}, X_\ns)$ and $N_i' \eqdef \ns_i(X_1,\dots, X_{\ns-1}, X'_\ns)$, and used the expression of $S$ from~\cref{eq:empirical:S:alt}. To handle this quantity, observe that since only the $\ns$-th sample changes, $\sum_{i=1}^\ab \abs{  \indic{N_i = 0} - \indic{N_i' = 0}  }$ is at most $1$: and this happens when $X_\ns$ falls on an element $i$ not yet observed in the first $\ns-1$ samples while $X'_\ns$ falls on an element $j$ already observed, or vice-versa. That is, we can write
-\begin{align*}
+\begin{align}
   \Var[Z_4] 
-  &\leq  \frac{\ns}{\ab^2} \sum_{i\neq j} \p(i)\p(j) \bPr{\ns_i(X_1,\dots, X_{\ns-1})=0, \ns_j(X_1,\dots, X_{\ns-1}) \geq 1 } \\
-  &= \frac{\ns}{\ab^2} \sum_{i\neq j} \p(i)\p(j) \Paren{ (1-\p(i))^{\ns-1} - (1-\p(i)-\p(j))^{\ns-1} }\\
-  &\leq \frac{\ns}{\ab^2} \sum_{i, j} \p(i)\p(j) \Paren{ 1 - (1-\p(j))^{\ns-1} }\\
-  &= \frac{\ns}{\ab^2} \Paren{ 1 - \sum_{j=1}^\ab \p(j) (1-\p(j))^{\ns-1} }
-\end{align*}
-where the first inequality follows the above discussion, taking the expectation over $X_\ns,X'_\ns$ and using symmetry between the two cases mentioned; the second inequality uses monotonicity of the function $y\mapsto (1-x)^m - (1-x-y)^m$ on $[0,x]$, and adds back the diagonal terms $i=j$ to the sum afterwards; and the last equality uses $\sum_i \p(i)=1$.
+  &\leq  \frac{\ns}{\ab^2} \sum_{i\neq j} \p(i)\p(j) \bPr{\ns_i(X_1,\dots, X_{\ns-1})=0, \ns_j(X_1,\dots, X_{\ns-1}) \geq 1 } \notag\\
+  &= \frac{\ns}{\ab^2} \sum_{i\neq j} \p(i)\p(j) \Paren{ (1-\p(i))^{\ns-1} - (1-\p(i)-\p(j))^{\ns-1} }\notag\\
+  &\leq \frac{\ns}{\ab^2} \sum_{i, j} \p(i)\p(j) \Paren{ 1 - (1-\p(j))^{\ns-1} }\notag\\
+  &= \frac{\ns}{\ab^2} \Big( 1 - \sum_{j=1}^\ab \p(j) (1-\p(j))^{\ns-1} \Big) \label{eq:empirical:var}
+\end{align}
+where the first inequality follows the above discussion, taking the expectation over $X_\ns,X'_\ns$ and using symmetry between the two cases mentioned; the second inequality uses monotonicity of the function $y\mapsto (1-x)^m - (1-x-y)^m$ on $[0,x]$, and adds back the diagonal terms $i=j$ to the sum afterwards; and the last equality uses $\sum_i \p(i)=1$.\footnote{Interestingly, the bound we just obtained is exactly 
+$
+  \Var[Z_4] \leq \frac{\ns}{\ab^2} ( 1 - \bEE{Z_2} )
+$, where $Z_2$ is the ``unique elements tester'' from~\cref{sec:uniformity:unique}.}
+
+Very conveniently, in the uniform case~\cref{eq:empirical:var} leads to the bound
+\begin{align}
+  \label{eq:empirical:var:unif}
+  \Var_{\uniform_\ab}[Z_4] 
+  &\leq \frac{\ns}{\ab^2} \Paren{ 1 - \Paren{1-\frac{1}{\ab}}^{\ns-1} } \leq \frac{\ns(\ns-1)}{\ab^3}
+\end{align}
+which combined with our bound~\cref{eq:empirical:expectation:gap} on the expectation gap leads to the condition
+\[
+    \frac{\ns^2}{\ab^3} \ll \frac{\ns^4\dst^4}{\ab^4}
+\]
+satisfied for $\ns \gg \sqrt{\ab}/\dst^2$. In the far case, a similar bound is easy to obtain for any $\p$ with $\norminf{\p} \lesssim 1/\ab$, since
+\begin{align}
+  \label{eq:empirical:var:lowinfty}
+  \Var_{\p}[Z_4] 
+  &\leq \frac{\ns}{\ab^2} \Big({ 1 - \sum_{j=1}^\ab \p(j) \Paren{1-\norminf{\p}}^{\ns-1} } \Big)
+  %= \frac{\ns}{\ab^2} \Paren{ 1 - \Paren{1-\norminf{\p}}^{\ns-1} } 
+   \leq \frac{\ns(\ns-1)}{\ab^2}\cdot \norminf{\p}\,,
+\end{align}
+so it would be quite nice if we could argue this was, in some sense, the \emph{only} case we needed to worry about. Which brings us to the second new tool to add to our toolkit: an argument based on \emph{stochastic dominance}, which will let us do exactly that. First, let us recall the key concept:
+\begin{definition}
+Let $A,B$ be two (real-valued) random variables. We say that $A$ \emph{stochastically dominates} $B$ if $\bPr{A \geq t} \geq \bPr{B \geq t}$ for all $t\in\R$; or, in terms of cumulative distribution functions, $F_A(t) \leq F_B(t)$ for all $t$.
+\end{definition}
+In our case, we have a random variable $Z_4$, and in the ``far'' case we want to prove $\bPr{Z_4 \geq \tau}$ is large (where $\tau$ is our threshold, based on the expectation gap). So if, for each $\p$ in the `far'' case, we can argue there is a $\p'$  with $\norminf{\p'} \lesssim 1/\ab$ (i.e., which we know how to analyze) such that $Z_4(\p)$ stochastically dominates $Z_4(\p')$, then we are good.
+
+To do so, we need two more steps: first, the notion of \emph{majorization}, and how this relates to stochastic dominance.
+\begin{definition}
+For a vector $x\in \R^\ab$, define $x^{\downarrow}\in\R^\ab$ as the vector with the same components, but sorted in non-increasing order. Then, given two vectors $x,y\in\R^\ab$, we say that $y$ \emph{majorizes} $x$ (denoted $y\succeq x$) if $\sum_{i=1}^\ell y^{\downarrow}_i \geq \sum_{i=1}^\ell x^{\downarrow}_i$ for all $1\leq \ell\leq \ab$, and $\sum_{i=1}^\ab y^{\downarrow}_i = \sum_{i=1}^\ab x^{\downarrow}_i$.
+\end{definition}
+The key relation between vector majorization and stochastic dominance is given in the following theorem:
+\begin{theorem}
+  \label{theo:stochdominance:symmetricfunction}
+  Let $f\colon \R^\ab\to\R$ by a symmetrix convex function. For a probability distribution $\p\in\distribs{\ab}$ and $\ns\in\N$, define the random variable $X_\ns(\p)$ as follows: let $N_1,\dots,N_\ab$ be the counts of each domain element among $\ns$ \iid samples from $\p$, and set $X_\ns(\p)=f(N_1,\dots,N_\ab)$. Then, for any $\p,\q$ such that $\p\succeq\q$, $X_\ns(\p)$ stochastically dominates $X_\ns(\q)$.
+\end{theorem}
+We will not prove this theorem, but instead use it as follows. First, we show that for every $\p$ which is far from uniform there exists some $\bar{\p}$ which majorizes $\p$, is still far from uniform, and importantly has small $\lp[\infty]$ norm: 
+\begin{lemma}
+  \label{lemma:distance:uniformity:averaging}
+For any $\p\in\distribs{\ab}$, let $\bar{\p}\in\distribs{\ab}$ denote the probability distribution obtained by averaging $\p$ over its $K\eqdef \clg{\ab/2}$ heaviest elements. Then (1)~$\p\succeq \bar{\p}$, (2)~$\norminf{\bar{\p}}\leq 2/\ab$, and (3)~$\totalvardist{\bar{\p}}{\uniform_\ab}\geq \frac{1}{2}\totalvardist{\p}{\uniform_\ab}$.
+\end{lemma}
+\begin{proof}
+Clearly, all properties are invariant by permutation of the domain, so we can assume for simplicity that $\p$ is non-increasing: $\p(1)\geq \p(2)\geq \dots \geq \p(\ab)$, and 
+$\bar{\p}(1) = \dots = \bar{\p}(K) = \frac{1}{K}\sum_{i=1}^K \p(i)$, $\bar{\p}(i)=\p(i)$ for $i\geq K$. In particular, this immediately implies (1), as well as (2) (since $\norminf{\bar{\p}} = \bar{\p}(1) \leq 2/\ab$).
+
+Let us prove (3), which states that this averaging does not decrease the distance too much. Consider the minimal set $S\subseteq[\ab]$ such that $\totalvardist{\p}{\uniform_\ab} = \p(S)-\uniform_\ab(S)$: we know that $S = \setOfSuchThat{ x}{\p(x) > 1/\ab}$. By motonicity of $\p$, this implies that $S = \{1,\dots,\ell\}$ for some $\ell\geq 1$.
+\begin{itemize}
+  \item If $\ell \geq K$, then $\bar{\p}(S)=\p(S)$, and so $\totalvardist{\bar{\p}}{\uniform_\ab} = \totalvardist{\p}{\uniform_\ab}$;
+  \item otherwise, $\ell < K$, in which case we look at $T=[\ab]\setminus S$, which satisfies $\totalvardist{\p}{\uniform_\ab} = \uniform_\ab(T) - \p(T)$. Let $T' \eqdef \{K+1, \dots, \ab\}\subsetneq T$; by monotonicity, 
+  %$\p(T\setminus T') = \p(\ell+1)+\dots+\p(K) \geq \frac{K-\ell}{\ab -K}\Paren{\p(K+1)+\dots+\p(\ab)}$
+  $\frac{\p(T\setminus T')}{|T\setminus T'|}\geq \frac{\p(T')}{|T'|}$, implying $\p(T') \leq \frac{|T'|}{|T|} \p(T)$. But then, since $\p = \bar{\p}$ on $T'$,
+  \begin{align*}
+     \totalvardist{\bar{\p}}{\uniform_\ab} &= \sup_{R\subseteq [\ab]} \Paren{\uniform_\ab(R) - \bar{\p}(R)} \geq  \uniform_\ab(T') - \bar{\p}(T') \\
+     &= \frac{|T'|}{|T|}\uniform_\ab(T)-\p(T') \geq \frac{|T'|}{|T|} \Paren{\uniform_\ab(T)-\p(T)} \\
+     &= \frac{|T'|}{|T|}\totalvardist{\p}{\uniform_\ab} \geq \frac{1}{2}\totalvardist{\p}{\uniform_\ab}\,,
+  \end{align*}
+  the last inequality following from $\frac{|T'|}{|T|} = \frac{\ab-K}{\ab-\ell} \geq \frac{\ab - \clg{\ab/2}}{\ab-1} \geq \frac{1}{2}$.
+\end{itemize}
+This concludes the proof of the lemma.
+\end{proof}
+Note that by the data processing inequality~\cref{fact:dpi}, we have $\totalvardist{\bar{\p}}{\uniform_\ab}\leq \totalvardist{\p}{\uniform_\ab}$, so the averaging can change the distance to uniformity by a factor at most 2.\footnote{Moreover, this factor 2 cannot be improved upon, as one can check with, e.g., $\p = \frac{\ab}{\ab-1}\dst \delta_1 + \Paren{1-\frac{\ab}{\ab-1}\dst} \uniform_\ab$, for which $\totalvardist{\p}{\uniform_\ab} = \dst$, but $\totalvardist{\bar{\p}}{\uniform_\ab} = \frac{1+o(1)}{2}\dst$.}
+
+Combining~\cref{theo:stochdominance:symmetricfunction,lemma:distance:uniformity:averaging}, we get that for every $\p$ such that $\totalvardist{\p}{\uniform_\ab} \geq \dst$, there exists some ``nicer'' $\bar{\p}$ such that $\totalvardist{\bar{\p}}{\uniform_\ab} \geq \dst/2$ with $\norminf{\bar{\p}}\leq 2/\ab$ and, for any choice of threshold $\tau$,
+\begin{equation}
+    \probaDistrOf{\p}{Z_4 \geq \tau } \geq \probaDistrOf{\bar{\p}}{Z_4 \geq \tau }\,.
+\end{equation}
+Thus, it suffices to choose a suitable $\tau$ for which the RHS is at least $2/3$ (along with $\probaDistrOf{\uniform_\ab}{Z_4 \geq \tau } \leq 1/3$, of course) to conclude. By~\cref{eq:empirical:expectation:gap} (but for $\dst/2$, not $\dst$), we know that the expectation gap for such a $\bar{\p}$ is at least
+$\Delta(\bar{\p})\geq \frac{\ns^2\dst^2}{16e\ab^2}$. Moreover, now we can use~\cref{eq:empirical:var:lowinfty} to get the variance bound 
+\begin{align}
+  \Var_{\bar{\p}}[Z_4] 
+   \leq \frac{2\ns(\ns-1)}{\ab^3}\,,
+\end{align}
+which lets us establish the following theorem:
+\begin{theorem}
+The empirical-distance tester (\cref{algo:empirical:plugin}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$ and time complexity $O(\ns)$.
+\end{theorem}
+\begin{proof}
+As discussed above, we only prove here the case $\ns \leq \ab$, \ie $\dst = \bigOmega{1/\ab^{1/4}}$; however, the statement holds for all regimes. 
+For any $\p\in\distribs{\ab}$, let $\Delta(\p) \eqdef \bE{\p}{Z_4} - \bE{\uniform_\ab}{Z_4}$. Clearly, if $\p=\uniform_\ab$ then $\Delta(\p)=0$; if $\totalvardist{\p}{\uniform_\ab} \geq \dst$, by  stochastic dominance it suffices to consider the corresponding $\bar{\p}$, which satisfies $\Delta(\bar{\p})\geq \frac{\ns^2\dst^2}{16e\ab^2} \eqdef \Delta$. We also have our variance bounds from~\cref{eq:empirical:var:unif,eq:empirical:var:lowinfty}. Define our threshold
+\[
+    \tau \eqdef \frac{\Delta}{2} = \frac{\ns^2\dst^2}{32e\ab^2}
+\]
+as in~\cref{algo:empirical:plugin} (for this regime of parameters).
+\begin{itemize}
+    \item In the uniform case, the probability to output \reject (and thus make a mistake) is bounded as
+    \[
+    \bPr{Z_4 \geq \bE{\uniform_\ab}{Z_4} + \tau} \leq \frac{\Var_{\uniform_\ab}[Z_4]}{\tau^2}
+    \leq \frac{\ns(\ns-1)}{\ab^3}\cdot \frac{(32e)^2\ab^4}{\ns^4\dst^4}
+    \]
+    which is less than $1/3$ as long as $\ns \geq 32e\sqrt{3\ab}/\dst^2$.
+    \item In the ``far'' case, the probability to err by outputting \accept is
+    \begin{align*}
+        \bP{\p}{Z_4 < \bE{\uniform_\ab}{Z_4} + \tau} %&= \bPr{Z_3 < \frac{\Delta(\p)}{2}  } \\       
+        &\leq \bP{\bar{\p}}{Z_4 < \bE{\uniform_\ab}{Z_4} + \tau} \\
+        &\leq \bP{\bar{\p}}{Z_4 < \bE{\bar{\p}}{Z_4} - \tau} \\
+        &\leq \frac{\Var_{\p}[Z_3]}{\tau^2} \\
+        &\leq \frac{2\ns(\ns-1)}{\ab^3}\cdot \frac{(32e)^2\ab^4}{\ns^4\dst^4}
+    \end{align*}
+    using~\cref{eq:empirical:var:lowinfty}, simplifying, then $\bEE{Z_3}\geq \ns\dst^2$. This is less than $1/3$ as long as $\ns \geq 32e\sqrt{6\ab}/\dst^2$.
+  \end{itemize}
+  The above analysis shows that both errors are less than $1/3$ for, say, $\ns = \lceil{32e\sqrt{6\ab}/\dst^2}\rceil$; this concludes the proof.
+\end{proof}
+\begin{remark}
+It is unclear whether one could avoid using the first (very convenient) ``stochastic dominance hammer'' (\cref{theo:stochdominance:symmetricfunction}), and instead relate directly the bound on $\Var_\p[Z_4]$ from~\cref{eq:empirical:var} to $\Delta(\p)$ for arbitrary ``far'' distribution $\p$ in order to obtain the right sample complexity.
+\end{remark}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Random binary hashing} Now for a tester that is \emph{not} sample-optimal (but has other advantages, and is relatively cute). If there is one thing we know how to do optimally, it's estimating the bias of a coin. We don't have a coin (Bernoulli) here, we have a glorious $(\ab-1)$-dimensional object.
-Hell, let's just randomly make it a coin, shall we? Pick your favourite ($4$-wise independent) hash function $h\colon[\ab]\to\{0,1\}$, thus randomly partitioning the domain $[\ab]$ in two sets $S_0,S_1$. Hash all the $\ns$ samples you got: \emph{now} we have a random coin!
+\subsection{Random binary hashing} 
+Now we turn to a tester that is \emph{not} sample-optimal~--~but has other advantages, and whose analysis contains a couple insighful aspects. The main idea is that, while large domains are complicated, if there is one thing we know how to do optimally it is estimating the bias of a coin. That is, we know how to handle the case $\ab=2$:
+\begin{fact}[Bias of a coin]
+  Given \iid samples from a Bernoulli with unknown parameter $\alpha\in[0,1]$, estimating $\alpha$ to an additive $\dst$ with probability $1-\errprob$ can be done with (and requires) $\bigTheta{\frac{\log(1/\errprob)}{\dst^2}}$ samples.
+\end{fact} 
+Of course, we do not have a probability distribution over $\{0,1\}$ here, we have a much more problematic $(\ab-1)$-dimensional object. However, what prevents us from \emph{making} our $\ns$ samples into \iid samples from a Bernoulli? Let us uniformly randomly partition the domain $[\ab]$ in two sets $S$ and $[\ab]\setminus S$, and convert each sample into a $\{0,1\}$ value accordingly: $X'_i \eqdef \indic{X_i\in S}$, for $1\leq i\leq \ns$.
+
+This gives us $\ns$ \iid samples from a Bernoulli random variable with parameter $\alpha(\p) \eqdef \p(S)$: let us estimate it! Since we know $S$, we know exactly what this should be under the uniform distribution: $\alpha(\uniform_\ab) = \uniform_\ab(S) = \abs{S}/\ab$. If only we could argue that $\alpha(\p)$ noticeably differs from $\uniform_\ab(S)$ (with high probability over the random choice of $S$) whenever $\p$ is $\dst$-far from uniform, we would have a tester. Luckily for us, this is, indeed, the case:
+\begin{lemma}[Random Binary Hashing]
+  Let $\p,\q\in\distribs{\ab}$. Then
+  \[
+        \probaDistrOf{S}{ |\p(S)-\q(S)| \geq \frac{1}{2\sqrt{2}}\normtwo{\p-\q} } \geq \frac{1}{48}
+  \] 
+  where $S\subseteq[\ab]$ is a uniformly random subset of $[\ab]$.
+\end{lemma}
+\begin{proof}
+If $\p=\q$, then the statement trivially holds as $|\p(S)-\q(S)|=0$ with probability one; we thus assume $\p\neq \q$. 
+Write $\delta \eqdef \p-\q\in\R^\ab$, so that $\p(S)-\q(S) = \sum_{i=1}^\ab \delta_i S_i$, where $S_1,\dots, S_\ab$ are independent $\bernoulli{1/2}$ (where $S_i$ indicates whether $i\in S$). Equivalently, since $\sum_{i=1}^\ab \delta_i=0$ we can write $\p(S)-\q(S) = \frac{1}{2}Z$, where $Z \eqdef \sum_{i=1}^\ab \delta_i \xi_i$ for $\xi_1,\dots,\xi_\ab$ \iid Rademacher (uniform on $\{\pm 1\}$). By linearity of expectation, it is immediate to check that $\bEE{Z}=0$ (although we will not use this), and that by independence  
+\[
+  \bEE{Z^2} = \sum_{1\leq i,j\leq \ab} \delta_i\delta_j \bEE{\xi_i\xi_j} = \sum_{i=1}^\ab \delta_i^2 = \normtwo{\delta}^2\,,
+\]
+so what we want to prove can be rewritten $\bPr{ Z^2 \geq \frac{1}{2} \bEE{Z^2} } \geq 1/48$. That is, we want an \emph{anticoncentration} result,\footnote{Indeed, we aim to show that, with constant probability, $Z$ stays away from its expectation $\bEE{Z}=0$~--~\ie that it does not concentrate too much around $\bEE{Z}$.} which suggests one of the most versatile tools for this, the Paley--Zygmund inequality:
+\begin{theorem}[Paley--Zygmund inequality]
+  \label{theo:pz}
+Let $U$ be a non-negative random variable with finite variance. Then, for every $\theta\in[0,1]$,
+\[
+    \bPr{ U \geq \theta \bEE{U} } \geq (1-\theta)^2\frac{\bEE{U}^2}{\bEE{U^2}}\,.
+\]
+\end{theorem}
+In our case, we will apply this to $Z^2$, which is indeed non-negative. Unfortunately, this means we need to compute $\bEE{U^4}$, in order to compare it to $\bEE{Z^2}^2$. We could do so directly, by expanding $\big({\sum_{i=1}^\ab \delta_i \xi_i}\big)^4$, keeping track of the various products appearing and using linearity of expectation. This is quite fastidious; instead, we will take a shortcut and bound the moment-generating function of $Z$. For any $\lambda\in\R$,
+\[
+  \bEE{e^{\lambda Z}} 
+  = \prod_{i=1}^\ab \bEE{e^{\lambda\delta_i \xi_i}}
+  \leq \prod_{i=1}^\ab e^{\frac{\lambda^2}{2}\delta_i^2}
+  = e^{\frac{\lambda^2}{2}\normtwo{\delta}^2}
+\]
+relying on, \eg Hoeffding's Lemma for the inequality. Using the Taylor expansion of $e^x$ along with the fact that $Z$ is symmetric (so all its odd moments cancel out), we have
+$
+  \bEE{e^{\lambda Z}} = \sum_{\ell=0}^\infty \frac{\lambda^{2\ell}}{(2\ell)!}\bEE{Z^{2\ell}} \geq \frac{\lambda^{4}}{4!}\bEE{Z^{4}} 
+$, and so, for any $\lambda\neq 0$,
+\[
+    \bEE{Z^{4}} \leq \frac{24}{\lambda^4}e^{\frac{\lambda^2}{2}\normtwo{\delta}^2}
+    = \frac{3}{2}\normtwo{\delta}^4\cdot \Paren{\frac{4}{\normtwo{\delta}^2\lambda^2}\cdot e^{\frac{\lambda^2}{4}\normtwo{\delta}^2}}^2\,.
+\]
+In particular, by studying the function $x>0 \mapsto e^x/x$ we see that the RHS is minimized for $\lambda = 2/\normtwo{\delta}$, showing that
+$
+    \bEE{Z^{4}} \leq \frac{3e^2}{2}\normtwo{\delta}^4
+$. 
+We can finally apply~\cref{theo:pz}, getting that, for every $\theta\in[0,1]$,
+\[
+ \bPr{ Z^2 \geq \theta \bEE{Z^2} } \geq (1-\theta)^2\frac{\bEE{Z^2}^2}{\bEE{Z^4}} \geq (1-\theta)^2\frac{2}{3e^2}
+ \geq \frac{(1-\theta)^2}{12}\,.
+\]
+Choosing $\theta=1/2$ then concludes the proof.
+\end{proof}
+\begin{remark}
+The proof of this lemma established a little more than stated: first, we actually showed a tradeoff, where for every $\alpha\in[0,1/2]$
+\[
+\probaDistrOf{S}{ |\p(S)-\q(S)| \geq \alpha\normtwo{\p-\q} } \geq \frac{1}{12}(1-4\alpha^2)^2\,.
+\]
+Second, although our proof via the MGF used full independence of the $\xi_i$'s (and thus a truly uniformly random set $S$), this was just to obtain bounds on the first 4 moments of $Z$, which is all that the Paley--Zygmund lemma eventually requires. Any distribution for $S$ with the same first 4 moments would still lead to the same guarantees! In particular, instead of a truly uniformly random $S$, one can instead use a $4$-wise independent hash function, which requires significantly less randomness and can be much faster.
+\end{remark}
+
+%Pick your favourite ($4$-wise independent) hash function $h\colon[\ab]\to\{0,1\}$, thus randomly partitioning the domain $[\ab]$ in two sets $S_0,S_1$. Hash all the $\ns$ samples you got: \emph{now} we have a random coin!
 
 Let's estimate its bias then: we know exactly what this should be under the uniform distribution: $\uniform_\ab(S_0)$. If only we could argue that $\p(S_0)$ noticeably differs from $\uniform_\ab(S_0)$ (with high probability over the random choice of the hash function) whenever $\p$ is $\dst$-far from uniform, we'd be good. Turns out\dots it is the case:
 \begin{equation}
@@ -712,7 +905,9 @@ mity testing.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exercises}
-Prove the monotonicity of $\lp[p]$ norms
+- Prove the monotonicity of $\lp[p]$ norms
+
+- It is known that $x\preceq y$ if, and only if, $x=Ay$ for some doubly stochastic matrix $A$~\citep[Theorem~2.1]{Arnold87}. Check that the averaging from~\cref{lemma:distance:uniformity:averaging} indeed corresponds to multiplying the pmf $\p$ (seen as a vector) by such a matrix.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
