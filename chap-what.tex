@@ -51,6 +51,7 @@ Another important point is that, while our main focus will be on \emph{discrete}
 
 \paragraph{Dependence on the error probability $\errprob$.} Our definition of testing algorithm leaves the error probability $\errprob$ as a free parameter; however, it is quite common in the distribution testing literature to set it as some arbitrary constant smaller than $1/2$ (usually $1/3$). Indeed, by a standard argument,\index{probability amplification} an error probability $1/3$ can be driven down to arbitrary $\errprob$ at the price of a $\bigO{\log(1/\errprob)}$ factor in the sample complexity. 
 \begin{lemma}[Error probability amplification]
+  \label{lemma:error:proba:amplification}
   Fix $\property$ and $\class$, and suppose there exists a testing algorithm $\Algo$ for $\property$ under $\class$ with sample complexity $\ns(\ab,\dst,1/3)$ and time complexity $\tc(\ab,\dst,1/3)$. Then there is a testing algorithm $\Algo'$ for $\property$ under $\class$ with sample and time complexities $\ns'(\ab,\dst,\errprob) \eqdef \ns(\ab,\dst,1/3)\clg{18\ln(1/\errprob)}$ and $\tc'(\ab,\dst,\errprob) \eqdef \bigO{ \tc(\ab,\dst,1/3) \log(1/\errprob)}$.\cmargin{Logarithm is binary!}
 \end{lemma}
 \begin{proof}[Proof sketch]
