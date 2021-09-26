@@ -91,8 +91,8 @@ By the above, $\expect{Z_1} = \normtwo{\p}^2$. If we threshold $Z_1$ somewhere b
     \State Set $\tau \gets \frac{1+2\dst^2}{\ab}$
     \State Compute \Comment{Can be done in $O(\ns)$ time if $\domain$ is known, $O(\ns\log\ns)$ if only $\ab$ is.}
     \[
-        Z_1 = \frac{1}{\binom{\ns}{2}} \sum_{1\leq s < t \leq \ns} \indic{x_s=x_t} = \frac{1}{\binom{\ns}{2}} \sum_{j\in\domain} \binom{\ns_j}{2}
-    \] where $\ns_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
+        Z_1 = \frac{1}{\binom{\ns}{2}} \sum_{1\leq s < t \leq \ns} \indic{x_s=x_t} = \frac{1}{\binom{\ns}{2}} \sum_{j\in\domain} \binom{\occur_j}{2}
+    \] where $\occur_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
     \If{ $Z_1 \geq \tau$ } \Return \reject \Comment{Not uniform}
     \Else\ 
       \Return \accept \Comment{Uniform}
@@ -248,9 +248,9 @@ The collision-based tester (\cref{algo:collision-based}) is a testing algorithm 
   \label{sec:uniformity:unique} Another idea: count the number of elements that appear exactly \emph{once} among the $\ns$ samples taken. Why is that a sensible thing to do? We have seen that the uniform distribution will have the fewer collisions, so, equivalently, will have the maximum number of unique elements. In this case, the estimator $Z_2$ (the number of unique elements) is defined as
 \begin{equation}
   \label{eq:def:z2}
-    Z_2 = \frac{1}{\ns} \sum_{j\in\domain} \indic{\ns_j=1}\,,
+    Z_2 = \frac{1}{\ns} \sum_{j\in\domain} \indic{\occur_j=1}\,,
 \end{equation}
-again with $\ns_j \eqdef \sum_{t=1}^\ns \indic{X_t=j}$. It is a simple matter to verify that this statistic has expectation\exercise{Do it!}
+again with $\occur_j \eqdef \sum_{t=1}^\ns \indic{X_t=j}$. It is a simple matter to verify that this statistic has expectation\exercise{Do it!}
 \begin{equation}
   \label{eq:z2:expectation}
   \expect{Z_2} = \sum_{i\in\domain} \p(i)(1-\p(i))^{\ns-1}
@@ -263,8 +263,8 @@ which is\dots{} a thing? Note that under the uniform distribution $\uniform_\ab$
     \State Set $\tau \gets (1-\frac{1}{\ab})^{\ns-1}-\frac{\ns\dst^2}{8\ab}$ \Comment{This is $\bE{\uniform_\ab}{Z_2} - \frac{\ns\dst^2}{8\ab}$}
     \State Compute \Comment{Can be done in $O(\ns)$ time if $\domain$ is known, $O(\ns\log\ns)$ if only $\ab$ is.}
     \[
-        Z_2 = \frac{1}{\ns} \sum_{j\in\domain} \indic{\ns_j=1}
-    \] where $\ns_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
+        Z_2 = \frac{1}{\ns} \sum_{j\in\domain} \indic{\occur_j=1}
+    \] where $\occur_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
     \If{ $Z_2 \leq \tau$ } \Return \reject \Comment{Not uniform}
     \Else\ 
       \Return \accept \Comment{Uniform}
@@ -335,11 +335,11 @@ where the first line uses $f\geq g$, the second from cancellation of the linear 
 At this point, we have half of the puzzle: it remains to get a handle on the variance of $Z_2$ in both the far and uniform cases. We start by providing an exact (albeit unwieldy) expression for it.%, which we will then massage to obtain a usable bound in the uniform case.
 \begin{align*}
 \Var[Z_2] 
-&= \frac{1}{\ns^2}\sum_{i,j\in\domain} \bEE{\indic{\ns_i=1}\indic{\ns_j=1}} - \bEE{Z_2}^2  \\
-&= \frac{1}{\ns^2}\sum_{i\in\domain} \bEE{\indic{\ns_i=1}} + \frac{1}{\ns^2}\sum_{i\neq j} \bEE{\indic{\ns_i=1}\indic{\ns_j=1}} - \bEE{Z_2}^2 \\
+&= \frac{1}{\ns^2}\sum_{i,j\in\domain} \bEE{\indic{\occur_i=1}\indic{\occur_j=1}} - \bEE{Z_2}^2  \\
+&= \frac{1}{\ns^2}\sum_{i\in\domain} \bEE{\indic{\occur_i=1}} + \frac{1}{\ns^2}\sum_{i\neq j} \bEE{\indic{\occur_i=1}\indic{\occur_j=1}} - \bEE{Z_2}^2 \\
 &= \frac{1}{\ns}\bEE{Z_2}- \bEE{Z_2}^2 + \frac{\ns-1}{\ns}\sum_{i\neq j} \p(i)\p(j)(1-(\p(i)+\p(j)))^{\ns-2}\,, %\label{eq:var:z2}
 \end{align*}
-where the last line relied on~\cref{eq:def:z2} to recognize $\bEE{Z_2}$ in the first term, and on the fact that $\bEE{\indic{\ns_i=1}\indic{\ns_j=1}} = \ns(\ns-1)\p(i)\p(j)(1-(\p(i)+\p(j)))^{\ns-2}$ for $i\neq j$. (Indeed, $\indic{\ns_i=1}\indic{\ns_j=1}$ is equal to one if, and only if, out of the $\ns$ samples two fall on $i$ and $j$, respectively, and the $\ns-2$ others hit $\domain\setminus\{i,j\}$.)
+where the last line relied on~\cref{eq:def:z2} to recognize $\bEE{Z_2}$ in the first term, and on the fact that $\bEE{\indic{\occur_i=1}\indic{\occur_j=1}} = \ns(\ns-1)\p(i)\p(j)(1-(\p(i)+\p(j)))^{\ns-2}$ for $i\neq j$. (Indeed, $\indic{\occur_i=1}\indic{\occur_j=1}$ is equal to one if, and only if, out of the $\ns$ samples two fall on $i$ and $j$, respectively, and the $\ns-2$ others hit $\domain\setminus\{i,j\}$.)
 
 This looks quite unwieldy; however, we can rearrange the term $\bEE{Z_2}^2$ to obtain the nicer expression
 \begin{align}
@@ -425,14 +425,14 @@ as in~\cref{algo:unique-elements}.
 \end{proof}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Modified $\chi^2$} If you are a statistician, or just took a Statistics class, or even got lost on Wikipedia at some point and ended up on the wrong page at the wrong time, you may know of Pearson's $\chi^2$ test for goodness-of-fit: for every element $i$ of the domain, count how many times it appeared in the samples, $N_i$. Compute $\sum_{i} \frac{(N_i-\ns/\ab)^2}{\ns/\ab}$. Compare the result to a predetermined threshold. This very natural idea, maybe not surprisingly, works well! In particular, since $N_i \sim \binomial{\ns}{\p(i)}$, it is not hard to see that
+\subsection{Modified $\chi^2$} If you are a statistician, or just took a Statistics class, or even got lost on Wikipedia at some point and ended up on the wrong page at the wrong time, you may know of Pearson's $\chi^2$ test for goodness-of-fit: for every element $i$ of the domain, count how many times it appeared in the samples, $\occur_i$. Compute $\sum_{i} \frac{(\occur_i-\ns/\ab)^2}{\ns/\ab}$. Compare the result to a predetermined threshold. This very natural idea, maybe not surprisingly, works well! In particular, since $\occur_i \sim \binomial{\ns}{\p(i)}$, it is not hard to see that
 \[
-\bEE{ \sum_{i=1}^\ab \frac{(N_i-\ns/\ab)^2}{\ns/\ab} } = \frac{\ab}{\ns}\sum_{i=1}^\ab \bEE{ \Paren{N_i-\frac{\ns}{\ab}}^2 } = \ab(\ns-1)\normtwo{\p-\uniform_\ab}^2 + \ab-1
+\bEE{ \sum_{i=1}^\ab \frac{(\occur_i-\ns/\ab)^2}{\ns/\ab} } = \frac{\ab}{\ns}\sum_{i=1}^\ab \bEE{ \Paren{\occur_i-\frac{\ns}{\ab}}^2 } = \ab(\ns-1)\normtwo{\p-\uniform_\ab}^2 + \ab-1
 \]
 using moments of a Binomial random variable and~\cref{eq:relation:collisionprob:distance:uniform}.\exercise{Check it!} This does look like a reasonable way to estimate the distance to uniformity \emph{via} the $\lp[2]$ distance again\dots{} unfortunately, the variance will be slightly annoying, due to the correlated between terms of the sums.
 
 
-To make the task easier, it is helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, which will greatly simplifies the analysis. Then, under this (slightly different) sampling model the $N_i$'s become independent, with $N_i\sim\poisson{\ns\p(i)}$: this is called \emph{Poissonization}\index{Poissonization}, and can be done more or less without loss of generality since a $\poisson{\ns}$ random variable will be between $0.99\ns$ and $1.01\ns$ with overwhelming probability. (See~\cref{sec:poissonization} for more on Poissonization, and why we can use it ``without loss of generality'').
+To make the task easier, it is helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, which will greatly simplifies the analysis. Then, under this (slightly different) sampling model the $\occur_i$'s become independent, with $\occur_i\sim\poisson{\ns\p(i)}$: this is called \emph{Poissonization}\index{Poissonization}, and can be done more or less without loss of generality since a $\poisson{\ns}$ random variable will be between $0.99\ns$ and $1.01\ns$ with overwhelming probability. (See~\cref{sec:poissonization} for more on Poissonization, and why we can use it ``without loss of generality'').
 
 \begin{algorithm}[ht!]
   \begin{algorithmic}[1]
@@ -441,8 +441,8 @@ To make the task easier, it is helpful to think of taking $\poisson{\ns}$ sample
     \State Set $\tau \gets 2\ns\dst^2$
     \State Compute \Comment{Can be done in $O(\ns)$ time if $\domain$ is known, $O(\ns\log\ns)$ if only $\ab$ is.}
     \[
-        Z_3 = \sum_{j\in\domain} \frac{(\ns_j-\ns/\ab)^2-\ns_j}{\ns/\ab}
-    \] where $\ns_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
+        Z_3 = \sum_{j\in\domain} \frac{(\occur_j-\ns/\ab)^2-\occur_j}{\ns/\ab}
+    \] where $\occur_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
     \If{ $Z_3 \geq \tau$ } \Return \reject \Comment{Not uniform}
     \Else\ 
       \Return \accept \Comment{Uniform}
@@ -453,18 +453,18 @@ To make the task easier, it is helpful to think of taking $\poisson{\ns}$ sample
 
 The bad news is that it does not actually lead to the optimal sample complexity: Poissonization introduces a bit more variance (as we introduce extra randomness ourselves by taking a random number of samples), and so the variance of this $\chi^2$ test can be too big due to the elements we only expect to see zero or once (so, most of them). The \emph{good} news is that a simple correction of that test, of the form
 \begin{equation}
-    Z_3 = \sum_{i=1}^\ab \frac{(N_i-\ns/\ab)^2- N_i}{\ns/\ab}
+    Z_3 = \sum_{i=1}^\ab \frac{(\occur_i-\ns/\ab)^2- \occur_i}{\ns/\ab}
 \end{equation}
-\emph{does} have a much smaller variance, and a threshold test of the form ``$Z_3 > \tau$?'' will yield the right sample complexity.\footnote{In the multinomial (``non-Poissonized'') case, substracting $N_i$ was not necessary, since that would correspond to removing overall $\frac{\ab}{\ns}\sum_{i=1}^\ab N_i = \ab$, a constant term. In the Poissonized case, however, $\sum_{i=1}^\ab N_i\sim\poisson{\ns}$, and $\frac{\ab}{\ns}\sum_{i=1}^\ab N_i$ is not a constant -- it is a random variable with expectation $\ab$ and (large) variance $\ab^2/\ns$.} Recalling that $N_i\sim\poisson{\ns\p(i)}$ for all $i$, the expectation of $Z_3$ will then just be 
+\emph{does} have a much smaller variance, and a threshold test of the form ``$Z_3 > \tau$?'' will yield the right sample complexity.\footnote{In the multinomial (``non-Poissonized'') case, substracting $\occur_i$ was not necessary, since that would correspond to removing overall $\frac{\ab}{\ns}\sum_{i=1}^\ab \occur_i = \ab$, a constant term. In the Poissonized case, however, $\sum_{i=1}^\ab \occur_i\sim\poisson{\ns}$, and $\frac{\ab}{\ns}\sum_{i=1}^\ab \occur_i$ is not a constant -- it is a random variable with expectation $\ab$ and (large) variance $\ab^2/\ns$.} Recalling that $\occur_i\sim\poisson{\ns\p(i)}$ for all $i$, the expectation of $Z_3$ will then just be 
 \begin{equation}
   \label{eq:expectation:z3}
     \expect{Z_3} = \ns\ab \normtwo{\p-\uniform_\ab}^2
 \end{equation}
 which is perfect. Analyzing this test boils down, again, to bounding the variance of $Z_3$ and invoking Chebyshev's inequality\dots{} Before doing so, we will make an innocuous change, but which will come quite handy in~\cref{sec:identity} when generalizing beyond the uniform distribution: let us rewrite
 \[
-    Z_3 = \sum_{i=1}^\ab \frac{(N_i-\ns\uniform_\ab(i))^2- N_i}{\ns\uniform_\ab(i)}
+    Z_3 = \sum_{i=1}^\ab \frac{(\occur_i-\ns\uniform_\ab(i))^2- \occur_i}{\ns\uniform_\ab(i)}
 \]
-where, of course, $\uniform_\ab(i) = 1/\ab$ for all $i\in[\ab]$. Recalling that, by Poissonization, all the $N_i$'s are independent Poisson random variables, we will invoke the following two technical claims, which follow from (somewhat tedious, but straightforward) computations involving the moments of Poisson random variables:\exercise{Prove this claim!}
+where, of course, $\uniform_\ab(i) = 1/\ab$ for all $i\in[\ab]$. Recalling that, by Poissonization, all the $\occur_i$'s are independent Poisson random variables, we will invoke the following two technical claims, which follow from (somewhat tedious, but straightforward) computations involving the moments of Poisson random variables:\exercise{Prove this claim!}
 \begin{claim}
   Let $\mu, \lambda \geq 0$. If $X\sim\poisson{\lambda}$, then 
   $
@@ -478,16 +478,16 @@ where, of course, $\uniform_\ab(i) = 1/\ab$ for all $i\in[\ab]$. Recalling that,
 Given this, by linearity of expectation we immediately get
 \begin{align}
     \bEE{Z_3} 
-    &= \sum_{i=1}^\ab \frac{\bEE{(N_i-\ns\uniform_\ab(i))^2- N_i}}{\ns\uniform_\ab(i)}
+    &= \sum_{i=1}^\ab \frac{\bEE{(\occur_i-\ns\uniform_\ab(i))^2- \occur_i}}{\ns\uniform_\ab(i)}
     = \ns\sum_{i=1}^\ab \frac{(\p(i)-\uniform_\ab(i))^2}{\uniform_\ab(i)} \notag\\
     &= \ns\cdot\chisquare{\p}{\uniform_\ab} \label{eq:expectation:z3:chisquare}
 \end{align}
 which here can further be simplified by $\chisquare{\p}{\uniform_\ab} = \ab\normtwo{\p-\uniform_\ab}^2$, as the denominator is constant and equal to $1/\ab$; this establishes~\cref{eq:expectation:z3}.
 
-Turning to the variance, we want to relate $\Var[Z_3]$ to known quantities, and in particular $\bEE{Z_3}$. To do so, we use independence of the $N_i$'s followed by the second part of the above claim to get
+Turning to the variance, we want to relate $\Var[Z_3]$ to known quantities, and in particular $\bEE{Z_3}$. To do so, we use independence of the $\occur_i$'s followed by the second part of the above claim to get
 \begin{align}
     \Var[Z_3]
-    &= \sum_{i=1}^\ab \frac{\Var[(N_i-\ns\uniform_\ab(i))^2- N_i]}{\ns^2\uniform_\ab(i)^2} \notag\\
+    &= \sum_{i=1}^\ab \frac{\Var[(\occur_i-\ns\uniform_\ab(i))^2- \occur_i]}{\ns^2\uniform_\ab(i)^2} \notag\\
     &= \sum_{i=1}^\ab \frac{2\ns^2\p(i)^2 + 4\ns^3\p(i)(\p(i)-\uniform_\ab(i))^2}{\ns^2\uniform_\ab(i)^2} \notag\\
     &= 2\sum_{i=1}^\ab \frac{\p(i)^2}{\uniform_\ab(i)^2}+4\ns\sum_{i=1}^\ab \frac{\p(i)(\p(i)-\uniform_\ab(i))^2}{\uniform_\ab(i)^2}\notag\\
     &\leq 2\sum_{i=1}^\ab \frac{\p(i)^2}{\uniform_\ab(i)^2}+4\ns\sqrt{\sum_{i=1}^\ab \frac{\p(i)^2}{\uniform_\ab(i)^2}}\cdot\sqrt{\sum_{i=1}^\ab \frac{(\p(i)-\uniform_\ab(i))^4}{\uniform_\ab(i)^2}}\notag\\
@@ -553,7 +553,7 @@ as in~\cref{algo:chisquare}.
   The above analysis shows that both errors are less than $1/3$ for, say, $\ns = \lceil{52\sqrt{\ab}/\dst^2}\rceil$; this concludes the proof.
 \end{proof}
 
-% It's a good exercise, and under the Poissonization assumption not that hard. (Try \emph{without} removing $N_i$ in the numerator, though, and see what you get\dots)
+% It's a good exercise, and under the Poissonization assumption not that hard. (Try \emph{without} removing $\occur_i$ in the numerator, though, and see what you get\dots)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Empirical distance to uniform}
@@ -579,8 +579,8 @@ That's the thing, though: the devil is in the $o(1)$ details. Sure, $\expect{Z_4
     \EndIf
     \State Compute \Comment{Can be done in $O(\ns)$ time if $\domain$ is known, $O(\ns\log\ns)$ if only $\ab$ is.}
     \[
-        Z_4 = \totalvardist{\hat{\p}}{\uniform_\ab} = \frac{1}{2} \sum_{j=1}^\ab \abs{\frac{\ns_j}{\ns} - \frac{1}{\ab} }
-    \] where $\ns_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
+        Z_4 = \totalvardist{\hat{\p}}{\uniform_\ab} = \frac{1}{2} \sum_{j=1}^\ab \abs{\frac{\occur_j}{\ns} - \frac{1}{\ab} }
+    \] where $\occur_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
     \If{ $Z_4 \geq \bE{\uniform_\ab}{Z_4} + \tau$ } \Return \reject \Comment{Not uniform}
     \Else\ 
       \Return \accept \Comment{Uniform}
@@ -595,18 +595,18 @@ For simplicity of exposition, we focus here on the case $\ns \leq \ab$, though t
 \paragraph{The expectation gap $\Delta(\p)$.} From the definition of total variation distance, we can rewrite
 \[
     Z_4 = \sum_{i=1}^\ab \Paren{\hat{\p}_\ns(i) - \frac{1}{\ab}}\indic{\hat{\p}_\ns(i) > 1/\ab}
-    = \frac{1}{\ns} \sum_{i=1}^\ab \Paren{\ns_i - \frac{\ns}{\ab} }_+
+    = \frac{1}{\ns} \sum_{i=1}^\ab \Paren{\occur_i - \frac{\ns}{\ab} }_+
 \]
-where as previously $\ns_i$ denotes the number of samples falling on element $i$, and $x_+ \eqdef \max(x,0)$. For the sake of the analysis, we will introduce the multivariate function
+where as previously $\occur_i$ denotes the number of samples falling on element $i$, and $x_+ \eqdef \max(x,0)$. For the sake of the analysis, we will introduce the multivariate function
 \begin{equation}
   \label{eq:empirical:S}
-  S(x_1,\dots,x_\ns) \eqdef \frac{1}{\ns} \sum_{i=1}^\ab \Paren{\ns_i(x_1,\dots,x_\ns) - \frac{\ns}{\ab} }_+
+  S(x_1,\dots,x_\ns) \eqdef \frac{1}{\ns} \sum_{i=1}^\ab \Paren{\occur_i(x_1,\dots,x_\ns) - \frac{\ns}{\ab} }_+
 \end{equation}
 and the function $\mu\colon\distribs{\ab}\to \R$ given by
 \[
  \mu(\p) \eqdef \bE{\p}{S(X_1,\dots,X_\ns)}\,.
 \] 
-(Note that $\bE{\p}{Z_4} = \mu(\p)$.) Then, since $\ns_i\sim\binomial{\ns}{\p(i)}$ under $\p$, we have the exact expression
+(Note that $\bE{\p}{Z_4} = \mu(\p)$.) Then, since $\occur_i\sim\binomial{\ns}{\p(i)}$ under $\p$, we have the exact expression
 \begin{align*}
  \mu(\p) 
     &= \frac{1}{\ns} \sum_{i=1}^\ab \sum_{\ell=0}^\ns \binom{\ns}{\ell} \p(i)^\ell (1-\p(i))^{\ns-\ell} \Paren{\ell - \frac{\ns}{\ab} }_+ \\
@@ -657,14 +657,14 @@ where again $\q$ is a probability distribution such that $\q = (1-\theta)\unifor
 \end{align}
 where the third inequality is Cauchy--Schwarz, the fourth is the definition of total variation distance along with $\totalvardist{\p}{\uniform_\ab}\geq \dst$ (and, in the exponent, $\ns \leq \ab$), and the last is $\Paren{1-1/\ab}^{\ab-2} \geq 1/e$ for $\ab \geq 2$.
 
-Before turning to proving concentration of $Z_4$ (that is, showing that the expectation gap, our signal, is not drowned by the random fluctations of $Z_4$ around its expectation), we will make an observation which will help in the analysis. Since we restricted ourselves to the regime $\ns/\ab\leq 1$, the $i$-th summand of $S$ in~\cref{eq:empirical:S} is non-zero only when $\ns_i\geq 1$, and thus we can rewrite
+Before turning to proving concentration of $Z_4$ (that is, showing that the expectation gap, our signal, is not drowned by the random fluctations of $Z_4$ around its expectation), we will make an observation which will help in the analysis. Since we restricted ourselves to the regime $\ns/\ab\leq 1$, the $i$-th summand of $S$ in~\cref{eq:empirical:S} is non-zero only when $\occur_i\geq 1$, and thus we can rewrite
 \begin{align}
   Z_4
-  &= \frac{1}{\ns} \sum_{i=1}^\ab \Paren{ \Paren{ \ns_i - \frac{\ns}{\ab} } +  \frac{\ns}{\ab} \indic{\ns_i = 0} } \notag\\
-  &= \frac{1}{\ns} \sum_{i=1}^\ab \Paren{ \ns_i - \frac{\ns}{\ab} } + \frac{1}{\ab} \sum_{i=1}^\ab \indic{\ns_i = 0} \notag\\
-  &= \frac{1}{\ab} \sum_{i=1}^\ab \indic{\ns_i = 0} \label{eq:empirical:S:alt}
+  &= \frac{1}{\ns} \sum_{i=1}^\ab \Paren{ \Paren{ \occur_i - \frac{\ns}{\ab} } +  \frac{\ns}{\ab} \indic{\occur_i = 0} } \notag\\
+  &= \frac{1}{\ns} \sum_{i=1}^\ab \Paren{ \occur_i - \frac{\ns}{\ab} } + \frac{1}{\ab} \sum_{i=1}^\ab \indic{\occur_i = 0} \notag\\
+  &= \frac{1}{\ab} \sum_{i=1}^\ab \indic{\occur_i = 0} \label{eq:empirical:S:alt}
 \end{align}
-where the last equality follows from $\sum_{i=1}^\ab \ns_i = \ns$. 
+where the last equality follows from $\sum_{i=1}^\ab \occur_i = \ns$. 
 That is, in this regime, $Z_4$ is exactly the fraction of \emph{unseen elements} of the domain; this readily allows one to retrieve~\cref{eq:empirical:tv:mu}, and also lets us relate $Z_4$ to the ``unique elements'' statistic $Z_2$ from~\cref{sec:uniformity:unique}.\footnote{Again, this relation only holds in the specific regime $\ns \leq \ab$; while we do nto cover the case $\ns > \ab$ here, the guarantees of $Z_4$ extend to this other regime; the identity~\cref{eq:empirical:S:alt}, however, does not.}
 
 \paragraph{Concentration of $Z_4$.} As you may have guessed, we will show that $Z_4$ concentrates around its expectation via Chebyshev's inequality, which requires us to bound $\Var[Z_4]$ in both the uniform and ``far'' cases. In order to diversify our toolkit, we will do so by invoking the \emph{Efron--Stein inequality}\index{Efron--Stein inequality}, which allows us to bound the variance of a function of $\ns$ independent random variables by the expected quadratic change of this function when only one sample is re-randomized: for a function $f$ of $\ns$ variables,
@@ -679,10 +679,10 @@ We apply this to $Z_4$, \ie the function $S$ defined in~\cref{eq:empirical:S}; g
   &\leq \frac{\ns}{2}  \bE{\p}{ \Paren{ S(X_1,\dots, X_{\ns-1}, X_\ns) - S(X_1,\dots, X_{\ns-1}, X'_\ns) }^2 } \\
   &= \frac{\ns}{2\ab^2} \bE{\p}{ \Big( \sum_{i=1}^\ab \Paren{ \indic{N_i = 0} - \indic{N_i' = 0} } \Big)^2 }
 \end{align*}
-where we wrote $N_i \eqdef \ns_i(\ns_i(X_1,\dots, X_{\ns-1}, X_\ns)$ and $N_i' \eqdef \ns_i(X_1,\dots, X_{\ns-1}, X'_\ns)$, and used the expression of $S$ from~\cref{eq:empirical:S:alt}. To handle this quantity, observe that since only the $\ns$-th sample changes, $\sum_{i=1}^\ab \abs{  \indic{N_i = 0} - \indic{N_i' = 0}  }$ is at most $1$: and this happens when $X_\ns$ falls on an element $i$ not yet observed in the first $\ns-1$ samples while $X'_\ns$ falls on an element $j$ already observed, or vice-versa. That is, we can write
+where we wrote $N_i \eqdef \occur_i(X_1,\dots, X_{\ns-1}, X_\ns)$ and $N_i' \eqdef \occur_i(X_1,\dots, X_{\ns-1}, X'_\ns)$, and used the expression of $S$ from~\cref{eq:empirical:S:alt}. To handle this quantity, observe that since only the $\ns$-th sample changes, $\sum_{i=1}^\ab \abs{  \indic{N_i = 0} - \indic{N_i' = 0}  }$ is at most $1$: and this happens when $X_\ns$ falls on an element $i$ not yet observed in the first $\ns-1$ samples while $X'_\ns$ falls on an element $j$ already observed, or vice-versa. That is, we can write
 \begin{align}
   \Var[Z_4] 
-  &\leq  \frac{\ns}{\ab^2} \sum_{i\neq j} \p(i)\p(j) \bPr{\ns_i(X_1,\dots, X_{\ns-1})=0, \ns_j(X_1,\dots, X_{\ns-1}) \geq 1 } \notag\\
+  &\leq  \frac{\ns}{\ab^2} \sum_{i\neq j} \p(i)\p(j) \bPr{\occur_i(X_1,\dots, X_{\ns-1})=0, \occur_j(X_1,\dots, X_{\ns-1}) \geq 1 } \notag\\
   &= \frac{\ns}{\ab^2} \sum_{i\neq j} \p(i)\p(j) \Paren{ (1-\p(i))^{\ns-1} - (1-\p(i)-\p(j))^{\ns-1} }\notag\\
   &\leq \frac{\ns}{\ab^2} \sum_{i, j} \p(i)\p(j) \Paren{ 1 - (1-\p(j))^{\ns-1} }\notag\\
   &= \frac{\ns}{\ab^2} \Big( 1 - \sum_{j=1}^\ab \p(j) (1-\p(j))^{\ns-1} \Big) \label{eq:empirical:var}
@@ -798,7 +798,7 @@ It is unclear whether one could avoid using the first (very convenient) ``stocha
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Random binary hashing} 
 Now we turn to a tester that is \emph{not} sample-optimal~--~but has other advantages, and whose analysis contains a couple insighful aspects. The main idea is that, while large domains are complicated, if there is one thing we know how to do optimally it is estimating the bias of a coin. That is, we know how to handle the case $\ab=2$:
-\begin{fact}[Bias of a coin]
+\begin{fact}[Bias of a coin]\exercise{Prove this!}
   \label{lemma:bias:coin}
   Given \iid samples from a Bernoulli with unknown parameter $\alpha\in[0,1]$, estimating $\alpha$ to an additive $\eta$ with probability $1-\errprob$ can be done with (and requires) $\bigTheta{\frac{\log(1/\errprob)}{\eta^2}}$ samples.
 \end{fact} 
@@ -933,19 +933,19 @@ Second, although our proof via the MGF used full independence of the $\xi_i$'s (
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Bipartite collisions} 
-Recall that in the collision-based tester from~\cref{sec:uniformity:collision-based}, we took a multiset $S$ of $\ns$ samples from $\p$ and defined our statistic $Z_1$ as the (normalized) number of ``collisions'' in $S$. That is fine, but requires to keep in memory all the samples observed so far. One related idea would be to instead take \emph{two} multisets $S_1,S_2$ of size $\ns_1$ and $\ns_2$, and only count ``bipartite collisions'' -- i.e., collisions between a sample of $S_1$ and one of $S_2$:
+Recall that in the collision-based tester from~\cref{sec:uniformity:collision-based}, we took a multiset $S$ of $\ns$ samples from $\p$ and defined our statistic $Z_1$ as the (normalized) number of ``collisions'' in $S$. That is fine, but requires to keep in memory all the samples observed so far. One related idea would be to instead take \emph{two} multisets $S_1,S_2$ of size $\nss$ and $\nst$, and only count ``bipartite collisions'' -- i.e., collisions between a sample of $S_1$ and one of $S_2$:
 \begin{equation}
-    Z_6 = \frac{1}{\ns_1 \ns_2}\sum_{(x,y)\in S_1\times S_2} \indic{x=y}
+    Z_6 = \frac{1}{\nss \nst}\sum_{(x,y)\in S_1\times S_2} \indic{x=y}
 \end{equation}
-One can check that $\expect{Z_6} = \normtwo{\p}^2$: we are back to using $\lp[2]$ as a proxy! Compared to the ``vanilla'' collision-based test, this is more flexible ($S_1,S_2$ need not be of the same size), and thus lends itself to some settings where a tradeoff between $\ns_1$ and $\ns_2$ is desirable: we will see that one needs $\ns_1\ns_2 \gtrsim \ab/\dst^4$ and $\min(\ns_1,\ns_2)\gtrsim 1/\dst^2$, and the resulting sample complexity is $\ns=\ns_1+\ns_2$. For the case $\ns_1=\ns_2$, this retrieves the optimal $\ns \asymp \sqrt{\ab}/\dst^2$.
+One can check that $\expect{Z_6} = \normtwo{\p}^2$: we are back to using $\lp[2]$ as a proxy! Compared to the ``vanilla'' collision-based test, this is more flexible ($S_1,S_2$ need not be of the same size), and thus lends itself to some settings where a tradeoff between $\nss$ and $\nst$ is desirable: we will see that one needs $\nss\nst \gtrsim \ab/\dst^4$ and $\min(\nss,\nst)\gtrsim 1/\dst^2$, and the resulting sample complexity is $\ns=\nss+\nst$. For the case $\nss=\nst$, this retrieves the optimal $\ns \asymp \sqrt{\ab}/\dst^2$.
 
 \begin{algorithm}[ht!]
   \begin{algorithmic}[1]
-    \Require Multisets $S, T$ of $\ns_1$ and $\ns_2$ samples $x_1,\dots,x_{\ns_1}\in \domain$, $y_1,\dots,y_{\ns_2}\in \domain$, parameters $\dst\in(0,1]$ and $\ab = \abs{\domain}$
+    \Require Multisets $S_1, S_2$ of $\nss$ and $\nst$ samples $x_1,\dots,x_{\nss}\in \domain$, $y_1,\dots,y_{\nst}\in \domain$, parameters $\dst\in(0,1]$ and $\ab = \abs{\domain}$
     \State Set $\tau \gets \frac{1+\frac{1}{2}\dst^2}{\ab}$
     \State Compute \Comment{Can be done in $O(\ns)$ time if $\domain$ is known, $O(\ns\log\ns)$ if only $\ab$ is.}
     \[
-        Z_6 = \frac{1}{\ns_1\ns_2} \sum_{s=1}^{\ns_1}\sum_{t=1}^{\ns_2} \indic{x_s=y_t}\,.
+        Z_6 = \frac{1}{\nss\nst} \sum_{s=1}^{\nss}\sum_{t=1}^{\nst} \indic{x_s=y_t}\,.
     \]
     \If{ $Z_6 \geq \tau$ } \Return \reject \Comment{Not uniform}
     \Else\ 
@@ -957,35 +957,35 @@ One can check that $\expect{Z_6} = \normtwo{\p}^2$: we are back to using $\lp[2]
 
 To bound the variance of $Z_6$, we start by expanding the square $Z_6^2$ and breaking the resulting double sum in 4 cases to get
 \begin{align*}
-  \ns_1^2 \ns_2^2 \bEE{Z_6^2}
+  \nss^2 \nst^2 \bEE{Z_6^2}
   &= \sum_{(x,y)\in S_1\times S_2}\sum_{(x',y')\in S_1\times S_2} \bEE{\indic{x=y}\indic{x'=y'}} \\
   &= \sum_{x\in S_1}\sum_{y\in S_2}\bEE{\indic{x=y}}\\
   &\quad+ \sum_{x\in S_1}\sum_{y\neq y'\in S_2}\bEE{\indic{x=y=y'}} \\
   &\quad+ \sum_{x\neq x'\in S_1}\sum_{y\in S_2}\bEE{\indic{x=x'=y}} \\
   &\quad+\sum_{x\neq x'\in S_1}\sum_{y \neq y'\in S_2} \bEE{\indic{x=y}}\bEE{\indic{x'=y'}}  \\
-  &= \ns_1\ns_2 \normtwo{\p}^2 + \ns_1 \ns_2(\ns_1+\ns_2-2) \norm{\p}_3^3 + \ns_1\ns_2(\ns_1-1)(\ns_2-1) \normtwo{\p}^4\,.
+  &= \nss\nst \normtwo{\p}^2 + \nss \nst(\nss+\nst-2) \norm{\p}_3^3 + \nss\nst(\nss-1)(\nst-1) \normtwo{\p}^4\,.
 \end{align*}
 From $\Var[Z_6] = \bEE{Z_6^2} - \expect{Z_6}^2$, we obtain
 \begin{align}
   \Var[Z_6] 
-  &= \frac{1}{\ns_1\ns_2}\normtwo{\p}^2 + \frac{\ns_1+\ns_2-2}{\ns_1\ns_2}\norm{\p}_3^3 - \frac{\ns_1+\ns_2-1}{\ns_1\ns_2}\normtwo{\p}^4 \notag\\
-  &\leq \frac{1}{\ns_1\ns_2}\normtwo{\p}^2 + \frac{\ns_1+\ns_2}{\ns_1\ns_2}(\norm{\p}_3^3-\normtwo{\p}^4) \label{eq:var:bipartite:collisions}\,,
+  &= \frac{1}{\nss\nst}\normtwo{\p}^2 + \frac{\nss+\nst-2}{\nss\nst}\norm{\p}_3^3 - \frac{\nss+\nst-1}{\nss\nst}\normtwo{\p}^4 \notag\\
+  &\leq \frac{1}{\nss\nst}\normtwo{\p}^2 + \frac{\nss+\nst}{\nss\nst}(\norm{\p}_3^3-\normtwo{\p}^4) \label{eq:var:bipartite:collisions}\,,
 \end{align}
-using as in the proof of~\cref{theo:collision-based} the fact that $\norm{\p}_3^3 \geq \normtwo{\p}^4$ to obtain the slightly nicer-looking upper bound of~\cref{eq:var:bipartite:collisions}. Note that when $\ns_1=\ns_2=\frac{\ns}{2}$, we retrieve the bound on $\Var[Z_1]$ from~\cref{eq:good:variance}! Specifically, we have exactly the same expression as in~\cref{eq:good:variance}, but with the factor $4/\ns$ replaced by $\frac{1}{\ns_1\ns_2}$ and $4/\ns^2$ replaced by $\frac{\ns_1+\ns_2}{\ns_1\ns_2}$. This is good -- we could follows the exact same analysis\exercise{Do it!} as in the proof of~\cref{theo:collision-based} to obtain, in the uniform case,
+using as in the proof of~\cref{theo:collision-based} the fact that $\norm{\p}_3^3 \geq \normtwo{\p}^4$ to obtain the slightly nicer-looking upper bound of~\cref{eq:var:bipartite:collisions}. Note that when $\nss=\nst=\frac{\ns}{2}$, we retrieve the bound on $\Var[Z_1]$ from~\cref{eq:good:variance}! Specifically, we have exactly the same expression as in~\cref{eq:good:variance}, but with the factor $4/\ns$ replaced by $\frac{1}{\nss\nst}$ and $4/\ns^2$ replaced by $\frac{\nss+\nst}{\nss\nst}$. This is good -- we could follows the exact same analysis\exercise{Do it!} as in the proof of~\cref{theo:collision-based} to obtain, in the uniform case,
 \[
   \probaDistrOf{\uniform_\ab}{ Z_6 \geq \frac{1+2\dst^2}{\ab} }
-  \leq \frac{\ab}{4\dst^4\ns_1\ns_2}\,, 
+  \leq \frac{\ab}{4\dst^4\nss\nst}\,, 
 \]
 and, in the ``far'' case,
 \[
   \probaDistrOf{\p}{ Z_6 < \frac{1+2\dst^2}{\ab} }
-  \leq \frac{5\ab}{4\dst^4\ns_1\ns_2} + \frac{\ns_1+\ns_2}{\ns_1\ns_2}\Paren{\frac{2\sqrt{\ab}}{\dst}+\frac{3}{\dst^2}}\,.
+  \leq \frac{5\ab}{4\dst^4\nss\nst} + \frac{\nss+\nst}{\nss\nst}\Paren{\frac{2\sqrt{\ab}}{\dst}+\frac{3}{\dst^2}}\,.
 \]
-At first glance, this looks perfect: our tester will be correct in both cases as long as $\ns_1\ns_2 \gtrsim \ab/\dst^4$, which is what we want, and $\frac{\ns_1\ns_2}{\ns_1+\ns_2} \gtrsim \max\big(\frac{\sqrt{\ab}}{\dst}, \frac{1}{\dst^2}\big)$. However, that last condition is an issue: if we wanted to set $\ns_1\gg \ns_2$, for instance, then we would still need
+At first glance, this looks perfect: our tester will be correct in both cases as long as $\nss\nst \gtrsim \ab/\dst^4$, which is what we want, and $\frac{\nss\nst}{\nss+\nst} \gtrsim \max\big(\frac{\sqrt{\ab}}{\dst}, \frac{1}{\dst^2}\big)$. However, that last condition is an issue: if we wanted to set $\nss\gg \nst$, for instance, then we would still need
 \[
-    \ns_2 \gtrsim \max\Paren{\frac{\sqrt{\ab}}{\dst}, \frac{1}{\dst^2} }\,,
+    \nst \gtrsim \max\Paren{\frac{\sqrt{\ab}}{\dst}, \frac{1}{\dst^2} }\,,
 \]
-which, given that the ``vanilla'' collision-based tester corresponded to $\ns_1=\ns_2 \asymp \frac{\sqrt{\ab}}{\dst^2}$, is not much of a tradeoff between $\ns_1$ and $\ns_2$ at all\dots
+which, given that the ``vanilla'' collision-based tester corresponded to $\nss=\nst \asymp \frac{\sqrt{\ab}}{\dst^2}$, is not much of a tradeoff between $\nss$ and $\nst$ at all\dots
 
 So, where did we go wrong? Recall that in order to handle the ``far'' case,\footnote{We only have to worry about the far case, as the uniform case is already good~--~the issue arises in the second term of the variance, which is zero under the uniform distribution.} in the proof of~\cref{theo:collision-based} we had set $\alpha \eqdef \ab\normtwo{\p-\uniform_\ab}^2 \geq 4\dst^2$, and bounded
 \[
@@ -1002,23 +1002,23 @@ $\norm{\p-\uniform}_3^3 \leq \norminf{\p-\uniform}\normtwo{\p-\uniform}^2$ to ge
 where the second inequality uses the triangle inequality and $\norminf{\p}\geq 1/\ab$ to bound $\norminf{\p-\uniform}$. Is that better? This is not immediately clear, since $\norminf{\p}$ could be much larger than $\alpha/\sqrt{\ab}$. Yet, \emph{if} we were lucky enough to have $\norminf{\p}\lesssim 1/\ab$, then this bound would be perfect! For instance, if we had $\norminf{\p}\leq 2/\ab$, then we \emph{could} write
 \begin{align}
   \Var_\p[Z_6]
-  &\leq \frac{1}{\ns_1\ns_2}\cdot \frac{1+\alpha^2}{\ab} + \frac{\ns_1+\ns_2}{\ns_1\ns_2}\cdot \frac{7\alpha^2}{\ab^2} \label{eq:var:bipartite:collisions:lowinfty}\,.
+  &\leq \frac{1}{\nss\nst}\cdot \frac{1+\alpha^2}{\ab} + \frac{\nss+\nst}{\nss\nst}\cdot \frac{7\alpha^2}{\ab^2} \label{eq:var:bipartite:collisions:lowinfty}\,.
 \end{align}
 As mentioned above, we clearly do not have that for every $\p$ such that $\totalvardist{\p}{\uniform_\ab}\geq \dst$. Nonetheless, we saw in~\cref{sec:uniformity:empirical} an argument, based on stochastic dominance, which effectively allowed to assume this was the case, losing only a factor $2$ in the distance parameter $\dst$. This was done by considering, for any given $\p$, the ``averaging'' $\bar{\p}$ defined in~\cref{lemma:distance:uniformity:averaging}.
 
 The issue, however, is that this stochastic dominance argument relied on our statistic $Z_4$ being a symmetric and convex function of the sample counts $N_1,\dots, N_\ab$. This is clearly not the case here: letting $N_1,\dots,N_\ab$ and $M_1,\dots,M_\ab$ be the counts of each domain element in the samples from $S$ and $T$, respectively, we can rewrite
 \begin{equation}
-    Z_6 = \frac{1}{\ns_1\ns_2}\sum_{i=1}^\ab N_i M_i
+    Z_6 = \frac{1}{\nss\nst}\sum_{i=1}^\ab N_i M_i
 \end{equation}
 which is neither symmetric nor convex in the $N_i,M_i$'s. Nevertheless, we can obviously write this as $Z_6 = S(N_1M_1,N_2M_2,\dots,N_\ab M_\ab)$ for a function $S\colon\R^\ab\to\R$ which is symmetric and linear (and so \textit{a fortiori} convex) in its arguments. This does not allow us to invoke our stochastic dominance hammer (\cref{theo:stochdominance:symmetricfunction}) directly, still, we can use the following mallet instead:
 \begin{theorem}
   \label{theo:stochdominance:symmetricfunction:variant}
-  Let $f\colon \R^\ab\to\R$ by a symmetric convex function. For a probability distribution $\p\in\distribs{\ab}$ and $\ns_1,\ns_2\in\N$, define the random variable $X_{\ns_1,\ns_2}(\p)$ as follows: let $N_1,\dots,N_\ab$ and $M_1,\dots,M_\ab$ be the counts of each domain element among $\ns_1$ and $\ns_2$ \iid samples from $\p$, respectively, and set $X_{\ns_1,\ns_2}(\p)=f(N_1M_1,\dots,N_\ab M_\ab)$. Then, for any $\p,\q$ such that $\p\succeq\q$, $X_{\ns_1,\ns_2}(\p)$ stochastically dominates $X_{\ns_1,\ns_2}(\q)$.
+  Let $f\colon \R\to\R$ by a non-decreasing function. For a probability distribution $\p\in\distribs{\ab}$ and $\nss,\nst\in\N$, define the random variable $X_{\nss,\nst}(\p)$ as follows: let $N_1,\dots,N_\ab$ and $M_1,\dots,M_\ab$ be the counts of each domain element among $\nss$ and $\nst$ \iid samples from $\p$, respectively, and set $X_{\nss,\nst}(\p)=f(N_1M_1+\dots+N_\ab M_\ab)$. Then, for any $\p,\q$ such that $\p\succeq\q$, $X_{\nss,\nst}(\p)$ stochastically dominates $X_{\nss,\nst}(\q)$.
 \end{theorem}
 We will prove this theorem at the end of the section; for now, let us use it to establish what we want:
 \begin{theorem}
   \label{theo:bipartite:collision-based}
-The bipartite collision-based tester (\cref{algo:bipartite:collision-based}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = \ns_1+\ns_2$ and time complexity $O(??)$, provided that $\ns_1\ns_2 \geq 24\ab/\dst^4$ and $\min(\ns_1,\ns_2)\geq 168/\dst^2$.
+The bipartite collision-based tester (\cref{algo:bipartite:collision-based}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = \nss+\nst$ and time complexity $O(\ns)$, provided that $\nss\nst \geq 24\ab/\dst^4$ and $\min(\nss,\nst)\geq 168/\dst^2$.
 \end{theorem}
 \begin{proof}
 Fix any $\p\in\distribs{\ab}$; if $\totalvardist{\p}{\uniform_\ab} \geq \dst$, by  stochastic dominance (\cref{theo:stochdominance:symmetricfunction:variant}) it suffices to consider the corresponding $\bar{\p}$, as defined in~\cref{lemma:distance:uniformity:averaging}, which satisfies $\bE{\bar{\p}}{Z_6} = \normtwo{\bar{\p}}^2 \geq \frac{1+4(\dst/2)^2}{\ab} = \frac{1+\dst^2}{\ab}$. We also have our variance bounds from~\cref{eq:var:bipartite:collisions,eq:var:bipartite:collisions:lowinfty}. Define our threshold
@@ -1031,9 +1031,9 @@ as in~\cref{algo:bipartite:collision-based}.
     \begin{align*}
     \bPr{Z_6 \geq \tau} 
     &= \bPr{Z_6 \geq (1+\tfrac{\dst^2}{2})\bE{\uniform_\ab}{Z_6}}  \leq \frac{4\Var_{\uniform_\ab}[Z_6]}{\dst^4\bE{\uniform_\ab}{Z_6}^2} 
-    \leq \frac{4\ab}{\ns_1\ns_2\dst^4}
+    \leq \frac{4\ab}{\nss\nst\dst^4}
     \end{align*}
-    using~\cref{eq:var:bipartite:collisions}; this is less than $1/3$ as long as $\ns_1\ns_2 \geq 12\ab/\dst^4$.
+    using~\cref{eq:var:bipartite:collisions}; this is less than $1/3$ as long as $\nss\nst \geq 12\ab/\dst^4$.
     \item In the ``far'' case, defining $\alpha$ by $\bE{\bar{\p}}{Z_6} = \frac{1+\alpha^2}{\ab}$ (so that $\alpha^2\geq \dst^2$), the probability to err by outputting \accept is
     \begin{align*}
         \bP{\p}{Z_6 < \tau}  
@@ -1041,26 +1041,146 @@ as in~\cref{algo:bipartite:collision-based}.
         = \bP{\bar{\p}}{Z_6 <  \frac{1+\frac{1}{2}\dst^2}{1+\alpha^2} \bE{\bar{\p}}{Z_6} } \\
         &\leq \bP{\bar{\p}}{Z_6 <  \Paren{1 - \frac{\alpha^2}{2(1+\alpha^2)}} \bE{\bar{\p}}{Z_6} } \\
         &\leq \frac{4(1+\alpha^2)^2}{\alpha^4}\cdot \frac{\Var_{\p}[Z_6]}{\bE{\bar{\p}}{Z_6}^2} \\
-        &\leq \frac{\ab}{\ns_1\ns_2}\cdot \frac{4(1+\alpha^2)}{\alpha^4} + \frac{\ns_1+\ns_2}{\ns_1\ns_2}\cdot \frac{28}{\alpha^2}  \\
-        &\leq \frac{8\ab}{\ns_1\ns_2\dst^4} + \frac{56}{\min(\ns_1,\ns_2)\dst^2}
+        &\leq \frac{\ab}{\nss\nst}\cdot \frac{4(1+\alpha^2)}{\alpha^4} + \frac{\nss+\nst}{\nss\nst}\cdot \frac{28}{\alpha^2}  \\
+        &\leq \frac{8\ab}{\nss\nst\dst^4} + \frac{56}{\min(\nss,\nst)\dst^2}
     \end{align*}
-    using~\cref{eq:var:bipartite:collisions:lowinfty}, then $\alpha^2\geq \dst^2$ (and $\dst \leq 1$) and $\ns_1+\ns_2\leq 2\max(\ns_1,\ns_2)$. This is less than $1/6+1/6=1/3$ as long as (1)~$\ns_1\ns_2 \geq 24\ab/\dst^4$ and~(2) $\min(\ns_1,\ns_2) \geq 168/\dst^2$.
-  \end{itemize}
-  The above analysis shows that both errors are less than $1/3$ for any $\ns = \ns_1+\ns_2$ such that $\ns_1\ns_2 \geq \lceil{24\ab/\dst^4}\rceil$ and $\min(\ns_1,\ns_2) \geq \clg{168/\dst^2}$; this concludes the proof.
+    using~\cref{eq:var:bipartite:collisions:lowinfty}, then $\alpha^2\geq \dst^2$ (and $\dst \leq 1$) and $\nss+\nst\leq 2\max(\nss,\nst)$. This is less than $1/6+1/6=1/3$ as long as (1)~$\nss\nst \geq 24\ab/\dst^4$ and~(2) $\min(\nss,\nst) \geq 168/\dst^2$.
+\end{itemize}
+  The above analysis shows that both errors are less than $1/3$ for any $\ns = \nss+\nst$ such that $\nss\nst \geq \lceil{24\ab/\dst^4}\rceil$ and $\min(\nss,\nst) \geq \clg{168/\dst^2}$; this concludes the proof.
 \end{proof}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Empirical subset weighting} That one, I really like. It's adaptive, it's weird, and (I think) it's new. Fix a parameter $1\leq s \leq \ns$. Take $\ns$ samples from $\p$, and consider the set $S$ (not multiset) induced by the first $s$ samples you get. One can check that
-\begin{equation}
-    \expect{\p(S)} = \sum_{i=1}^\ab \p(i) (1-(1-\p(i))^s)
-\end{equation}
-which should be roughly (making a bunch of approximations) $\expect{\p(S)}\approx s\normtwo{\p}^2$. Under the uniform distribution, this is exactly $(1-(1-1/\ab)^s)\approx s/\ab$, where the approximation is valid for $s\ll \ab$.
+\subsection{Empirical subset weighting} 
+To conclude, we will look at a somewhat different type of algorithms, in that this one can inherently be seen as \emph{adaptive}: it works in two stages, where the second depends on what the outcome of the first stage was. As in the previous section, it also allows for some tradeoff, dividing the $\ns$ total samples into two sets of size $\nss$ and $\nst$.
 
-Great: we have a new estimator for (roughly) the $\lp[2]$ norm! Now, assuming things went well, as the end of this first stage we have a set $S$ such that $\p(S)$ is approximately either $s/\ab$ or $s\normtwo{\p}^2\geq s(1+\Omega(\dst^2))/\ab$ (we just argued that this is what things happen \emph{in expectation}).\footnote{Some more details are required to argue that $\p(S)$ does concentrate enough around its expectation.} So, let's do a second stage! Take the next $\ns-s$ samples, and just count the number of them which fall in $S$: this is allows you to estimate $\p(S)$  up to an additive $s\dst^2/\ab$, as long as
+
+Fix an integer $1\leq \nss \leq \ns$. Take $\nss$ \iid samples from $\p$, and consider the \emph{set} $S\subseteq\domain$ (not multiset) induced by those $\nss$ samples. The quantity of interest will be $\p(S)$, the (unknown) probability weight of that random set $S$:
+\begin{equation}
+    \p(S) = \sum_{j=1}^\ab \p(j) \indic{\occur_j \geq 1}
+\end{equation}
+where, as before, $\occur_j$ is the number of occurrences of $j$ among the $\nss$ samples. One can check the expectation of this random variable is
+\begin{equation}
+  \label{eq:expect:empirical:weight}
+    \expect{\p(S)} = \sum_{i=1}^\ab \p(i) (1-(1-\p(i))^{\nss})
+\end{equation}
+which should be roughly (making a few not necessarily warranted approximations) $\expect{\p(S)}\approx \nss\normtwo{\p}^2$. Under the uniform distribution, this is exactly $(1-(1-1/\ab)^{\nss})\approx \nss/\ab$, where the approximation is valid for $\nss\ll \ab$.
+
+Great: we have a new estimator for (more or less) the $\lp[2]$ norm! Now, assuming things went well, as the end of this first stage we have a set $S$ such that $\p(S)$ is approximately either $\nss/\ab$ or $\nss\normtwo{\p}^2\geq \nss(1+\Omega(\dst^2))/\ab$ (we just argued that this is what happens \emph{in expectation}).\footnote{Some more details are required to argue that $\p(S)$ does concentrate enough around its expectation.} So, let's do a second stage! Take the next $\nst \eqdef \ns-\nss$ samples, and count the number of them which fall in $S$: this is allows you to estimate $\p(S)$  up to an additive $\nss\dst^2/\ab$, as long as
 \[
-      \ns - s \gtrsim \frac{\ab}{s\dst^4}
+      \nst \gg \frac{\ab}{\nss\dst^4}
 \]
-(exercise: check that). Optimizing, we get that for $s=\ns/2$ this leads to $\ns \asymp \sqrt{\ab}/\dst^2$: optimal sample complexity! Only drawback: we need $s\ll \ab$ for our approximations to be valid (after that, $\expect{\p(S)}$ cannot be approximately $s\normtwo{\p}^2$ anymore; same issue as with the ``unique elements'' algorithm), so we get the condition $\dst \gg 1/\ab^{1/4}$. Slight bummer.
+(see~\cref{lemma:bias:coin:test} below). This lets us retrieve the same condition $\nss\nst\gg \ab/\dst^4$ as in the previous section; and, similarly, for $\nss=\ns/2$ this leads to the optimal $\ns \asymp \sqrt{\ab}/\dst^2$! Only drawback: we need $\nss\ll \ab$ for our approximations to be valid~--~indeed, after that, $\expect{\p(S)}$ cannot be approximately $\nss\normtwo{\p}^2$ anymore: the former is at most one, the latter at least $\nss/\ab$. This is, at its core, the same issue as with the ``unique elements'' algorithm from~\cref{sec:uniformity:unique}, and this imposes the condition $\dst \gg 1/\ab^{1/4}$.
+
+\begin{algorithm}[ht!]
+  \begin{algorithmic}[1]
+    \Require Multisets $S_1, S_2$ of $\nss$ and $\nst$ samples $x_1,\dots,x_{\nss}\in \domain$, $y_1,\dots,y_{\nst}\in \domain$, parameters $\dst\in(0,1]$ and $\ab = \abs{\domain}$
+    \State Set $\tau \gets ????$
+    \State Compute $S$, the \emph{set} of samples from $S_1$. \Comment{Can be done in $O(\nss\log\nss)$ time, and $O(\nss)$ expected (\eg, via cuckoo hashing).}
+    \State Compute \Comment{Can be done in $O(\nst)$ time.}
+    \[
+        Z_7 = \frac{1}{\nst} \sum_{t=1}^{\nst} \indic{y_t\in S}\,.
+    \]
+    \If{ $Z_7 \geq \tau$ } \Return \reject \Comment{Not uniform}
+    \Else\ 
+      \Return \accept \Comment{Uniform}
+    \EndIf
+  \end{algorithmic}
+  \caption{\label{algo:empirical:subset}\sc Empirical Subset Weighting Tester}
+\end{algorithm}
+
+The key part of the analysis is in analyzing the random variable $\p(S)$ from the first stage of the algorithm; the second stage, whose goal is to \emph{estimate} $\p(S)$, is much simpler to handle. To do so, as usual by now, we begin by bounding the expectation gap
+\begin{equation}
+    \Delta(\p) \eqdef \bE{\p}{\p(S)} - \bE{\uniform_\ab}{\uniform_\ab(S)}
+\end{equation}
+when $\p$ is far from uniform. From~\cref{eq:expect:empirical:weight}, we can explicitly write, for every $\p\in\distribs{\ab}$,
+\begin{align*}
+  \Delta(\p) 
+  &= \sum_{i=1}^\ab \p(i) (1-(1-\p(i))^{\nss}) - \Paren{1-(1-1/\ab)^{\nss}} \\
+  &= \sum_{i=1}^\ab \p(i) \Paren{ (1-1/\ab)^{\nss} - (1-\p(i))^{\nss} }\,,
+\end{align*}
+``hiding one'' by writing $\Paren{1-(1-1/\ab)^{\nss}} = \sum_{i=1}^\ab \p(i)\Paren{1-(1-1/\ab)^{\nss}}$. We are in luck: the resulting expression turns out to be exactly the same as in the expectation for $Z_2$ (\cref{lemma:gap:z2}), with $\nss$ instead of $\ns-1$! We can therefore reuse the analysis we had then, and immediately get:
+\begin{lemma}
+  \label{lemma:gap:z7}
+If $\ns \leq \ab$, we have
+\[
+    \Delta(\p) \geq \frac{\ns}{16\ab}\totalvardist{\p}{\uniform_\ab}^2\,.
+\]
+\end{lemma}
+
+\bgroup\color{purple}
+We will here introduce (and use) another concept we have not seen yet, that of \emph{negative association} between random variables. This is a stronger notion than negative correlation, and is very useful when dealing with random variables which are dependent ``but in a way which helps us'' (to prove concentration):
+\begin{definition}[Negative Association]
+The random variables $X_1,\dots, X_n$ are said to be \emph{negatively associated} if, for all disjoint subsets $I,J\subseteq [\ns]$ and functions $f\colon \R^{|I|} \to \R$, $g\colon \R^{|J|} \to \R$, we have
+\[
+    \bEE{f((X_i)_{i\in I})g((X_j)_{j\in J})} \leq \bEE{f((X_i)_{i\in I})}\bEE{g((X_j)_{j\in J})} \
+\]
+whenever $f,g$ are both non-increasing or both non-decreasing. 
+\end{definition}
+As it turns out, the sample counts $N_1,\dots,N_\ab$ are negatively associated (see, \eg,~\citep[Section~2.2]{DubhashiR98}), which we will use below.\footnote{What we will use does not require the full power of negative associativity and could be obtained directly, but it is a good concept to know, so~--~why not?} 
+We will rely on this to bound the variance explicitly, starting with the expected square:
+\begin{align*}
+  \expect{\p(S)^2} 
+  &= \sum_{i=1}^\ab\sum_{j=1}^\ab \p(i)\p(j) \bEE{\indic{\occur_i \geq 1}\indic{\occur_j \geq 1}} \\
+  &= \sum_{i=1}^\ab\p(i)^2 \bEE{\indic{\occur_i \geq 1}} + 2\sum_{i< j} \p(i)\p(j) \bEE{\indic{\occur_i \geq 1}\indic{\occur_j \geq 1}} \\
+  &\leq \sum_{i=1}^\ab\p(i)^2 \bEE{\indic{\occur_i \geq 1}} + 2\sum_{i< j} \p(i)\p(j) \bEE{\indic{\occur_i \geq 1}}\bEE{\indic{\occur_j \geq 1}} \\
+  &= \sum_{i=1}^\ab\p(i)^2 \bPr{\occur_i \geq 1} + \Paren{\sum_{i=1}^\ab \p(i)\bPr{\occur_i \geq 1} }^{\!\!2} - \sum_{i=1}^\ab\p(i)^2 \bPr{\occur_i \geq 1}^2 \\
+  &= \sum_{i=1}^\ab\p(i)^2 \bPr{\occur_i \geq 1}(1-\bPr{\occur_i \geq 1}) + \expect{\p(S)}^2\,,
+\end{align*}
+where the inequality follows from negative associativiy, and we got the third equality by completing the sum $2\sum_{i<j} x_{i,j} = \sum_{i,j} x_{i,j} - \sum_{i} x_{i,i}$. That is, we just proved
+\begin{align}
+  \label{eq:variance:subset:weight}
+  \Var[\p(S)]
+  &\leq \sum_{i=1}^\ab\p(i)^2 \bPr{\occur_i \geq 1}\bPr{\occur_i = 0}\,.
+\end{align}
+By upper bounding the last factor by $1$ and using the inequality $\sum_i a_ib_i c_i \leq \Paren{\sum_i a_i^2}^{1/2}\Paren{\sum_i b_i^2}^{1/2}\Paren{\sum_i c_i^2}^{1/2}$,\footnote{This can be proven, for instance, by Cauchy--Schwarz (twice) followed by the monotonicity of $\lp[p]$ norms: $\norm{\cdot}_4\leq \norm{\cdot}_2$.} we then get
+\begin{align}
+  \Var[\p(S)]
+  &\leq \sum_{i=1}^\ab\p(i) \bPr{\occur_i \geq 1} \p(i) \notag\\
+  &= \sum_{i=1}^\ab \Paren{\p(i) \bPr{\occur_i \geq 1}}^{1/2} \Paren{\p(i) \bPr{\occur_i \geq 1}}^{1/2} \p(i) \notag\\
+  &\leq \expect{\p(S)}\cdot \normtwo{\p} \leq \expect{\p(S)}^{3/2}
+\end{align}
+where for the last step we used that
+\[
+\expect{\p(S)} = \sum_{i=1}^\ab \p(i) (1-(1-\p(i))^{\nss}) \geq \sum_{i=1}^\ab \p(i) (1-(1-\p(i))) = \normtwo{\p}^2\,.
+\]
+This allows us to prove that the first stage of the algorithm will (with high probability) succeed, in that the random variable $\p(S)$ will significantly differ under the uniform and ``far'' cases.
+\begin{lemma}
+  
+\end{lemma}
+\begin{proof}
+Let $\p\in\distribs{\ab}$, and recall that $\bE{\uniform_\ab}{\uniform_\ab(S)} = 1-(1-1/\ab)^{\nss} \leq \frac{\nss}{\ab}$.
+\begin{itemize}
+    \item In the uniform case, 
+    \begin{align*}
+    \bPr{\p(S) \geq \bE{\uniform_\ab}{\uniform_\ab(S)} + \frac{\nss\dst^2}{64\ab}} 
+    &\leq \frac{4096\ab^2\Var_{\uniform_\ab}[\uniform_\ab(S)]}{\nss^2\dst^4} 
+    \leq \frac{4096}{\nss\dst^4}
+    \end{align*}
+    using~\cref{eq:variance:subset:weight}, which implies $\Var_{\uniform_\ab}[\uniform_\ab(S)] \leq \frac{1}{\ab}\bE{\uniform_\ab}{\uniform_\ab(S)}$; this is less than $1/6$ as long as $\nss \geq 24576/\dst^4$.
+    \item In the ``far'' case, since by~\cref{lemma:gap:z7} we have $\Delta(\p) \geq \frac{\nss\dst^2}{16\ab} \geq \frac{\dst^2}{16}\bE{\uniform_\ab}{\uniform_\ab(S)}$, 
+    \begin{align*}
+        \bPr{\p(S) < \bE{\uniform_\ab}{\uniform_\ab(S)} + \frac{3\nss\dst^2}{64\ab}} 
+        &\leq \bPr{\p(S) < \bE{\uniform_\ab}{\uniform_\ab(S)} + \frac{3}{4}\Delta(\p)}\\
+        &= \bPr{\p(S) < \bE{\p}{\p(S)} - \frac{1}{4}\Delta(\p)} \\
+        &\leq \frac{16\Var[\p(S)]}{\Delta(\p)^2} \\
+        &\leq \frac{16\norminf{\p}\bE{\p}{\p(S)}}{\Delta(\p)^2} \\
+        &\leq \frac{4096 \ab^2\norminf{\p}^2}{\nss\dst^4} \\
+    \end{align*}
+    using~\cref{eq:var:bipartite:collisions:lowinfty}, then $\alpha^2\geq \dst^2$ (and $\dst \leq 1$) and $\nss+\nst\leq 2\max(\nss,\nst)$. This is less than $1/6+1/6=1/3$ as long as (1)~$\nss\nst \geq 24\ab/\dst^4$ and~(2) $\min(\nss,\nst) \geq 168/\dst^2$.
+\end{itemize}
+
+
+By~\cref{lemma:gap:z7}, 
+\end{proof}
+\egroup
+
+
+
+We will require the following result, which can be seen as a ``localized'' variant of~\cref{lemma:bias:coin}.\footnote{Localized, as it depends on the ``location'' $\beta$ we focus on, while~\cref{lemma:bias:coin} holds for all possible values~--~and is thus a worst-case result (over the unknown value $\alpha$).}
+\begin{fact}[Bias of a coin, distinguishing]
+  \label{lemma:bias:coin:test}\exercise{Prove this!}
+  Given \iid samples from a Bernoulli with unknown parameter $\alpha\in[0,1]$, distinguishing with probability $1-\errprob$ between $\alpha \leq \beta$ and $\alpha \geq \beta(1+\eta)$ can be done with (and requires) $\bigTheta{\frac{\log(1/\errprob)}{\beta\eta^2}}$ samples.
+\end{fact} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1085,13 +1205,14 @@ mity testing.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exercises}
-- Prove the monotonicity of $\lp[p]$ norms
-
-- It is known that $x\preceq y$ if, and only if, $x=Ay$ for some doubly stochastic matrix $A$~\citep[Theorem~2.1]{Arnold87}. Check that the averaging from~\cref{lemma:distance:uniformity:averaging} indeed corresponds to multiplying the pmf $\p$ (seen as a vector) by such a matrix.
+\begin{enumerate}
+  \item Prove the monotonicity of $\lp[p]$ norms: if $1\leq r\leq s \leq \infty$, then $\norm{x}_s \leq \norm{x}_r$ for every $x\in \R^n$.
+  \item It is known that $x\preceq y$ if, and only if, $x=Ay$ for some doubly stochastic matrix $A$~\citep[Theorem~2.1]{Arnold87}. Check that the averaging from~\cref{lemma:distance:uniformity:averaging} indeed corresponds to multiplying the pmf $\p$ (seen as a vector) by such a matrix.
+\end{enumerate}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Deferred proof}
+\section{Deferred proofs}
   \label{sec:deferred:chap:identity}
 \begin{lemma}[\cref{lemma:technical:distinct:elements}, restated]
 Fix $m \geq 1$ and $\ab \in \N$. For any $x_1,\dots,x_\ab \geq 0$ such that $\sum_{i=1}^\ab x_i = 1$, we have
@@ -1123,6 +1244,13 @@ m\sum_{i < j} &x_i x_j \Paren{ (1-x_i - x_j)^{m-1} - (1-x_i)^m(1-x_j)^m} \\
 concluding the proof.
 \end{proof}
 
+\begin{theorem}[\cref{theo:stochdominance:symmetricfunction:variant}, restated]
+  Let $f\colon \R\to\R$ by a non-decreasing function. For a probability distribution $\p\in\distribs{\ab}$ and $\nss,\nst\in\N$, define the random variable $X_{\nss,\nst}(\p)$ as follows: let $N_1,\dots,N_\ab$ and $M_1,\dots,M_\ab$ be the counts of each domain element among $\nss$ and $\nst$ \iid samples from $\p$, respectively, and set $X_{\nss,\nst}(\p)=f(N_1M_1+\dots+N_\ab M_\ab)$. Then, for any $\p,\q$ such that $\p\succeq\q$, $X_{\nss,\nst}(\p)$ stochastically dominates $X_{\nss,\nst}(\q)$.
+\end{theorem}
+\begin{proof}
+\todonoteinline{To do.}
+\end{proof}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bgroup\color{black!50!purple}
@@ -1144,29 +1272,29 @@ while the (exact) variance in this case is
 &\operatorname*{\sim}_{\ab\to \infty} \frac{2}{\ab}
 \end{align*}
 This shows that the former upper bound cannot hold as stated. Looking into the proof, the issue appears to be at the first step in bounding 
-the quantity $\frac{1}{2} \sum_{t=1}^\ns \bEE{(S-S^{(t)})^2}$~\cite[p.3, top of right column]{Paninski08}, as $|S-S^{(i)}|$ can take values 0, 1,or 4 (not just 0 or 1), and some events leading to these have been forgotten. As an example: the case $(n_i,n_j)=(0,1)$ on $\ns-1$ samples leads to a difference of 2 when the remaining sample falls on $i$ in one case and $j$ in the other (as it gives 2 unique elements in one case, and 0 in the other), and is thus different from say the case $(n_i,n_j)=(0,2)$ which leads to a difference of 1 when the remaining sample falls on $i$ in one case and $j$ in the other (as it gives 1 unique elements in one case, and 0 in the other). The current analysis omits this distinction, and some other cases; it is not clear to us how to fix their proof, which is why we chose to provide an alternative argument to bound the variance.
+the quantity $\frac{1}{2} \sum_{t=1}^\ns \bEE{(S-S^{(t)})^2}$~\cite[p.3, top of right column]{Paninski08}, as $|S-S^{(i)}|$ can take values 0, 1,or 4 (not just 0 or 1), and some events leading to these have been forgotten. As an example: the case $(\occur_i,\occur_j)=(0,1)$ on $\ns-1$ samples leads to a difference of 2 when the remaining sample falls on $i$ in one case and $j$ in the other (as it gives 2 unique elements in one case, and 0 in the other), and is thus different from say the case $(\occur_i,\occur_j)=(0,2)$ which leads to a difference of 1 when the remaining sample falls on $i$ in one case and $j$ in the other (as it gives 1 unique elements in one case, and 0 in the other). The current analysis omits this distinction, and some other cases; it is not clear to us how to fix their proof, which is why we chose to provide an alternative argument to bound the variance.
 
 \paragraph{More details.} Specifically, after using the Efron--Stein inequality,~\citet{Paninski08} bounds the expected squared difference between $S$ and $S'$ (the number of unique elements observed on $\ns$ samples, where $S$ and $S'$ differ only one one single sample: i.e., $S=S(X_1,\dots,X_{\ns-1}, X_\ns)$ and $S=S(X_1,\dots,X_{\ns-1}, X'_\ns)$, with $X_\ns,X'_\ns$ \iid) as
 \[
-  \bEE{(S-S')^2} = \sum_{1\leq i,j\leq \ab} \p(i)\p(j) \bE{X_1,\dots,X_{\ns-1}}{ \indic{\ns_i=0, \ns_j>0} + \indic{\ns_j=0, \ns_i>0} }
+  \bEE{(S-S')^2} = \sum_{1\leq i,j\leq \ab} \p(i)\p(j) \bE{X_1,\dots,X_{\ns-1}}{ \indic{\occur_i=0, \occur_j>0} + \indic{\occur_j=0, \occur_i>0} }
 \]
-by considering what $X_\ns,X'_\ns$ take, and the contribution to $(S-S')^2$ this makes (where $\ns_i$ denotes the number of occurrences of $i$ among $X_1,\dots,X_{\ns-1}$).
+by considering what $X_\ns,X'_\ns$ take, and the contribution to $(S-S')^2$ this makes (where $\occur_i$ denotes the number of occurrences of $i$ among $X_1,\dots,X_{\ns-1}$).
 However, accounting for all the ways $(S-S')^2$ could differ shows that there are 6 terms, not just 2: instead of 
 \begin{equation}
   \label{eq:pan:bound}
-\indic{\ns_i=0, \ns_j>0} + \indic{\ns_j=0, \ns_i>0} 
+\indic{\occur_i=0, \occur_j>0} + \indic{\occur_j=0, \occur_i>0} 
 \end{equation}
 one should have
 \begin{align*}
-& 4\cdot \textcolor{red}{\indic{\ns_i=0, \ns_j=1}} + \textcolor{red}{\indic{\ns_i=0, \ns_j>1}} + \indic{\ns_i=1, \ns_j>1} \\
-&+ 4\cdot \textcolor{red}{\indic{\ns_j=0, \ns_i=1}} + \textcolor{red}{\indic{\ns_j=0, \ns_i>1}} + \indic{\ns_j=1, \ns_i>1} 
+& 4\cdot \textcolor{red}{\indic{\occur_i=0, \occur_j=1}} + \textcolor{red}{\indic{\occur_i=0, \occur_j>1}} + \indic{\occur_i=1, \occur_j>1} \\
+&+ 4\cdot \textcolor{red}{\indic{\occur_j=0, \occur_i=1}} + \textcolor{red}{\indic{\occur_j=0, \occur_i>1}} + \indic{\occur_j=1, \occur_i>1} 
 \end{align*}
 and while~\eqref{eq:pan:bound} (up to a factor 4) can be used to upper bound the sum of 4 of those 6 terms (those in red), there remain 2 unaccounted for:
 $
-\indic{\ns_i=1, \ns_j>1}
+\indic{\occur_i=1, \occur_j>1}
 $
 and 
 $
-\indic{\ns_j=1, \ns_i>1}
+\indic{\occur_j=1, \occur_i>1}
 $. As mentioned above, it is not clear to us how to bound the contribution of those extra two terms (while the other 4 ``red'' terms, of course, would follow from the original argument, losing a factor 4 only in the bound).
 \egroup
