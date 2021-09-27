@@ -2,8 +2,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Uniformity testing}
   \label{sec:uniformity}
-\cnote{Thorough presentation of the many algorithms for uniformity testing,
-with proofs, and relative advantages of each.}
+%\cnote{Thorough presentation of the many algorithms for uniformity testing, with proofs, and relative advantages of each.}
 
 It is known~\citep{Paninski08} that the sample complexity of uniformity testing with distance parameter $\dst\in(0,1]$ is $\Theta(\sqrt{\ab}/\dst^2)$, which is, for a large range of parameters, significantly smaller than the domain size $\ab$. This means that we can reliably infer interesting properties of the distribution after observing only a tiny fraction of the domain elements! That's nice. Now, \emph{how do we perform uniformity testing?}  And what should we keep in mind while doing so?
 
@@ -28,17 +27,18 @@ In this chapter, we will have a detailed look at 7 different uniformity testing 
   \hline
      & \bf Sample complexity & \bf Notes & \bf References \\\hline
     \bf Collision-based & $\dfrac{\ab^{1/2}}{\dst^2}$ & ``Natural'' & \cite{GoldreichR00,DiakonikolasGPP19} \\\hline
-    \bf Unique elements & $\dfrac{\ab^{1/2}}{\dst^2}$ & $\dst \gg 1/\ab^{1/4}$ & \cite{Paninski08} \\\hline
+    \bf Unique elements & $\dfrac{\ab^{1/2}}{\dst^2}$ & Low sensitivity $\dst \gg 1/\ab^{1/4}$ & \cite{Paninski08} \\\hline
     \bf Modified $\chi^2$ & $\dfrac{\ab^{1/2}}{\dst^2}$ & (None) & \cite{ValiantV17,AcharyaDK15,DiakonikolasKN15} \\\hline
     \bf Empirical distance to uniform & $\dfrac{\ab^{1/2}}{\dst^2}$ & Low sensitivity & \cite{DiakonikolasGPP18} \\\hline
     \bf Random binary hashing & $\dfrac{\ab}{\dst^2}$ & Suboptimal, but fast & \cite{AcharyaCT19b} \\\hline
-    \bf Bipartite collisions & $\dfrac{\ab^{1/2}}{\dst^2}$ & $\dst \gg 1/\ab^{1/10}$ & \cite{DiakonikolasGKR19} \\\hline
-    \bf Empirical subset weighting & $\dfrac{\ab^{1/2}}{\dst^2}$ & $\dst \gg 1/\ab^{1/4}$ &  \\\hline
+    \bf Bipartite collisions & $\dfrac{\ab^{1/2}}{\dst^2}$ & Tradeoff possible & \cite{DiakonikolasGKR19} \\\hline
+    \bf Empirical subset weighting & $\dfrac{\ab^{1/2}}{\dst^2}$ & Tradeoff possible $\dst \gg 1/\ab^{1/4}$ & \cite{AcharyaCLST21} \\\hline
   \end{tabularx}
 % %   \end{adjustwidth}
-  \caption{\label{tab:summary:uniformity:testing}The current landscape of uniformity testing, based on the algorithms I know of. For ease of reading, we omit the $O(\cdot)$, $\Theta(\cdot)$, and $\Omega(\cdot)$'s from the table: all results should be read as asymptotic with regard to the parameters, up to absolute constants.}
+  \caption{\label{tab:summary:uniformity:testing}The current landscape of uniformity testing, based on the algorithms covered in this survey. For ease of reading, we omit the $O(\cdot)$, $\Theta(\cdot)$, and $\Omega(\cdot)$'s from the table: all results should be read as asymptotic with regard to the parameters, up to absolute constants.}
 \end{table}
 
+\subsection{The $\lp[2]$ distance, and why}
 A key insight, which underlies a lot of the algorithms we will cover, is that here \emph{$\lp[2]$ distance is a good proxy for total variation distance}:
 \begin{equation}
   \label{eq:relation:l1:l2:cs}
@@ -245,7 +245,8 @@ The collision-based tester (\cref{algo:collision-based}) is a testing algorithm 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Unique elements}
-  \label{sec:uniformity:unique} Another idea: count the number of elements that appear exactly \emph{once} among the $\ns$ samples taken. Why is that a sensible thing to do? We have seen that the uniform distribution will have the fewer collisions, so, equivalently, will have the maximum number of unique elements. In this case, the estimator $Z_2$ (the number of unique elements) is defined as
+  \label{sec:uniformity:unique}
+Another idea: count the number of elements that appear exactly \emph{once} among the $\ns$ samples taken. Why is that a sensible thing to do? We have seen that the uniform distribution will have the fewer collisions, so, equivalently, will have the maximum number of unique elements. In this case, the estimator $Z_2$ (the number of unique elements) is defined as
 \begin{equation}
   \label{eq:def:z2}
     Z_2 = \frac{1}{\ns} \sum_{j\in\domain} \indic{\occur_j=1}\,,
@@ -589,7 +590,7 @@ That's the thing, though: the devil is in the $o(1)$ details. Sure, $\expect{Z_4
   \caption{\label{algo:empirical:plugin}\sc Empirical Distance Tester}
 \end{algorithm}
 
-For simplicity of exposition, we focus here on the case $\ns \leq \ab$, though the analysis of the test can be performed for extended to all parameter regimes -- see~\citet{DiakonikolasGPP18} for the full general case. The argument proceeds in two steps: first, computing and bounding the expectation of $Z_4$ under the uniform and the far cases separately is not going to really work, so instead we will bound the expectation gap $\Delta(\p)\eqdef \bE{\p}{Z_4}-\bE{\uniform_{\ab}}{Z_4}$ directly (a little like in the case of the unique elements-based tester). Then, once the gap in expectation is established, we will once again argue concentration of $Z_4$ as usual by a variance-based (Chebyshev's inequality) argument~--~but this time diversifying our toolkit and using a different tool, the Efron--Stein lemma, to bound the variance.\todonote{Revisit this.}
+For simplicity of exposition, we focus here on the case $\ns \leq \ab$, though the analysis of the test can be performed for extended to all parameter regimes -- see~\citet{DiakonikolasGPP18} for the full general case. The argument proceeds in two steps: first, computing and bounding the expectation of $Z_4$ under the uniform and the far cases separately is not going to really work, so instead we will bound the expectation gap $\Delta(\p)\eqdef \bE{\p}{Z_4}-\bE{\uniform_{\ab}}{Z_4}$ directly (a little like in the case of the unique elements-based tester). Then, once the gap in expectation is established, we will once again argue concentration of $Z_4$ as usual by a variance-based (Chebyshev's inequality) argument~--~but this time diversifying our toolkit and using a different tool, the Efron--Stein lemma, to bound the variance.
 %instead by invoking a more powerful (and slightly fancier) concentration inequality.\todonote{Revisit this.}
 
 \paragraph{The expectation gap $\Delta(\p)$.} From the definition of total variation distance, we can rewrite
@@ -931,6 +932,17 @@ The proof of this lemma established a little more than stated: first, we actuall
 Second, although our proof via the MGF used full independence of the $\xi_i$'s (and thus a truly uniformly random set $S$), this was only to obtain bounds on the first 4 moments of $Z$, which is all that the Paley--Zygmund lemma eventually requires. Any distribution for $S$ with the same first 4 moments will then lead to the same guarantees! In particular, instead of a truly uniformly random $S$, one can instead use a $4$-wise independent hash function, which requires significantly less randomness and can be much easier.
 \end{remark}
 
+Finally, we conclude this section by mentioning a generalization of the binary hashing lemma~\cref{lemma:random:binary:hashing} to an arbitrary number of parts:
+\begin{theorem}[Domain Compression Lemma]
+  \label{theo:random:dct:hashing}
+  There exist absolute constants $c_1,c_2>0$ such that the following holds. For any $2\leq \ell\leq \ab$ and any $\p,\q\in\distribs{\ab}$,
+  \[
+        \probaDistrOf{\Pi}{ \totalvardist{\p_\Pi}{\q_\Pi} \geq c_1\sqrt{\frac{\ell}{\ab}}\totalvardist{\p}{\q} } \geq c_2\,,
+  \] 
+  where $\Pi=(\Pi_1,\dots\Pi_\ell)$ is a uniformly random partition of $[\ab]$ in $\ell$ subsets, and $\p_\Pi\in\distribs{\ell}$ denotes the probability distribution on $[\ell]$ induced by $\p$ and $\Pi$ via $\p_\Pi(i) = \p(\Pi_i)$.
+\end{theorem}
+This theorem, which we will not prove, can be seen as some type of ``one-sided'' dimensionality reduction for probability distributions, and lets us trade domain size for distances. In some settings, this can lead to better sample complexities, \eg by starting with some testing algorithm and optimizing its sample complexity $\ns(\ell, \dst\sqrt{\ell/\ab}, 1/3)$ as a function of $\ell$.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Bipartite collisions} 
 Recall that in the collision-based tester from~\cref{sec:uniformity:collision-based}, we took a multiset $S$ of $\ns$ samples from $\p$ and defined our statistic $Z_1$ as the (normalized) number of ``collisions'' in $S$. That is fine, but requires to keep in memory all the samples observed so far. One related idea would be to instead take \emph{two} multisets $S_1,S_2$ of size $\nss$ and $\nst$, and only count ``bipartite collisions'' -- i.e., collisions between a sample of $S_1$ and one of $S_2$:
@@ -1140,7 +1152,7 @@ where for the last step we used that
 \leq 1-(1-\norminf{\p})^{\nss}
 \leq \nss\norminf{\p}\,.
 \]
-Of course,~\cref{eq:variance:subset:weight} requires a bound on $\norminf{\p}$, which we do \emph{not} have for the ``far'' case.\footnote{Unfortunately, we also cannot in this case use our stochastic dominance hammer, or even gavel, as it is not true in general that $\p(S)$ stochastically dominates $\q(S)$ whenever $\p\preceq\q$.} Yet, by observing that the function $x\in[0,1]\mapsto x(1-x)^m$ is maximized at $\frac{1}{m+1}$ (where it is at most $\frac{1}{2(m+1)}$) we can get
+Of course,~\cref{eq:variance:subset:weight} requires a bound on $\norminf{\p}$, which we do \emph{not} have for the ``far'' case.\footnote{Unfortunately, we cannot in this case use our stochastic dominance hammer, or even gavel, as it is not true in general that $\p(S)$ stochastically dominates $\q(S)$ whenever $\p\succeq\q$.} Yet, by observing that the function $x\in[0,1]\mapsto x(1-x)^m$ is maximized at $\frac{1}{m+1}$ (where it is at most $\frac{1}{2(m+1)}$) we can get
 \begin{align}
   \Var[\p(S)]
   &\leq \sum_{i=1}^\ab\p(i) \bPr{\occur_i \geq 1} \cdot \p(i) (1-\p(i))^{\nss}
@@ -1229,15 +1241,17 @@ mity testing.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}
-\cite{Ingster??}
+\cite{Ingster86}
 \cite{GoldreichR00}
-\cite{Batu++}
+\cite{BatuFRSW00}
 \cite{Paninski08}
 \cite{ChanDVV14}
 \cite{AcharyaDK15}
 \cite{DiakonikolasGPP18}
 \cite{BlaisCG17}
 \cite{HuangM13}
+
+\cite{AcharyaCT19b,AcharyaCHST20,AminJM20}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1251,6 +1265,7 @@ mity testing.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Deferred proofs}
   \label{sec:deferred:chap:identity}
+We here provide the omitted proofs from the chapter. The first, from~\cref{sec:uniformity:unique}, is due to~\citet{MathSE-fedja}.
 \begin{lemma}[\cref{lemma:technical:distinct:elements}, restated]
 Fix $m \geq 1$ and $\ab \in \N$. For any $x_1,\dots,x_\ab \geq 0$ such that $\sum_{i=1}^\ab x_i = 1$, we have
 \[
