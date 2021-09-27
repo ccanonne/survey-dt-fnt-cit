@@ -1074,13 +1074,13 @@ Great: we have a new estimator for (more or less) the $\lp[2]$ norm! Now, assumi
 \begin{algorithm}[ht!]
   \begin{algorithmic}[1]
     \Require Multisets $S_1, S_2$ of $\nss$ and $\nst$ samples $x_1,\dots,x_{\nss}\in \domain$, $y_1,\dots,y_{\nst}\in \domain$, parameters $\dst\in(0,1]$ and $\ab = \abs{\domain}$
-    \State Set $\tau \gets ????$
+    \State Set $\tau \gets \frac{\nss\dst^2}{64\ab}$
     \State Compute $S$, the \emph{set} of samples from $S_1$. \Comment{Can be done in $O(\nss\log\nss)$ time, and $O(\nss)$ expected (\eg, via cuckoo hashing).}
     \State Compute \Comment{Can be done in $O(\nst)$ time.}
     \[
         Z_7 = \frac{1}{\nst} \sum_{t=1}^{\nst} \indic{y_t\in S}\,.
     \]
-    \If{ $Z_7 \geq \tau$ } \Return \reject \Comment{Not uniform}
+    \If{ $Z_7 \geq 1-(1-\frac{1}{\ab})^{\nss} + 2\tau$ } \Return \reject \Comment{Not uniform}
     \Else\ 
       \Return \accept \Comment{Uniform}
     \EndIf
@@ -1106,8 +1106,6 @@ If $\ns \leq \ab$, we have
     \Delta(\p) \geq \frac{\ns}{16\ab}\totalvardist{\p}{\uniform_\ab}^2\,.
 \]
 \end{lemma}
-
-\bgroup\color{purple}
 We will here introduce (and use) another concept we have not seen yet, that of \emph{negative association} between random variables. This is a stronger notion than negative correlation, and is very useful when dealing with random variables which are dependent ``but in a way which helps us'' (to prove concentration):
 \begin{definition}[Negative Association]
 The random variables $X_1,\dots, X_n$ are said to be \emph{negatively associated} if, for all disjoint subsets $I,J\subseteq [\ns]$ and functions $f\colon \R^{|I|} \to \R$, $g\colon \R^{|J|} \to \R$, we have
@@ -1128,59 +1126,98 @@ We will rely on this to bound the variance explicitly, starting with the expecte
 \end{align*}
 where the inequality follows from negative associativiy, and we got the third equality by completing the sum $2\sum_{i<j} x_{i,j} = \sum_{i,j} x_{i,j} - \sum_{i} x_{i,i}$. That is, we just proved
 \begin{align}
-  \label{eq:variance:subset:weight}
   \Var[\p(S)]
   &\leq \sum_{i=1}^\ab\p(i)^2 \bPr{\occur_i \geq 1}\bPr{\occur_i = 0}\,.
 \end{align}
-By upper bounding the last factor by $1$ and using the inequality $\sum_i a_ib_i c_i \leq \Paren{\sum_i a_i^2}^{1/2}\Paren{\sum_i b_i^2}^{1/2}\Paren{\sum_i c_i^2}^{1/2}$,\footnote{This can be proven, for instance, by Cauchy--Schwarz (twice) followed by the monotonicity of $\lp[p]$ norms: $\norm{\cdot}_4\leq \norm{\cdot}_2$.} we then get
+By upper bounding the last factor by $1$, we then get
 \begin{align}
   \Var[\p(S)]
-  &\leq \sum_{i=1}^\ab\p(i) \bPr{\occur_i \geq 1} \p(i) \notag\\
-  &= \sum_{i=1}^\ab \Paren{\p(i) \bPr{\occur_i \geq 1}}^{1/2} \Paren{\p(i) \bPr{\occur_i \geq 1}}^{1/2} \p(i) \notag\\
-  &\leq \expect{\p(S)}\cdot \normtwo{\p} \leq \expect{\p(S)}^{3/2}
+  &\leq \norminf{\p}\expect{\p(S)} \leq \nss\norminf{\p}^2\, \label{eq:variance:subset:weight}
 \end{align}
 where for the last step we used that
 \[
-\expect{\p(S)} = \sum_{i=1}^\ab \p(i) (1-(1-\p(i))^{\nss}) \geq \sum_{i=1}^\ab \p(i) (1-(1-\p(i))) = \normtwo{\p}^2\,.
+\bE{\p}{\p(S)} = \sum_{i=1}^\ab \p(i) (1-(1-\p(i))^{\nss}) %\leq \sum_{i=1}^\ab \p(i) (1-(1-\norminf{\p})^{\nss}) 
+\leq 1-(1-\norminf{\p})^{\nss}
+\leq \nss\norminf{\p}\,.
 \]
-This allows us to prove that the first stage of the algorithm will (with high probability) succeed, in that the random variable $\p(S)$ will significantly differ under the uniform and ``far'' cases.
+Of course,~\cref{eq:variance:subset:weight} requires a bound on $\norminf{\p}$, which we do \emph{not} have for the ``far'' case.\footnote{Unfortunately, we also cannot in this case use our stochastic dominance hammer, or even gavel, as it is not true in general that $\p(S)$ stochastically dominates $\q(S)$ whenever $\p\preceq\q$.} Yet, by observing that the function $x\in[0,1]\mapsto x(1-x)^m$ is maximized at $\frac{1}{m+1}$ (where it is at most $\frac{1}{2(m+1)}$) we can get
+\begin{align}
+  \Var[\p(S)]
+  &\leq \sum_{i=1}^\ab\p(i) \bPr{\occur_i \geq 1} \cdot \p(i) (1-\p(i))^{\nss}
+  \leq \frac{\expect{\p(S)}}{2\nss}\,.
+\end{align}
+
+This allows us to prove that the first stage of the algorithm will (with high probability) succeed, in that the random variable $\p(S)$ will significantly differ under the uniform and ``far'' cases. 
 \begin{lemma}
-  
+  \label{lemma:empirical:subset:guarantee:pS}
+  For $\p\in\distribs{\ab}$ such that $\totalvardist{\p}{\uniform_\ab} \geq \dst$, we have
+  \[
+  \bP{\uniform_\ab}{\uniform_\ab(S) \geq \bE{\uniform_\ab}{\uniform_\ab(S)} + \tau} \leq \frac{1}{6}
+  , \quad
+  \bP{\p}{\p(S) \leq \bE{\uniform_\ab}{\uniform_\ab(S)} + 3\tau} \leq \frac{1}{6}\,,
+  \]
+  where $\tau \eqdef \frac{\nss\dst^2}{64\ab}$; provided that $\ab \geq \nss \geq 115\sqrt{\ab}/\dst^2$ and $\dst \geq 15/\ab^{1/4}$.
 \end{lemma}
 \begin{proof}
-Let $\p\in\distribs{\ab}$, and recall that $\bE{\uniform_\ab}{\uniform_\ab(S)} = 1-(1-1/\ab)^{\nss} \leq \frac{\nss}{\ab}$.
+Let $\p\in\distribs{\ab}$. As usual by now, we will invoke Chebyshev's inequality to prove the desired bounds.
 \begin{itemize}
     \item In the uniform case, 
     \begin{align*}
-    \bPr{\p(S) \geq \bE{\uniform_\ab}{\uniform_\ab(S)} + \frac{\nss\dst^2}{64\ab}} 
+    \bP{\uniform_\ab}{\uniform_\ab(S) \geq \bE{\uniform_\ab}{\uniform_\ab(S)} + \frac{\nss\dst^2}{64\ab}} 
     &\leq \frac{4096\ab^2\Var_{\uniform_\ab}[\uniform_\ab(S)]}{\nss^2\dst^4} 
     \leq \frac{4096}{\nss\dst^4}
     \end{align*}
-    using~\cref{eq:variance:subset:weight}, which implies $\Var_{\uniform_\ab}[\uniform_\ab(S)] \leq \frac{1}{\ab}\bE{\uniform_\ab}{\uniform_\ab(S)}$; this is less than $1/6$ as long as $\nss \geq 24576/\dst^4$.
-    \item In the ``far'' case, since by~\cref{lemma:gap:z7} we have $\Delta(\p) \geq \frac{\nss\dst^2}{16\ab} \geq \frac{\dst^2}{16}\bE{\uniform_\ab}{\uniform_\ab(S)}$, 
+    using~\cref{eq:variance:subset:weight}, which implies $\Var_{\uniform_\ab}[\uniform_\ab(S)] \leq \frac{1}{\ab^2}\bE{\uniform_\ab}{\uniform_\ab(S)}$; this is less than $1/6$ as long as\footnote{It is worth pointing out, in case this was not apparent, that this survey does \emph{not} focus on optimizing the constants.} $\nss \geq 24576/\dst^4$.
+    \item In the ``far'' case, we have by~\cref{lemma:gap:z7} we have $\Delta(\p) \geq \frac{\nss\dst^2}{16\ab} \geq \frac{\dst^2}{16}\bE{\uniform_\ab}{\uniform_\ab(S)}$, 
     \begin{align*}
         \bPr{\p(S) < \bE{\uniform_\ab}{\uniform_\ab(S)} + \frac{3\nss\dst^2}{64\ab}} 
         &\leq \bPr{\p(S) < \bE{\uniform_\ab}{\uniform_\ab(S)} + \frac{3}{4}\Delta(\p)}\\
         &= \bPr{\p(S) < \bE{\p}{\p(S)} - \frac{1}{4}\Delta(\p)} \\
-        &\leq \frac{16\Var[\p(S)]}{\Delta(\p)^2} \\
-        &\leq \frac{16\norminf{\p}\bE{\p}{\p(S)}}{\Delta(\p)^2} \\
-        &\leq \frac{4096 \ab^2\norminf{\p}^2}{\nss\dst^4} \\
+        &\leq \frac{16\Var[\bar{\p}(S)]}{\Delta(\p)^2} \\
+        &\leq \frac{128\ab}{\nss^2\dst^2}\cdot \frac{\bE{\p}{\p(S)}}{\Delta(\p)} \\
+        &\leq \frac{2176\ab}{\nss^2\dst^4} 
     \end{align*}
-    using~\cref{eq:var:bipartite:collisions:lowinfty}, then $\alpha^2\geq \dst^2$ (and $\dst \leq 1$) and $\nss+\nst\leq 2\max(\nss,\nst)$. This is less than $1/6+1/6=1/3$ as long as (1)~$\nss\nst \geq 24\ab/\dst^4$ and~(2) $\min(\nss,\nst) \geq 168/\dst^2$.
+    using~\cref{eq:variance:subset:weight}, then $\frac{\bE{\p}{\p(S)}}{\Delta(\p)} = 1+\frac{\bE{\uniform_\ab}{\p(S)}}{\Delta(\p)} \leq 1+\frac{16}{\dst^2} \leq \frac{17}{\dst^2}$. This is less than $1/6$ whenever $\nss \geq 115\sqrt{\ab}/\dst^2$.
 \end{itemize}
-
-
-By~\cref{lemma:gap:z7}, 
+Observing that our condition $\dst \geq 15/\ab^{1/4}$ implies $115\sqrt{\ab}/\dst^2\geq 24576/\dst^4$ concludes the proof of the lemma.
 \end{proof}
-\egroup
 
-
-
-We will require the following result, which can be seen as a ``localized'' variant of~\cref{lemma:bias:coin}.\footnote{Localized, as it depends on the ``location'' $\beta$ we focus on, while~\cref{lemma:bias:coin} holds for all possible values~--~and is thus a worst-case result (over the unknown value $\alpha$).}
+The second stage then boils down to using $\nst$ samples to distinguish between the two cases: (1)~$\p(S) \leq \bE{\uniform_\ab}{\uniform_\ab(S)} + \tau$ and (2)~$\p(S) \geq \bE{\uniform_\ab}{\uniform_\ab(S)} + 3\tau$, assuming one of the two holds (which will if the first stage is successful). To do so, we will require the following result, which can be seen as a ``localized'' variant of~\cref{lemma:bias:coin}.\footnote{Localized, as it depends on the ``location'' $\beta$ we focus on, while~\cref{lemma:bias:coin} holds for all possible values~--~and is thus a worst-case result (over the unknown value $\alpha$).}
 \begin{fact}[Bias of a coin, distinguishing]
   \label{lemma:bias:coin:test}\exercise{Prove this!}
-  Given \iid samples from a Bernoulli with unknown parameter $\alpha\in[0,1]$, distinguishing with probability $1-\errprob$ between $\alpha \leq \beta$ and $\alpha \geq \beta(1+\eta)$ can be done with (and requires) $\bigTheta{\frac{\log(1/\errprob)}{\beta\eta^2}}$ samples.
+  Given \iid samples from a Bernoulli with unknown parameter $\alpha\in[0,1]$, distinguishing with probability $1-\errprob$ between $\alpha \leq \beta$ and $\alpha \geq \beta(1+\eta)$ can be done with (and requires) $\bigTheta{\frac{\log(1/\errprob)}{\beta\eta^2}}$ samples. This is achieved by the empirical estimator.
 \end{fact} 
+We are now ready to establish the guarantees of our algorithm.
+\begin{theorem}
+  \label{theo:empirical-subset}
+The empirical subset weighting tester (\cref{algo:empirical:subset}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = \nss+\nst$ and time complexity $O(\nss\log\nss + \nst)$ (expected $O(\nss+\nst)$), provided that $\nss\nst \geq C\ab/\dst^4$, $115\sqrt{\ab}/\dst^2\leq \ns_1 \leq \ab$, and $\dst \geq 15/\ab^{1/4}$.
+\end{theorem}
+\begin{proof}
+Fix any $\p\in\distribs{\ab}$, and define 
+\[
+    \tau \eqdef \frac{\nss\dst^2}{64\ab}
+\]
+as in~\cref{algo:empirical:subset,lemma:empirical:subset:guarantee:pS}. We assume that $\ns_2 \geq C\cdot\frac{\ab}{\nss\dst^4}$, where $C>0$ is the constant hidden in the $O(\cdot)$ of \cref{lemma:bias:coin:test}, so that we can apply this lemma with $\beta \eqdef \bE{\uniform_\ab}{\uniform_\ab(S)} + \tau$, $\eta\eqdef \frac{2\tau}{\beta}$, and $\delta \eqdef 1/6$. Here, we implicitly used that
+$
+ \bE{\uniform_\ab}{\uniform_\ab(S)} \leq \frac{\nss}{\ab}
+$,
+to get
+\[
+    \frac{1}{\beta\eta^2} = \frac{\beta}{4\tau^2} \lesssim \frac{\ab}{\nss\dst^4}\,.
+\]
+\begin{itemize}
+    \item In the uniform case, by~\cref{lemma:empirical:subset:guarantee:pS,lemma:bias:coin:test} we have that, with probability at least $(1-\frac{1}{6})^2 \geq 2/3$,
+    $\uniform_\ab(S) \leq \bE{\uniform_\ab}{\uniform_\ab(S)} + \tau = \beta$ and our estimate $Z_7$ of  $\uniform_\ab(S)$ detects it, so that we output $\accept$. 
+    \item In the ``far'' case, similarly by~\cref{lemma:empirical:subset:guarantee:pS,lemma:bias:coin:test}, with probability at least $(1-\frac{1}{6})^2$,
+    $\p(S) \geq \bE{\uniform_\ab}{\uniform_\ab(S)} + 3\tau = \beta(1+\eta)$ and our estimate $Z_7$ of  $\p(S)$ detects it, so that we output $\reject$. 
+\end{itemize}
+  The above analysis shows that both errors are less than $1/3$ for any $\ns = \nss+\nst$ such that $\nss\nst \geq C\ab/\dst^4$ and $\ab\geq\nss \geq \clg{115\sqrt{\ab}/\dst^2}$; this concludes the proof.
+\end{proof}
+Setting $\ns_1=\ns_2$ in the above theorem, we get as an immediate corollary:
+\begin{corollary}
+  \label{coro:empirical-subset}
+The empirical subset weighting tester (\cref{algo:empirical:subset}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$ and time complexity $O(\ns\log\ns)$ (expected $O(\ns)$), provided that $\dst \geq 15/\ab^{1/4}$.
+\end{corollary}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
