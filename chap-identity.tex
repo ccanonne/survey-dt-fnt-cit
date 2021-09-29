@@ -19,7 +19,7 @@ There are several things to consider in a testing algorithm. To name a few:
 \end{description}
 
 In this chapter, we will have a detailed look at 7 different uniformity testing algorithms, each with its pros and cons. For each of them, we will provide a full proof of their performance, which will help us illustrate several techniques and ideas underlying the analysis of distribution testing algorithms. 
-\cref{tab:summary:uniformity:testing} summarizes the name, and some of the specificities, of those seven algorithms. 
+\cref{tab:summary:uniformity:testing} summarizes the name, and some of the specificities, of those seven algorithms: we will discuss them in more detail in~\cref{ssec:uniformity:discussion}. 
 \begin{table}[ht]\centering\footnotesize
   \def\arraystretch{1.25}%  1 is the default, change whatever you need
 % %   \begin{adjustwidth}{0in}{0in}% adjust the L and R margins by 1 inch
@@ -66,7 +66,7 @@ so combining the two we get that $\totalvardist{\p}{\uniform_\ab}>\dst$ implies 
 
 \begin{remark}
   \label{rk:relation:l1:l2}
-  \cref{eq:relation:l1:l2:cs} provides an upper bound on the total variation distance in terms of the $\lp[2]$ distance. Recalling further that $\lp[p]$ norms are monotone (non-increasing) in $p$,\exercise{Prove it.} we further get that $\normone{x}\geq \normtwo{x}$ for any $x\in\R^d$, and therefore
+  \cref{eq:relation:l1:l2:cs} provides an upper bound on the total variation distance in terms of the $\lp[2]$ distance. Recalling further that $\lp[p]$ norms are monotone (non-increasing) in $p$,\exercise{Prove it:~\cref{ex:identity:monotonicity:lp}.} we further get that $\normone{x}\geq \normtwo{x}$ for any $x\in\R^d$, and therefore
 \begin{equation}
   \label{eq:relation:l1:l2:overall}
   \frac{1}{2}\normtwo{\p-\q} \leq \totalvardist{\p}{\q} \leq \frac{\sqrt{\ab}}{2}\normtwo{\p-\q}
@@ -251,7 +251,7 @@ Another idea: count the number of elements that appear exactly \emph{once} among
   \label{eq:def:z2}
     Z_2 = \frac{1}{\ns} \sum_{j\in\domain} \indic{\occur_j=1}\,,
 \end{equation}
-again with $\occur_j \eqdef \sum_{t=1}^\ns \indic{X_t=j}$. It is a simple matter to verify that this statistic has expectation\exercise{Do it!}
+again with $\occur_j \eqdef \sum_{t=1}^\ns \indic{X_t=j}$. It is a simple matter to verify that this statistic has expectation\exercise{Check it: \cref{ex:expectation:z2}.}
 \begin{equation}
   \label{eq:z2:expectation}
   \expect{Z_2} = \sum_{i\in\domain} \p(i)(1-\p(i))^{\ns-1}
@@ -426,12 +426,11 @@ as in~\cref{algo:unique-elements}.
 \end{proof}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Modified $\chi^2$} If you are a statistician, or just took a Statistics class, or even got lost on Wikipedia at some point and ended up on the wrong page at the wrong time, you may know of Pearson's $\chi^2$ test for goodness-of-fit: for every element $i$ of the domain, count how many times it appeared in the samples, $\occur_i$. Compute $\sum_{i} \frac{(\occur_i-\ns/\ab)^2}{\ns/\ab}$. Compare the result to a predetermined threshold. This very natural idea, maybe not surprisingly, works well! In particular, since $\occur_i \sim \binomial{\ns}{\p(i)}$, it is not hard to see that
+\subsection{Modified $\chi^2$} If you are a statistician, or just took a Statistics class, or even got lost on Wikipedia at some point and ended up on the wrong page at the wrong time, you may know of Pearson's $\chi^2$ test for goodness-of-fit: for every element $i$ of the domain, count how many times it appeared in the samples, $\occur_i$. Compute $\sum_{i} \frac{(\occur_i-\ns/\ab)^2}{\ns/\ab}$. Compare the result to a predetermined threshold. This very natural idea, maybe not surprisingly, works well! In particular, since $\occur_i \sim \binomial{\ns}{\p(i)}$, one can derive
 \[
-\bEE{ \sum_{i=1}^\ab \frac{(\occur_i-\ns/\ab)^2}{\ns/\ab} } = \frac{\ab}{\ns}\sum_{i=1}^\ab \bEE{ \Paren{\occur_i-\frac{\ns}{\ab}}^2 } = \ab(\ns-1)\normtwo{\p-\uniform_\ab}^2 + \ab-1
+\bEE{ \sum_{i=1}^\ab \frac{(\occur_i-\ns/\ab)^2}{\ns/\ab} } = \frac{\ab}{\ns}\sum_{i=1}^\ab \bEE{ \Paren{\occur_i-\frac{\ns}{\ab}}^2 } = \ab(\ns-1)\normtwo{\p-\uniform_\ab}^2 + \ab-1\,,
 \]
 using moments of a Binomial random variable and~\cref{eq:relation:collisionprob:distance:uniform}.\exercise{Check it!} This does look like a reasonable way to estimate the distance to uniformity \emph{via} the $\lp[2]$ distance again\dots{} unfortunately, the variance will be slightly annoying, due to the correlated between terms of the sums.
-
 
 To make the task easier, it is helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, which will greatly simplifies the analysis. Then, under this (slightly different) sampling model the $\occur_i$'s become independent, with $\occur_i\sim\poisson{\ns\p(i)}$: this is called \emph{Poissonization}\index{Poissonization}, and can be done more or less without loss of generality since a $\poisson{\ns}$ random variable will be between $0.99\ns$ and $1.01\ns$ with overwhelming probability. (See~\cref{sec:poissonization} for more on Poissonization, and why we can use it ``without loss of generality'').
 
@@ -465,8 +464,9 @@ which is perfect. Analyzing this test boils down, again, to bounding the varianc
 \[
     Z_3 = \sum_{i=1}^\ab \frac{(\occur_i-\ns\uniform_\ab(i))^2- \occur_i}{\ns\uniform_\ab(i)}
 \]
-where, of course, $\uniform_\ab(i) = 1/\ab$ for all $i\in[\ab]$. Recalling that, by Poissonization, all the $\occur_i$'s are independent Poisson random variables, we will invoke the following two technical claims, which follow from (somewhat tedious, but straightforward) computations involving the moments of Poisson random variables:\exercise{Prove this claim!}
+where, of course, $\uniform_\ab(i) = 1/\ab$ for all $i\in[\ab]$. Recalling that, by Poissonization, all the $\occur_i$'s are independent Poisson random variables, we will invoke the technical claim below, which follows from (somewhat tedious, but straightforward) computations involving the moments of Poisson random variables:\exercise{Verify it: \cref{ex:uniformity:moments:poisson}.}
 \begin{claim}
+  \label{claim:uniformity:moments:poisson}
   Let $\mu, \lambda \geq 0$. If $X\sim\poisson{\lambda}$, then 
   $
   \bEE{(X-\mu)^2-X} = (\lambda-\mu)^2
@@ -799,7 +799,7 @@ It is unclear whether one could avoid using the first (very convenient) ``stocha
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Random binary hashing} 
 Now we turn to a tester that is \emph{not} sample-optimal~--~but has other advantages, and whose analysis contains a couple insighful aspects. The main idea is that, while large domains are complicated, if there is one thing we know how to do optimally it is estimating the bias of a coin. That is, we know how to handle the case $\ab=2$:
-\begin{fact}[Bias of a coin]\exercise{Prove this!}
+\begin{fact}[Bias of a coin]\exercise{Prove this!~\cref{ex:uniformity:bias:coin}.}
   \label{lemma:bias:coin}
   Given \iid samples from a Bernoulli with unknown parameter $\alpha\in[0,1]$, estimating $\alpha$ to an additive $\eta$ with probability $1-\errprob$ can be done with (and requires) $\bigTheta{\frac{\log(1/\errprob)}{\eta^2}}$ samples.
 \end{fact} 
@@ -945,6 +945,7 @@ This theorem, which we will not prove, can be seen as some type of ``one-sided''
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Bipartite collisions} 
+  \label{sec:uniformity:bipartite}
 Recall that in the collision-based tester from~\cref{sec:uniformity:collision-based}, we took a multiset $S$ of $\ns$ samples from $\p$ and defined our statistic $Z_1$ as the (normalized) number of ``collisions'' in $S$. That is fine, but requires to keep in memory all the samples observed so far. One related idea would be to instead take \emph{two} multisets $S_1,S_2$ of size $\nss$ and $\nst$, and only count ``bipartite collisions'' -- i.e., collisions between a sample of $S_1$ and one of $S_2$:
 \begin{equation}
     Z_6 = \frac{1}{\nss \nst}\sum_{(x,y)\in S_1\times S_2} \indic{x=y}
@@ -983,16 +984,17 @@ From $\Var[Z_6] = \bEE{Z_6^2} - \expect{Z_6}^2$, we obtain
   &= \frac{1}{\nss\nst}\normtwo{\p}^2 + \frac{\nss+\nst-2}{\nss\nst}\norm{\p}_3^3 - \frac{\nss+\nst-1}{\nss\nst}\normtwo{\p}^4 \notag\\
   &\leq \frac{1}{\nss\nst}\normtwo{\p}^2 + \frac{\nss+\nst}{\nss\nst}(\norm{\p}_3^3-\normtwo{\p}^4) \label{eq:var:bipartite:collisions}\,,
 \end{align}
-using as in the proof of~\cref{theo:collision-based} the fact that $\norm{\p}_3^3 \geq \normtwo{\p}^4$ to obtain the slightly nicer-looking upper bound of~\cref{eq:var:bipartite:collisions}. Note that when $\nss=\nst=\frac{\ns}{2}$, we retrieve the bound on $\Var[Z_1]$ from~\cref{eq:good:variance}! Specifically, we have exactly the same expression as in~\cref{eq:good:variance}, but with the factor $4/\ns$ replaced by $\frac{1}{\nss\nst}$ and $4/\ns^2$ replaced by $\frac{\nss+\nst}{\nss\nst}$. This is good -- we could follows the exact same analysis\exercise{Do it!} as in the proof of~\cref{theo:collision-based} to obtain, in the uniform case,
+using as in the proof of~\cref{theo:collision-based} the fact that $\norm{\p}_3^3 \geq \normtwo{\p}^4$ to obtain the slightly nicer-looking upper bound of~\cref{eq:var:bipartite:collisions}. Note that when $\nss=\nst=\frac{\ns}{2}$, we retrieve the bound on $\Var[Z_1]$ from~\cref{eq:good:variance}! Specifically, we have exactly the same expression as in~\cref{eq:good:variance}, but with the factor $4/\ns$ replaced by $\frac{1}{\nss\nst}$ and $4/\ns^2$ replaced by $\frac{\nss+\nst}{\nss\nst}$. This is good -- we could follows the exact same analysis\exercise{\cref{ex:uniformity:bipartite}.} as in the proof of~\cref{theo:collision-based} to obtain, in the uniform case,
 \[
   \probaDistrOf{\uniform_\ab}{ Z_6 \geq \frac{1+2\dst^2}{\ab} }
   \leq \frac{\ab}{4\dst^4\nss\nst}\,, 
 \]
 and, in the ``far'' case,
-\[
+\begin{align}
+  \label{eq:uniform:bipartite:firstattempt}
   \probaDistrOf{\p}{ Z_6 < \frac{1+2\dst^2}{\ab} }
   \leq \frac{5\ab}{4\dst^4\nss\nst} + \frac{\nss+\nst}{\nss\nst}\Paren{\frac{2\sqrt{\ab}}{\dst}+\frac{3}{\dst^2}}\,.
-\]
+\end{align}
 At first glance, this looks perfect: our tester will be correct in both cases as long as $\nss\nst \gtrsim \ab/\dst^4$, which is what we want, and $\frac{\nss\nst}{\nss+\nst} \gtrsim \max\big(\frac{\sqrt{\ab}}{\dst}, \frac{1}{\dst^2}\big)$. However, that last condition is an issue: if we wanted to set $\nss\gg \nst$, for instance, then we would still need
 \[
     \nst \gtrsim \max\Paren{\frac{\sqrt{\ab}}{\dst}, \frac{1}{\dst^2} }\,,
@@ -1185,7 +1187,7 @@ Let $\p\in\distribs{\ab}$. As usual by now, we will invoke Chebyshev's inequalit
         \bPr{\p(S) < \bE{\uniform_\ab}{\uniform_\ab(S)} + \frac{3\nss\dst^2}{64\ab}} 
         &\leq \bPr{\p(S) < \bE{\uniform_\ab}{\uniform_\ab(S)} + \frac{3}{4}\Delta(\p)}\\
         &= \bPr{\p(S) < \bE{\p}{\p(S)} - \frac{1}{4}\Delta(\p)} \\
-        &\leq \frac{16\Var[\bar{\p}(S)]}{\Delta(\p)^2} \\
+        &\leq \frac{16\Var[\p(S)]}{\Delta(\p)^2} \\
         &\leq \frac{128\ab}{\nss^2\dst^2}\cdot \frac{\bE{\p}{\p(S)}}{\Delta(\p)} \\
         &\leq \frac{2176\ab}{\nss^2\dst^4} 
     \end{align*}
@@ -1196,7 +1198,7 @@ Observing that our condition $\dst \geq 15/\ab^{1/4}$ implies $115\sqrt{\ab}/\ds
 
 The second stage then boils down to using $\nst$ samples to distinguish between the two cases: (1)~$\p(S) \leq \bE{\uniform_\ab}{\uniform_\ab(S)} + \tau$ and (2)~$\p(S) \geq \bE{\uniform_\ab}{\uniform_\ab(S)} + 3\tau$, assuming one of the two holds (which will if the first stage is successful). To do so, we will require the following result, which can be seen as a ``localized'' variant of~\cref{lemma:bias:coin}.\footnote{Localized, as it depends on the ``location'' $\beta$ we focus on, while~\cref{lemma:bias:coin} holds for all possible values~--~and is thus a worst-case result (over the unknown value $\alpha$).}
 \begin{fact}[Bias of a coin, distinguishing]
-  \label{lemma:bias:coin:test}\exercise{Prove this!}
+  \label{lemma:bias:coin:test}\exercise{Prove this!~\cref{ex:uniformity:bias:coin:testing}.}
   Given \iid samples from a Bernoulli with unknown parameter $\alpha\in[0,1]$, distinguishing with probability $1-\errprob$ between $\alpha \leq \beta$ and $\alpha \geq \beta(1+\eta)$ can be done with (and requires) $\bigTheta{\frac{\log(1/\errprob)}{\beta\eta^2}}$ samples. This is achieved by the empirical estimator.
 \end{fact} 
 We are now ready to establish the guarantees of our algorithm.
@@ -1232,6 +1234,10 @@ The empirical subset weighting tester (\cref{algo:empirical:subset}) is a testin
 \end{corollary}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discussion}
+  \label{ssec:uniformity:discussion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Identity testing}
   \label{sec:identity}
@@ -1256,10 +1262,27 @@ mity testing.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exercises}
-\begin{enumerate}
-  \item Prove the monotonicity of $\lp[p]$ norms: if $1\leq r\leq s \leq \infty$, then $\norm{x}_s \leq \norm{x}_r$ for every $x\in \R^n$.
-  \item It is known that $x\preceq y$ if, and only if, $x=Ay$ for some doubly stochastic matrix $A$~\citep[Theorem~2.1]{Arnold87}. Check that the averaging from~\cref{lemma:distance:uniformity:averaging} indeed corresponds to multiplying the pmf $\p$ (seen as a vector) by such a matrix.
-\end{enumerate}
+\begin{question}\label{ex:identity:monotonicity:lp}
+  Prove the monotonicity of $\lp[p]$ norms: if $1\leq r\leq s \leq \infty$, then $\norm{x}_s \leq \norm{x}_r$ for every $x\in \R^n$.
+\end{question}
+\begin{question}\label{ex:expectation:z2} 
+  Prove~\cref{eq:def:z2}: that is, the ``unique elements'' statistic $Z_2$ from~\cref{sec:uniformity:unique} has expectation $\bE{\p}{Z_2} = \sum_{i\in\domain} \p(i)(1-\p(i))^{\ns-1}$.
+\end{question}
+\begin{question}\label{ex:uniformity:moments:poisson}
+  Establish~\cref{claim:uniformity:moments:poisson}, using (or computing) the expression for the first 4 moments of a $\poisson{\lambda}$ random variable.
+\end{question}
+\begin{question}\label{ex:uniformity:bias:coin}
+  Establish the upper bound part of~\cref{lemma:bias:coin}, by proving \textit{via} an Hoeffding or Chernoff bound that the empirical estimator achieves the stated sample complexity. (The lower bound can be shown by considering the case $\alpha=1/2$, but we have not seen in this chapter the information-theoretic tools to establish it: this will be in~\cref{chap:lowerbounds}.)
+\end{question}
+\begin{question}\label{ex:uniformity:bias:coin:testing}
+  Establish the upper bound part of~\cref{lemma:bias:coin:test}, by proving \textit{via} a Chernoff bound that appropriately thresholding the empirical estimator achieves the stated sample complexity. (For the lower bound, same remark as for~\cref{ex:uniformity:bias:coin}.)
+\end{question}
+\begin{question}\label{ex:uniformity:bipartite}
+  Follow the analysis of~\cref{theo:collision-based} to derive, for the bipartite collisions tester, the guarantee~\cref{eq:uniform:bipartite:firstattempt} from the variance bound~\cref{eq:var:bipartite:collisions}.
+\end{question}
+\begin{question}\label{ex:identity:averaging:stochastic} 
+    It is known that $x\preceq y$ if, and only if, $x=Ay$ for some doubly stochastic matrix $A$~\citep[Theorem~2.1]{Arnold87}. Check that the averaging from~\cref{lemma:distance:uniformity:averaging} indeed corresponds to multiplying the pmf $\p$ (seen as a vector) by such a matrix.
+\end{question}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1296,6 +1319,7 @@ m\sum_{i < j} &x_i x_j \Paren{ (1-x_i - x_j)^{m-1} - (1-x_i)^m(1-x_j)^m} \\
 concluding the proof.
 \end{proof}
 
+The next proof is that of our ``stochastic dominance mallet'' from~\cref{sec:uniformity:bipartite}:
 \begin{theorem}[\cref{theo:stochdominance:symmetricfunction:variant}, restated]
   Let $f\colon \R\to\R$ by a non-decreasing function. For a probability distribution $\p\in\distribs{\ab}$ and $\nss,\nst\in\N$, define the random variable $X_{\nss,\nst}(\p)$ as follows: let $N_1,\dots,N_\ab$ and $M_1,\dots,M_\ab$ be the counts of each domain element among $\nss$ and $\nst$ \iid samples from $\p$, respectively, and set $X_{\nss,\nst}(\p)=f(N_1M_1+\dots+N_\ab M_\ab)$. Then, for any $\p,\q$ such that $\p\succeq\q$, $X_{\nss,\nst}(\p)$ stochastically dominates $X_{\nss,\nst}(\q)$.
 \end{theorem}

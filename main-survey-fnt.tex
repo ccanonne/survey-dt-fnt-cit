@@ -13,6 +13,18 @@
 
 \usepackage{framed}
 \usepackage{tabularx}
+
+%%%%%%%%%%%%%%%%% Exercises %%%%%%%%%%%%%%%%%
+\newtheorem{question}{Exercise}[chapter]
+
+\newcommand{\exinline}[1]{(\refstepcounter{question}Exercise~\thequestion\label{#1})}
+
+\crefname{question}{Exercise}{Exercises}
+\Crefname{question}{Exercise}{Exercises}
+\crefname{claim}{Claim}{Claims}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
 \renewcommand\tabularxcolumn[1]{m{#1}}% for vertical centering text in X column
 
@@ -139,6 +151,7 @@ measurements). Talk about adaptive schemes?}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Information-theoretic lower bounds}
+  \label{chap:lowerbounds}
 \section{Proving hardness by reductions}
 \section{Indistinguishability via moment-matching}
 \section{Ingster's method}
