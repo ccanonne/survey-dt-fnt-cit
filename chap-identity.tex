@@ -1236,6 +1236,14 @@ The empirical subset weighting tester (\cref{algo:empirical:subset}) is a testin
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Discussion}
   \label{ssec:uniformity:discussion}
+In this section, we have covered and analyzed seven different algorithms for uniformity testing;\footnote{There may (and surely are) other possible algorithms one could consider, of course; yet, we hope that this chapter provided a good and representative overview of the ideas, techniques, and tools one could use to analyze such algorithms.} some, such as the collision-based tester and the bipartite collision tester, or the unique element tester and the empirical distance tester, were related, and many (but not all) relied on the use of $\lp[2]$ distance as a proxy for total variation distance. Before concluding this section, let us have a look at some of their differences, and specific advantages of each of them.
+
+\begin{itemize}
+  \item The collision-based tester, besides being a very natural idea (which turns out to yield the optimal sample complexity!), is as a byproduct an estimator of the $\lp[2]$ norm of the distribution, \ie, its collision probability. This could be useful by itself, if one is interested in this quantity for its own sake. Perhaps more importantly, the use of $\lp[2]$ as proxy (via Cauchy--Schwarz), combined with monotonicity of $\lp[p]$ norms ($\lp[2]\leq \lp[1]$), implies that this tester actually provides some amount of \emph{tolerance} (robustness to model misspecification): instead of just between $\p=\uniform_\ab$ and $\totalvardist{\p}{\uniform_\ab} \geq \dst$, it enables one to distinguish between $\totalvardist{\p}{\uniform_\ab} \leq \dst/(2\sqrt{\ab})$ and $\totalvardist{\p}{\uniform_\ab} \geq \dst$. This seemingly small tolerance happens to be quite helpful in many settings. Of course, the same comment applies to the bipartite collision tester, but also to the random binary hashing tester (which also relies on, and estimates, the squared $\lp[2]$ distance).
+  \item Both the unique elements tester and the empirical distance tester have \emph{low sensitivity}, meaning that changing the value of a single one of the $\ns$ samples cannot change the value of the resulting statistic ($Z_2$ or $Z_4$) by much: roughly, $\asymp 2/\ns$. While the different renormalization makes it a little tricky to compare, the collision-based tester, for instance, has much worse sensitivity, as changing one sample can have a much larger effect on the statistic (since $Z_1$ is a quadratic function of the sample counts). Having low sensitivity, which is essentially an $\lp[1]$ Lipschitzness guarantee, in turn is very desirable to obtain robust algorithms (\ie robust to data corruption, adversarial or not), or, importantly, to obtain \emph{differentially private} algorithms~\citep{DworkMNS06}, since the amount of random noise added to ensure data privacy is directly related to this sensivity. In particular, the unique elements tester and the empirical distance tester each have been used to obtain optimal, or near-sample-optimal, differentially private uniformity testing algorithms~\citep{AcharyaSZ18,AliakbarpourDR18}.
+  \item The random binary hashing testing, albeit not sample-optimal, only requires to store a \emph{single} bit of information per sample. (Moreover, this can be generalized to $\numbits$ bits by hashing to $2^\numbits$ elements instead of two, leveraging~\cref{theo:random:dct:hashing}.) This can be very valuable in memory-limited or communication-limited settings (we will get back to this in~\cref{chap:constrained}), or in the case of \emph{local} differential privacy~\cite{KLNRS:11}, where this can be used to obtain a sample-optimal locally private uniformity testing algorithm~\citep{AcharyaCFST21} (as optimally privatizing \emph{one} bit is much easier than a full $\log\ab$-bit sample).
+  \item Finally, the $\chi^2$ tester\dots just works. It also nicely generalizes to other problems (identity testing, as we will see in~\cref{sec:identity}; or even, with appropriate modifications, to ``closeness testing'' (two-sample goodness-of-fit) or other related testing tasks. Among other enjoyable properties, its asymptotic distribution (as the number of samples $\ns\to\infty$) can be obtained, letting us (asymptotically) obtain confidence intervals. It also does provide, as the collision-based tester, some amount of tolerance, in the so-called $\chi^2$ divergence; we will see in~\cref{chap:algorithmic:frameworks} how this $\chi^2$-divergence tolerance can be used as a blackbox to obtain testing algorithms for other properties than uniformity.
+\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1331,7 +1339,7 @@ The next proof is that of our ``stochastic dominance mallet'' from~\cref{sec:uni
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bgroup\color{black!50!purple}
 \paragraph{The variance analysis from~\citet{Paninski08}.}
-The proof of~\cref{theo:uniformity:unique:elements} presented in this survey departs from the original one from~\citet{Paninski08}. The argument analyzing the expectation gap (\cref{lemma:gap:z2}) is similar, although we tried to make it a little simpler and intuitive (which, admittedly, is very subjective). The main difference is in bounding the variance in the ``far'' case; indeed, while~\cite{Paninski08} relies for this on the Efron--Stein inequality, the proof he presents is flawed, and the claimed variance bound does not follow.
+The proof of~\cref{theo:uniformity:unique:elements} presented in this survey departs from the original one from~\citet{Paninski08}. The argument analyzing the expectation gap (\cref{lemma:gap:z2}) is similar, although we tried to make it a little simpler and intuitive (which, admittedly, is very subjective). The main difference is in bounding the variance in the ``far'' case; indeed, while~\citep{Paninski08} relies for this on the Efron--Stein inequality, the argument given is flawed, and the claimed variance bound does not follow.
 
 Specifically, the proof of~\citet[Lemma~2]{Paninski08} claims the bound
 \[
@@ -1341,15 +1349,23 @@ which, if true, would imply (after renormalizing to match our notation)
 \[
   \Var_{\uniform_\ab}[Z_2] \leq \frac{1}{\ns}(1-(1-1/\ab)^{\ns-1}) \operatorname*{\sim}_{\ab\to \infty} \frac{1}{\ab}
 \]
-while the (exact) variance in this case is
-\begin{align*}
-\Var_{\uniform_\ab}[Z_2]
-&= \frac{\bE{\uniform_\ab}{Z_2}(1-\bE{\uniform_\ab}{Z_2})}{\ns} + \frac{\ns-1}{\ns}\Paren{ \frac{\ab-1}{\ab}\Paren{1-\frac{2}{\ab}}^{\ns-2} - \bE{\uniform_\ab}{Z_2}^2} \\
-&\operatorname*{\sim}_{\ab\to \infty} \frac{2}{\ab}
-\end{align*}
-This shows that the former upper bound cannot hold as stated. Looking into the proof, the issue appears to be at the first step in bounding 
-the quantity $\frac{1}{2} \sum_{t=1}^\ns \bEE{(S-S^{(t)})^2}$~\cite[p.3, top of right column]{Paninski08}, as $|S-S^{(i)}|$ can take values 0, 1,or 4 (not just 0 or 1), and some events leading to these have been forgotten. As an example: the case $(\occur_i,\occur_j)=(0,1)$ on $\ns-1$ samples leads to a difference of 2 when the remaining sample falls on $i$ in one case and $j$ in the other (as it gives 2 unique elements in one case, and 0 in the other), and is thus different from say the case $(\occur_i,\occur_j)=(0,2)$ which leads to a difference of 1 when the remaining sample falls on $i$ in one case and $j$ in the other (as it gives 1 unique elements in one case, and 0 in the other). The current analysis omits this distinction, and some other cases; it is not clear to us how to fix their proof, which is why we chose to provide an alternative argument to bound the variance.
+while the (exact) variance in the uniform case can be computed explicitly, and is asymptotically $\Var_{\uniform_\ab}[Z_2] \operatorname*{\sim}_{\ab\to \infty} \frac{2}{\ab}$. 
+% \begin{align*}
+% \Var_{\uniform_\ab}[Z_2]
+% &= \frac{\bE{\uniform_\ab}{Z_2}(1-\bE{\uniform_\ab}{Z_2})}{\ns} + \frac{\ns-1}{\ns}\Paren{ \frac{\ab-1}{\ab}\Paren{1-\frac{2}{\ab}}^{\ns-2} - \bE{\uniform_\ab}{Z_2}^2} \\
+% &\operatorname*{\sim}_{\ab\to \infty} \frac{2}{\ab}
+% \end{align*}
+This shows that the former upper bound cannot hold as stated. The issue arises in the first step, when bounding 
+the quantity $\frac{1}{2} \sum_{t=1}^\ns \bEE{(S-S^{(t)})^2}$ after applying the Efron--Stein inequality, as $(S-S^{(t)})^2$ can take values 0, 1,or 4 (not just 0 or 1), and some events leading to these have been overlooked. It is not clear to us how to fix their proof, which is why we chose to provide an alternative argument to bound the variance. Interestingly, the analysis from~\citet[Lemma~2]{Paninski08} \emph{can} be used (partially) to bound the variance of a different statistic, $Z_4$, and we do so to derive~\cref{eq:empirical:var} in~\cref{sec:uniformity:empirical}.
 
+ %As an example: the case $(\occur_i,\occur_j)=(0,1)$ on $\ns-1$ samples leads to a difference of 2 when the remaining sample falls on $i$ in one case and $j$ in the other (as it gives 2 unique elements in one case, and 0 in the other), and is thus different from say the case $(\occur_i,\occur_j)=(0,2)$ which leads to a difference of 1 when the remaining sample falls on $i$ in one case and $j$ in the other (as it gives 1 unique elements in one case, and 0 in the other). The current analysis omits this distinction, and some other cases; it is not clear to us how to fix their proof, which is why we chose to provide an alternative argument to bound the variance.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% Hide this; keep for reference, this contains the details
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\iffalse
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \paragraph{More details.} Specifically, after using the Efron--Stein inequality,~\citet{Paninski08} bounds the expected squared difference between $S$ and $S'$ (the number of unique elements observed on $\ns$ samples, where $S$ and $S'$ differ only one one single sample: i.e., $S=S(X_1,\dots,X_{\ns-1}, X_\ns)$ and $S=S(X_1,\dots,X_{\ns-1}, X'_\ns)$, with $X_\ns,X'_\ns$ \iid) as
 \[
   \bEE{(S-S')^2} = \sum_{1\leq i,j\leq \ab} \p(i)\p(j) \bE{X_1,\dots,X_{\ns-1}}{ \indic{\occur_i=0, \occur_j>0} + \indic{\occur_j=0, \occur_i>0} }
@@ -1373,4 +1389,8 @@ and
 $
 \indic{\occur_j=1, \occur_i>1}
 $. As mentioned above, it is not clear to us how to bound the contribution of those extra two terms (while the other 4 ``red'' terms, of course, would follow from the original argument, losing a factor 4 only in the bound).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\fi
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \egroup
