@@ -74,16 +74,14 @@ $P_L \leq P \leq P_H.$ Then for any $\gamma \in (0,1]$, we have
 Observe that this tail bound exhibits both behaviours: it decays in a subgaussian fashion for small $\gamma$, before switching to a subexponential tail bound for large $\gamma$. 
 
 We conclude this section by providing a very convenient bound, specifically for Poisson random variables, which shares the same ``two-tail'' behaviour:
-
-\newcommand{\bennett}[1]{\psi\mleft(#1\mright)}
 \begin{theorem}[Poisson concentration]\label{theo:main:poisson:bounds}
 Let $X$ be a $\poisson{\lambda}$ random variable, where $\lambda > 0$. Then, for any $t>0$, we have
 \begin{equation}\label{eq:poisson:upper:tail}
-    \probaOf{ X \geq \lambda + t} \leq e^{-\frac{t^2}{2\lambda}\bennett{\frac{t}{\lambda}}} \leq e^{-\frac{t^2}{2(\lambda+t)}}
+    \probaOf{ X \geq \lambda + t} \leq e^{-\frac{t^2}{2\lambda}\psi\Paren{\frac{t}{\lambda}}} \leq e^{-\frac{t^2}{2(\lambda+t)}}
 \end{equation}
 and, for any $0<t< \lambda$,
 \begin{equation}\label{eq:poisson:lower:tail}
-  \probaOf{ X \leq \lambda - t} \leq e^{-\frac{t^2}{2\lambda}\bennett{-\frac{t}{\lambda}}} \leq e^{-\frac{t^2}{2(\lambda+t)}}\,,
+  \probaOf{ X \leq \lambda - t} \leq e^{-\frac{t^2}{2\lambda}\psi\Paren{-\frac{t}{\lambda}}} \leq e^{-\frac{t^2}{2(\lambda+t)}}\,,
 \end{equation}
 where $\psi(u)\eqdef 2\frac{(1+u)\ln(1+u)-u}{u^2}$ for $u\geq -1$.
 In particular, for any $t\geq 0$,
