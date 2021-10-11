@@ -1,1 +1,94 @@
-{theo:hoeffding}
+We only mention here a few good bounds that we found to be useful, and sufficient in many or most settings. There are, of course, many others, and many refinements or variants of the bounds we present here. We refer the reader to, \eg \citet[Chapter~2]{Vershynin18} or~\citet{BoucheronLM13} for a much more comprehensive and insightful coverage. 
+
+We start with the mother of all concentration inequalities, Markov's inequality:
+\begin{theorem}[Markov's inequality]
+  \label{theo:markov}
+Let $X$ be a non-negative random variable with $\bEE{X} < \infty$. For any $t > 0$, we have
+\[  
+  \bPr{ X \geq t } \leq \frac{\bEE{X}}{t}
+\]
+\end{theorem}
+\noindent Applying this to $(X-\bEE{X})^2$, we get 
+\begin{theorem}[Chebyshev's inequality]
+  \label{theo:chebyshev}
+Let $X$ be a random variable with $\bEE{X^2} < \infty$. For any $t > 0$, we have
+\[  
+  \bPr{ \abs{X-\bEE{X}} \geq t } \leq \frac{\Var[X]}{t^2}
+\]
+\end{theorem}
+By applying Markov's inequality to the moment-generating function (MGF) of $\sum_{i=1}^n X_i$ in various ways, one can also obtain the following statements:
+\begin{theorem}[Hoeffding bound]
+  \label{theo:hoeffding}
+Let $X_1,\dots,X_n$ be independent random variables, where $X_i$ takes values in $[a_i,b_i]$. For any $t \geq 0$, we have
+\begin{align}
+\bPr{ \sum_{i=1}^n X_i   > \sum_{i=1}^n \bEE{X_i} + t }  
+&\leq \exp(-\frac{2 t^2}{\sum_{i=1}^n (b_i-a_i)^2}) \\
+\bPr{\sum_{i=1}^n X_i  < \sum_{i=1}^n \bEE{X_i} - t }
+ &\leq \exp(-\frac{2 t^2}{\sum_{i=1}^n (b_i-a_i)^2})
+ \end{align}
+\end{theorem}
+
+\begin{corollary}[Hoeffding bound]
+  \label{coro:hoeffding}
+Let $X_1,\dots,X_n$ be \iid random variables taking value in $[0,1]$, with mean $\mu$. For any $\gamma \in (0,1]$ we have
+\begin{align}
+\bPr{ \abs{\frac{1}{n}\sum_{i=1}^n X_i  - \mu} > \gamma }
+ &\leq 2\exp(-2 \gamma^2 n)
+\end{align}
+\end{corollary}
+
+\begin{theorem}[Chernoff bound]
+  \label{theo:chernoff}
+Let $X_1,\dots,X_n$ be independent random variables taking value in $[0,1]$, and let $P \eqdef \sum_{i=1}^n \bEE{X_i}$ For any $\gamma \in (0,1]$ we have
+\begin{align}
+\bPr{\sum_{i=1}^n X_i > (1+\gamma)P } &< \exp(-\gamma^2 P/3)\\
+\bPr{\sum_{i=1}^n X_i < (1-\gamma)P } &< \exp(-\gamma^2 P/2)
+\end{align}
+In particular, if $X_1,\dots,X_n$ are \iid with mean $\mu$, then for any $\gamma \in (0,1]$ we have
+\begin{align}
+\bPr{ \abs{\frac{1}{n}\sum_{i=1}^n X_i  - \mu} > \gamma\mu }
+ &\leq 2\exp(-\gamma^2 n \mu/3) \label{eq:chernoff:iid}
+\end{align}
+\end{theorem}
+As a rule of thumb, the ``multiplicative'' (Chernoff) from~\cref{theo:chernoff} is preferable to the ``additive'' bound (Hoeffding) from~\cref{coro:hoeffding} whenever $\mu  \eqdef P/n \ll 1$. In case one only has an upper or lower bound on the quantity $P = \sum_{i=1}^n \bEE{X_i}$, the following version of the Chernoff bound can come in handy:
+\begin{theorem}[Chernoff bound (upper and lower bound version)]
+  \label{theo:chernoff:with:ublb}
+In the setting of~\cref{theo:chernoff}, suppose that
+$P_L \leq P \leq P_H.$ Then for any $\gamma \in (0,1]$, we have
+\begin{align}
+\bPr{\sum_{i=1}^n X_i > (1+\gamma)P_H } &< \exp(-\gamma^2 P_H/3) \\
+\bPr{\sum_{i=1}^n X_i < (1-\gamma)P_L } &< \exp(-\gamma^2 P_L/2)
+\end{align}
+\end{theorem}
+
+\begin{theorem}[Bernstein's inequality] \label{theo:bernstein}
+	Let $X_1,\dots, X_n$ be independent random variables taking values in $[-a,a]$, and such that $\bEE{X_i^2} \leq v_i$ for all $i$. Then, for every $t\geq 0$, we have
+	\[
+	\bPr{ \abs{\sum_{i=1}^n X_i-\sum_{i=1}^n \bEE{X_i}} \geq t } \leq \exp\Paren{-\frac{t^2}{2(\sum_{i=1}^n v_i+\frac{a}{3}t)}}\,.
+	\]
+	In particular, if $X_1,\dots,X_n$ are \iid with mean $\mu$ and $\bEE{X_1^2} \leq v$, then for any $\gamma \geq 0$ we have
+	\[
+	\bPr{ \abs{\frac{1}{n}\sum_{i=1}^n X_i-\mu} \geq \gamma } \leq \exp\Paren{-\frac{\gamma^2n}{2(v+\frac{a}{3}\gamma)}}\,.
+	\]
+\end{theorem}
+Observe that this tail bound exhibits both behaviours: it decays in a subgaussian fashion for small $\gamma$, before switching to a subexponential tail bound for large $\gamma$. 
+
+We conclude this section by providing a very convenient bound, specifically for Poisson random variables, which shares the same ``two-tail'' behaviour:
+
+\newcommand{\bennett}[1]{\psi\mleft(#1\mright)}
+\begin{theorem}[Poisson concentration]\label{theo:main:poisson:bounds}
+Let $X$ be a $\poisson{\lambda}$ random variable, where $\lambda > 0$. Then, for any $t>0$, we have
+\begin{equation}\label{eq:poisson:upper:tail}
+    \probaOf{ X \geq \lambda + t} \leq e^{-\frac{t^2}{2\lambda}\bennett{\frac{t}{\lambda}}} \leq e^{-\frac{t^2}{2(\lambda+t)}}
+\end{equation}
+and, for any $0<t< \lambda$,
+\begin{equation}\label{eq:poisson:lower:tail}
+  \probaOf{ X \leq \lambda - t} \leq e^{-\frac{t^2}{2\lambda}\bennett{-\frac{t}{\lambda}}} \leq e^{-\frac{t^2}{2(\lambda+t)}}\,,
+\end{equation}
+where $\psi(u)\eqdef 2\frac{(1+u)\ln(1+u)-u}{u^2}$ for $u\geq -1$.
+In particular, for any $t\geq 0$,
+\begin{equation}\label{eq:poisson:both:tail}
+  \probaOf{ \abs{X -\lambda} \geq t} \leq 2e^{-\frac{t^2}{2(\lambda+t)}}\,.
+\end{equation}
+\end{theorem}
+\cmargin{Is the proof needed?}

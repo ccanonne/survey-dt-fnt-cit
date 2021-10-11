@@ -4,9 +4,10 @@
   \label{sec:uniformity}
 %\cnote{Thorough presentation of the many algorithms for uniformity testing, with proofs, and relative advantages of each.}
 
-It is known~\citep{Paninski08} that the sample complexity of uniformity testing with distance parameter $\dst\in(0,1]$ is $\Theta(\sqrt{\ab}/\dst^2)$, which is, for a large range of parameters, significantly smaller than the domain size $\ab$. This means that we can reliably infer interesting properties of the distribution after observing only a tiny fraction of the domain elements! That's nice. Now, \emph{how do we perform uniformity testing?}  And what should we keep in mind while doing so?
+It is known~\citep{Paninski08} that the sample complexity of uniformity testing with distance parameter $\dst\in(0,1]$ is $\Theta(\sqrt{\ab}/\dst^2)$, which is, for a large range of parameters, significantly smaller than the domain size $\ab$. This means that we can reliably infer interesting properties of the distribution after observing only a negligible fraction of the domain elements! That is quite surprising, and nice. Now, \emph{how do we perform uniformity testing?}  And what should we keep in mind while doing so?
 
-There are several things to consider in a testing algorithm. To name a few:
+
+Although the sample complexity is of course a key aspect, there are several things to consider in a testing algorithm. To name a few:
 \begin{description}
   \item[Data efficiency:] does the algorithm achieve the optimal sample complexity $\Theta(\sqrt{\ab}/\dst^2)$?
   \item[Time efficiency:] how fast is the algorithm to run (as a function of $\ab,\dst$, and the number of samples $\ns$)?
@@ -1251,7 +1252,7 @@ In this section, we have covered and analyzed seven different algorithms for uni
   \label{sec:identity}
 \cnote{Discuss the instance-optimal setting as well, and the relation to unifor-
 mity testing.}
-
+\tbc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}
@@ -1264,8 +1265,9 @@ mity testing.}
 \cite{DiakonikolasGPP18}
 \cite{BlaisCG17}
 \cite{HuangM13}
-
 \cite{AcharyaCT19b,AcharyaCHST20,AminJM20}
+
+\tbc
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1356,8 +1358,7 @@ and use the case $m=n=1$ along with the fact that addition of independent summan
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\bgroup\color{black!50!purple}
-\paragraph{The variance analysis from~\citet{Paninski08}.}
+\paragraph{Note: The variance analysis from~\citet{Paninski08}.}
 The proof of~\cref{theo:uniformity:unique:elements} presented in this survey departs from the original one from~\citet{Paninski08}. The argument analyzing the expectation gap (\cref{lemma:gap:z2}) is similar, although we tried to make it a little simpler and intuitive (which, admittedly, is very subjective). The main difference is in bounding the variance in the ``far'' case; indeed, while~\citep{Paninski08} relies for this on the Efron--Stein inequality, the argument given is flawed, and the claimed variance bound does not follow.
 
 Specifically, the proof of~\citet[Lemma~2]{Paninski08} claims the bound
@@ -1412,4 +1413,3 @@ $. As mentioned above, it is not clear to us how to bound the contribution of th
 \fi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\egroup

@@ -21,7 +21,17 @@ We begin with the notion of distance we will be concerned about, the total varia
   \]
   Given a subset $\class\subseteq\distribs{\ab}$ of distributions, we further define the distance from $\p\in\distribs{\ab}$ to $\class$ as $\totalvardist{\p}{\class} \eqdef \inf_{\q\in\class} \totalvardist{\p}{\q}$, and will say that $\p$ is \emph{$\dst$-far from $\class$} if $\totalvardist{\p}{\class}\geq \dst$.
 \end{definition}
-One can check that $\dtv$ defines a metric on $\distribs{\ab}$, and takes values in $[0,1]$.\exercise{Check it!} Noreover, the total variation distance exhibits several important properties, some of which will be detailed at length in~\cref{app:distances}; we recall a crucial one below. \todonote{Pinsker, postprocessing, relation to TV, etc.}
+One can check that $\dtv$ defines a metric on $\distribs{\ab}$, and takes values in $[0,1]$.\exercise{Check it!} Moreover, the total variation distance exhibits several important properties, some of which will be detailed at length in~\cref{app:distances}; we recall a crucial one below.
+
+\begin{fact}[Data Processing Inequality]
+  \label{fact:dpi}
+  Suppose $X$ and $Y$ are independent random variables with distributions $\p$ and $\q$, and let $f$ be any (possibly randomized) function independent of $X,Y$. Then the probability distributions $\p_f$ and $\q_f$ of $f(X)$ and $f(Y)$ satisfy
+  \[
+      \totalvardist{\p_f}{\q_f} \leq \totalvardist{\p}{\q}\,.
+  \]
+  That is, \emph{postprocessing cannot increase the total variation distance.}
+\end{fact}
+
 
 Assuming that $\p,\q$ are absolutely continuous with respect to some dominating measure $\mu$,
   \begin{equation}
@@ -73,7 +83,7 @@ The standard formulation of distribution testing, as stated in~\cref{def:testing
 \begin{itemize}
   \item Very stringent -- strong guarantee
   \item Well-behaved: actual metric (triangle inequality), bounded
-  \item Data processing inequality: robust to post-processing
+  \item Data processing inequality (\cref{fact:dpi}): robust to postprocessing
   \item Relation to hypothesis testing
 \end{itemize}
 
@@ -105,11 +115,12 @@ where we denote by $R$ the internal randomness of $\Algo$. Since, for any fixed 
 \end{align*}
 as claimed. Finally, it is immediate from the definition of total variation distance that the proposed test satisfies $\text{Type~I} + \text{Type~II} = 1 + \p_0(S^\ast) - \p_1(S^\ast) = 1- \totalvardist{\p_0}{\p_1}$.
 \end{proof}
-
+\tbc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{The road not taken: tolerant testing}
-
+\tbc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}
+\tbc
