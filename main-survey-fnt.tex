@@ -148,6 +148,7 @@ partial measurements, etc). Focus on communication constraints ($\numbits$-bit
 measurements). Talk about adaptive schemes?}
 \section{Continuous distributions and quantization}
 \section{Random hashing and domain compression}
+  \label{sec:domain:compression}
 \section{Application: distributed inference}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -161,45 +162,48 @@ measurements). Talk about adaptive schemes?}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Beyond \iid sampling}
-\cnote{Less detailed: This is a short chapter, where each section contains one key result/example
-to illustrate the model or question, along with references.}
-
-\section{Conditional sampling}
-\cnote{Ability to sample, conditioning on specific events.}
-
-\section{Evaluation access}
-\cnote{Exact or approximate access to the probability mass or cumulative
-distribution function.}
-
-\section{Testing properties of Markov chains}
-\cnote{Only one sample (trajectory) of a Markov chain.}
-
-\section{Causal models and interventions}
+% \chapter{Beyond \iid sampling}
+% \cnote{Less detailed: This is a short chapter, where each section contains one key result/example
+% to illustrate the model or question, along with references.}
+%
+% \section{Conditional sampling}
+% \cnote{Ability to sample, conditioning on specific events.}
+%
+% \section{Evaluation access}
+% \cnote{Exact or approximate access to the probability mass or cumulative
+% distribution function.}
+%
+% \section{Testing properties of Markov chains}
+% \cnote{Only one sample (trajectory) of a Markov chain.}
+%
+% \section{Causal models and interventions}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Quantum distribution testing}
-
-\cnote{Less detailed: Not many full derivations here, mostly statement of the results and
-sketch of the proofs/ideas. Focus on testing the fully mixed state.}
-\section{What is quantum distribution testing?}
-\cnote{Brief (very) intro to quantum computing; mention of different models
-(treated below), and their respective advantages/disadvantages.}
-\section{Testing classical distributions with quantum measurements}
-\cnote{Short section. This is mostly about getting faster algorithms, discuss
-the (lack of) implications for sample complexity.}
-\section{Testing quantum states\dots}
-\subsection{With local measurements}
-\subsection{With unentangled measurements}
-\cnote{Two flavors: adaptive and non-adaptive. Discuss the recent work of
-Bubeck, Chen, and Li showing a separation between the two.}
-\subsection{With entangled measurements}
-\cnote{Tight bounds for testing mixed states: in particular, O'Donnell and
-Wright.}
+% \chapter{Quantum distribution testing}
+%
+% \cnote{Less detailed: Not many full derivations here, mostly statement of the results and
+% sketch of the proofs/ideas. Focus on testing the fully mixed state.}
+% \section{What is quantum distribution testing?}
+% \cnote{Brief (very) intro to quantum computing; mention of different models
+% (treated below), and their respective advantages/disadvantages.}
+% \section{Testing classical distributions with quantum measurements}
+% \cnote{Short section. This is mostly about getting faster algorithms, discuss
+% the (lack of) implications for sample complexity.}
+% \section{Testing quantum states\dots}
+% \subsection{With local measurements}
+% \subsection{With unentangled measurements}
+% \cnote{Two flavors: adaptive and non-adaptive. Discuss the recent work of
+% Bubeck, Chen, and Li showing a separation between the two.}
+% \subsection{With entangled measurements}
+% \cnote{Tight bounds for testing mixed states: in particular, O'Donnell and
+% Wright.}
 
 \appendix
+
+\chapter{Some good inequalities}
+\input{chap-inequalities}
 
 %BACKMATTER SEE DOCUMENTATION
 \backmatter  % references, restarts sample
