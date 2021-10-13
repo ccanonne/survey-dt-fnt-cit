@@ -431,7 +431,7 @@ as in~\cref{algo:unique-elements}.
 \[
 \bEE{ \sum_{i=1}^\ab \frac{(\occur_i-\ns/\ab)^2}{\ns/\ab} } = \frac{\ab}{\ns}\sum_{i=1}^\ab \bEE{ \Paren{\occur_i-\frac{\ns}{\ab}}^2 } = \ab(\ns-1)\normtwo{\p-\uniform_\ab}^2 + \ab-1\,,
 \]
-using moments of a Binomial random variable and~\cref{eq:relation:collisionprob:distance:uniform}.\exercise{Check it!} This does look like a reasonable way to estimate the distance to uniformity \emph{via} the $\lp[2]$ distance again\dots{} unfortunately, the variance will be slightly annoying, due to the correlated between terms of the sums.
+using moments of a Binomial random variable and~\cref{eq:relation:collisionprob:distance:uniform}.\exercise{Check it!} This does look like a reasonable way to estimate the distance to uniformity \emph{via} the $\lp[2]$ distance again\dots{} unfortunately, the variance will be quite annoying, due to the correlations between terms of the sums.
 
 To make the task easier, it is helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, which will greatly simplifies the analysis. Then, under this (slightly different) sampling model the $\occur_i$'s become independent, with $\occur_i\sim\poisson{\ns\p(i)}$: this is called \emph{Poissonization}\index{Poissonization}, and can be done more or less without loss of generality since a $\poisson{\ns}$ random variable will be between $0.99\ns$ and $1.01\ns$ with overwhelming probability. (See~\cref{sec:poissonization} for more on Poissonization, and why we can use it ``without loss of generality'').
 
@@ -454,6 +454,7 @@ To make the task easier, it is helpful to think of taking $\poisson{\ns}$ sample
 
 The bad news is that it does not actually lead to the optimal sample complexity: Poissonization introduces a bit more variance (as we introduce extra randomness ourselves by taking a random number of samples), and so the variance of this $\chi^2$ test can be too big due to the elements we only expect to see zero or once (so, most of them). The \emph{good} news is that a simple correction of that test, of the form
 \begin{equation}
+  \label{eq:def:z3}
     Z_3 = \sum_{i=1}^\ab \frac{(\occur_i-\ns/\ab)^2- \occur_i}{\ns/\ab}
 \end{equation}
 \emph{does} have a much smaller variance, and a threshold test of the form ``$Z_3 > \tau$?'' will yield the right sample complexity.\footnote{In the multinomial (``non-Poissonized'') case, substracting $\occur_i$ was not necessary, since that would correspond to removing overall $\frac{\ab}{\ns}\sum_{i=1}^\ab \occur_i = \ab$, a constant term. In the Poissonized case, however, $\sum_{i=1}^\ab \occur_i\sim\poisson{\ns}$, and $\frac{\ab}{\ns}\sum_{i=1}^\ab \occur_i$ is not a constant -- it is a random variable with expectation $\ab$ and (large) variance $\ab^2/\ns$.} Recalling that $\occur_i\sim\poisson{\ns\p(i)}$ for all $i$, the expectation of $Z_3$ will then just be 
@@ -1293,6 +1294,13 @@ mity testing.}
 \begin{question}\label{ex:identity:averaging:stochastic} 
     It is known that $x\preceq y$ if, and only if, $x=Ay$ for some doubly stochastic matrix $A$~\citep[Theorem~2.1]{Arnold87}. Check that the averaging from~\cref{lemma:distance:uniformity:averaging} indeed corresponds to multiplying the pmf $\p$ (seen as a vector) by such a matrix.
 \end{question}
+\begin{question}
+  Recall that our $\chi^2$-based statistic (\cref{eq:def:z3}) was analyzed under the Poissonized sampling model, which led us to define it with a $-\occur_i$ term in the numerator. We will show that this term is necessary: that is, under the Poissonization assumption, consider the ``simpler'' statistic
+  \[
+      Z'_3 \eqdef \sum_{i=1}^\ab \frac{(\occur_i-\ns/\ab)^2}{\ns/\ab}\,.
+  \]
+  Show that its expectation is $\ns\ab\normtwo{\p-\uniform_\ab}^2 +\ab$ (so the expectation \emph{gap} remains the same), but that the variance now contains an extra term $\frac{\ab^2}{\ns}$. What sample complexity does this yield?
+\end{question}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1349,11 +1357,12 @@ $q \eqdef \frac{\q(i)}{\p(i)+\p(j)}$. Note that this implies $p > q \geq 1/2$. T
 \]
 for all $t\in \R$, where $M,N$ are independent $\binomial{m}{p}$ and $\binomial{n}{p}$, and $M',N'$ independent $\binomial{m}{q}$ and $\binomial{n}{q}$; and $p>q\geq 1/2$.
 
-To prove this last statement, observe that the case $m=n=1$ can be shown from the identity $MN+(1-M)(1-N) = \indic{M=N}$, and the fact that $\bPr{M=N}=p^2+(1-p)^2 \geq q^2+(1-q)^2 = \bPr{M'=N'}$. The general case $m,n\geq 1$ then follows from rewriting the binomials as sum of \iid Bernoullis $M=\sum_{\ell=1}^m X_i$, $N=\sum_{\ell=1}^n Y_i$, so that
-\[
-    MN+(m-M)(n-N) = \sum_{\ell=1}^m\sum_{\ell'=1}^n ( X_\ell Y_{\ell'} + (1-X_\ell)(1-Y_{\ell'}) )\,;
-\]
-and use the case $m=n=1$ along with the fact that addition of independent summands preserves stochastic dominance~\citep{MathSE-massai}.
+\tbc
+% To prove this last statement, observe that the case $m=n=1$ can be shown from the identity $MN+(1-M)(1-N) = \indic{M=N}$, and the fact that $\bPr{M=N}=p^2+(1-p)^2 \geq q^2+(1-q)^2 = \bPr{M'=N'}$. The general case $m,n\geq 1$ then follows from rewriting the binomials as sum of \iid Bernoullis $M=\sum_{\ell=1}^m X_i$, $N=\sum_{\ell=1}^n Y_i$, so that
+% \[
+%     MN+(m-M)(n-N) = \sum_{\ell=1}^m\sum_{\ell'=1}^n ( X_\ell Y_{\ell'} + (1-X_\ell)(1-Y_{\ell'}) )\,;
+% \]
+% and use the case $m=n=1$ along with the fact that addition of independent summands preserves stochastic dominance~\citep{MathSE-massai}.
 \end{proof}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
