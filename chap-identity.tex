@@ -1140,7 +1140,7 @@ We will rely on this to bound the variance explicitly, starting with the expecte
   &= \sum_{i=1}^\ab\p(i)^2 \bPr{\occur_i \geq 1} + \Paren{\sum_{i=1}^\ab \p(i)\bPr{\occur_i \geq 1} }^{\!\!2} - \sum_{i=1}^\ab\p(i)^2 \bPr{\occur_i \geq 1}^2 \\
   &= \sum_{i=1}^\ab\p(i)^2 \bPr{\occur_i \geq 1}(1-\bPr{\occur_i \geq 1}) + \expect{\p(S)}^2\,,
 \end{align*}
-where the inequality follows from negative associativiy, and we got the third equality by completing the sum $2\sum_{i<j} x_{i,j} = \sum_{i,j} x_{i,j} - \sum_{i} x_{i,i}$. That is, we just proved
+where the inequality follows from negative associativity, and we got the third equality by completing the sum $2\sum_{i<j} x_{i,j} = \sum_{i,j} x_{i,j} - \sum_{i} x_{i,i}$. That is, we just proved
 \begin{align}
   \Var[\p(S)]
   &\leq \sum_{i=1}^\ab\p(i)^2 \bPr{\occur_i \geq 1}\bPr{\occur_i = 0}\,.
@@ -1183,7 +1183,7 @@ Let $\p\in\distribs{\ab}$. As usual by now, we will invoke Chebyshev's inequalit
     &\leq \frac{4096\ab^2\Var_{\uniform_\ab}[\uniform_\ab(S)]}{\nss^2\dst^4} 
     \leq \frac{4096}{\nss\dst^4}
     \end{align*}
-    using~\cref{eq:variance:subset:weight}, which implies $\Var_{\uniform_\ab}[\uniform_\ab(S)] \leq \frac{1}{\ab^2}\bE{\uniform_\ab}{\uniform_\ab(S)}$; this is less than $1/6$ as long as\footnote{It is worth pointing out, in case this was not apparent, that this survey does \emph{not} focus on optimizing the constants.} $\nss \geq 24576/\dst^4$.
+    using~\cref{eq:variance:subset:weight}, which implies $\Var_{\uniform_\ab}[\uniform_\ab(S)] \leq \frac{\nss}{\ab^2}$; this is less than $1/6$ as long as\footnote{It is worth pointing out, in case this was not apparent, that this survey does \emph{not} focus on optimizing the constants.} $\nss \geq 24576/\dst^4$.
     \item In the ``far'' case, we have by~\cref{lemma:gap:z7} we have $\Delta(\p) \geq \frac{\nss\dst^2}{16\ab} \geq \frac{\dst^2}{16}\bE{\uniform_\ab}{\uniform_\ab(S)}$, 
     \begin{align*}
         \bPr{\p(S) < \bE{\uniform_\ab}{\uniform_\ab(S)} + \frac{3\nss\dst^2}{64\ab}} 
