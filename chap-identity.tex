@@ -1003,7 +1003,7 @@ At first glance, this looks perfect: our tester will be correct in both cases as
 \]
 which, given that the ``vanilla'' collision-based tester corresponded to $\nss=\nst \asymp \frac{\sqrt{\ab}}{\dst^2}$, is not much of a tradeoff between $\nss$ and $\nst$ at all\dots
 
-So, where did we go wrong? Recall that in order to handle the ``far'' case,\footnote{We only have to worry about the far case, as the uniform case is already good~--~the issue arises in the second term of the variance, which is zero under the uniform distribution.} in the proof of~\cref{theo:collision-based} we had set $\alpha \eqdef \ab\normtwo{\p-\uniform_\ab}^2 \geq 4\dst^2$, and bounded
+So, where did we go wrong? Recall that in order to handle the ``far'' case,\footnote{We only have to worry about the far case, as the uniform case is already good~--~the issue arises in the second term of the variance, which is zero under the uniform distribution.} in the proof of~\cref{theo:collision-based} we had set $\alpha^2 \eqdef \ab\normtwo{\p-\uniform_\ab}^2 \geq 4\dst^2$, and bounded
 \[
     \norm{\p}_3^3-\normtwo{\p}^4 \leq \frac{\alpha^{3}}{\ab^{3/2}} + \frac{3\alpha^2}{\ab^2}
 \]
@@ -1016,28 +1016,63 @@ $\norm{\p-\uniform}_3^3 \leq \norminf{\p-\uniform}\normtwo{\p-\uniform}^2$ to ge
         \leq 2\norminf{\p}\frac{\alpha^{2}}{\ab} + \frac{3\alpha^2}{\ab^2}
     \end{align*}
 where the second inequality uses the triangle inequality and $\norminf{\p}\geq 1/\ab$ to bound $\norminf{\p-\uniform}$. Is that better? This is not immediately clear, since $\norminf{\p}$ could be much larger than $\alpha/\sqrt{\ab}$. Yet, \emph{if} we were lucky enough to have $\norminf{\p}\lesssim 1/\ab$, then this bound would be perfect! For instance, if we had $\norminf{\p}\leq 2/\ab$, then we \emph{could} write
-\begin{align}
+\begin{align}\marginnote{If only\dots}
   \Var_\p[Z_6]
-  &\leq \frac{1}{\nss\nst}\cdot \frac{1+\alpha^2}{\ab} + \frac{\nss+\nst}{\nss\nst}\cdot \frac{7\alpha^2}{\ab^2} \label{eq:var:bipartite:collisions:lowinfty}\,.
+  &\stackrel{?}{\leq} \frac{1}{\nss\nst}\cdot \frac{1+\alpha^2}{\ab} + \frac{\nss+\nst}{\nss\nst}\cdot \frac{7\alpha^2}{\ab^2} \label{eq:var:bipartite:collisions:lowinfty}\,.
 \end{align}
-As mentioned above, we clearly do not have that for every $\p$ such that $\totalvardist{\p}{\uniform_\ab}\geq \dst$. Nonetheless, we saw in~\cref{sec:uniformity:empirical} an argument, based on stochastic dominance, which effectively allowed to assume this was the case, losing only a factor $2$ in the distance parameter $\dst$. This was done by considering, for any given $\p$, the ``averaging'' $\bar{\p}$ defined in~\cref{lemma:distance:uniformity:averaging}.
+As mentioned above, we clearly do \emph{not} have that for every $\p$ such that $\totalvardist{\p}{\uniform_\ab}\geq \dst$. Still, we saw in~\cref{sec:uniformity:empirical} an argument, based on stochastic dominance, which effectively allowed to assume this was the case, losing only a factor $2$ in the distance parameter $\dst$. This was done by considering, for any given $\p$, the ``averaging'' $\bar{\p}$ defined in~\cref{lemma:distance:uniformity:averaging}.
 
-The issue, however, is that this stochastic dominance argument relied on our statistic $Z_4$ being a symmetric and convex function of the sample counts $N_1,\dots, N_\ab$. This is clearly not the case here: letting $N_1,\dots,N_\ab$ and $M_1,\dots,M_\ab$ be the counts of each domain element in the samples from $S$ and $T$, respectively, we can rewrite
+Can we do the same here? Unfortunately, \emph{no}. This stochastic dominance argument relied on our statistic $Z_4$ being a symmetric and convex function of the sample counts $N_1,\dots, N_\ab$. This is clearly not the case here: letting $N_1,\dots,N_\ab$ and $M_1,\dots,M_\ab$ be the counts of each domain element in the samples from $S$ and $T$, respectively, we can rewrite
 \begin{equation}
     Z_6 = \frac{1}{\nss\nst}\sum_{i=1}^\ab N_i M_i
 \end{equation}
-which is neither symmetric nor convex in the $N_i,M_i$'s. Nevertheless, we can obviously write this as $Z_6 = S(N_1M_1,N_2M_2,\dots,N_\ab M_\ab)$ for a function $S\colon\R^\ab\to\R$ which is symmetric and linear (and so \textit{a fortiori} convex) in its arguments. This does not allow us to invoke our stochastic dominance hammer (\cref{theo:stochdominance:symmetricfunction}) directly, still, we can use the following mallet instead:
-\begin{theorem}
-  \label{theo:stochdominance:symmetricfunction:variant}
-  Let $f\colon \R\to\R$ by a non-decreasing function. For a probability distribution $\p\in\distribs{\ab}$ and $\nss,\nst\in\N$, define the random variable $X_{\nss,\nst}(\p)$ as follows: let $N_1,\dots,N_\ab$ and $M_1,\dots,M_\ab$ be the counts of each domain element among $\nss$ and $\nst$ \iid samples from $\p$, respectively, and set $X_{\nss,\nst}(\p)=f(N_1M_1+\dots+N_\ab M_\ab)$. Then, for any $\p,\q$ such that $\p\succeq\q$, $X_{\nss,\nst}(\p)$ stochastically dominates $X_{\nss,\nst}(\q)$.
-\end{theorem}
-We will prove this theorem at the end of the section; for now, let us use it to establish what we want:
+which is neither symmetric nor convex in the $N_i,M_i$'s, and so we cannot our stochastic dominance hammer (\cref{theo:stochdominance:symmetricfunction}). Sure, but maybe we could still use some stochastic mallet? After all, we have $Z_6 = S(N_1M_1,N_2M_2,\dots,N_\ab M_\ab)$ for a function $S\colon\R^\ab\to\R$ which is symmetric and linear (and so \textit{a fortiori} convex) in its arguments! Unfortunately\dots \emph{still no.} As we will verify in~\cref{ex:nomallet}, stochastic dominance here fails in a spectacular way. So we are left with the variance bound which follows from what we had established, but features an $\norminf{\p}$ where we would like $O(1/\ab)$.
+\begin{align}
+  \Var_\p[Z_6]
+  &\leq \frac{1}{\nss\nst}\cdot \frac{1+\alpha^2}{\ab} + \frac{\nss+\nst}{\nss\nst}\cdot \frac{5\norminf{\p}\alpha^2}{\ab} \label{eq:var:bipartite:collisions:infty}\,.
+\end{align}
+
+Nonetheless we can enforce \emph{some} bound on $\norminf{\p}$, by using an extra number of samples $\nsu$ to detect if something looks amiss. This is exactly what~\cref{algo:linfty} will allow us to do, ensuring that $\norminf{\p} \lesssim 1/\nsu$. For technical reasons, this will require $\nsu \leq \ab^{2/3}$; as we will see in~\cref{ex:linftycheck} we could improve this mild restriction to any $\nsu \leq \ab^{(s-1)/s}$, for any constant $s\geq 3$, at the cost of worse constants.
+\begin{algorithm}[ht!]
+  \begin{algorithmic}[1]
+    \Require Multiset $S$ of $\nsu$ samples $x_1,\dots,x_{\nsu}\in \domain$ and $\ab = \abs{\domain}$
+    \State Check if any value $i\in[\ab]$ appears at least 3 times in $S$ 
+    \If{ this happens and $\nsu \leq \ab^{2/3}$ } \Return \reject \Comment{Not uniform}
+    \Else\ 
+      \Return \accept \Comment{Uniform}
+    \EndIf
+  \end{algorithmic}
+  \caption{\label{algo:linfty}\sc $\lp[\infty]$ Tester via $3$-way collision}
+\end{algorithm}
+\begin{lemma}
+  \label{lemma:linfty:test}
+Given $\nsu$ \iid samples from a distribution $\p\in\distribs{\ab}$,~\cref{algo:linfty} distinguishes with probability at least $5/6$ between (i)~$\p=\uniform_\ab$ (\ie $\norminf{\p}=1/\ab$)  and (ii)~$\norminf{\p} > 10/\nsu$, provided that $\nsu \leq \ab^{2/3}$.
+\end{lemma}
+\begin{proof}
+Suppose that $\p=\uniform_\ab$. For any $s\geq 2$, the probability $p(\nsu,\ab,s)$ to observe an $s$-way collision among $\nsu$ \iid samples from the uniform distribution on $\ab$ elements is bounded as 
+\begin{equation}
+    p(\nsu,\ab,s) \leq \frac{1}{\ab^{s-1}}\binom{\nsu}{s}
+\end{equation}
+(see,~\eg~\citet[Theorem~2]{KazuhiroDKK06}), which for $s=3$ gives the bound $p(\nsu,\ab,3) \leq \frac{\nsu^3}{6\ab^{2}}$, which is at most $1/6$ for $\nsu \leq \ab^{2/3}$.
+
+Now, assume $\norminf{\p} > 10/\nsu$, and consider any element $i\in[\ab]$ such that $\p(i)=\norminf{\p}$. The number of times $\occur_{i}$ this element $i$ appears among the $\nsu$ samples follows a Binomial distribution with parameters $\nsu$ and $\norminf{\p}$ (and thus mean $\nsu\norminf{\p} > 10$), and so by a Chernoff bound (\cref{theo:chernoff:with:ublb}) we have
+$
+    \bPr{ \occur_{i} < 3 } < 1/6. 
+$
+\end{proof}
+
+% Nevertheless, we can obviously write this as $Z_6 = S(N_1M_1,N_2M_2,\dots,N_\ab M_\ab)$ for a function $S\colon\R^\ab\to\R$ which is symmetric and linear (and so \textit{a fortiori} convex) in its arguments. This does not allow us to invoke our stochastic dominance hammer (\cref{theo:stochdominance:symmetricfunction}) directly, still, we can use the following mallet instead:
+% \begin{theorem}
+%   \label{theo:stochdominance:symmetricfunction:variant}
+%   Let $f\colon \R\to\R$ by a non-decreasing function. For a probability distribution $\p\in\distribs{\ab}$ and $\nss,\nst\in\N$, define the random variable $X_{\nss,\nst}(\p)$ as follows: let $N_1,\dots,N_\ab$ and $M_1,\dots,M_\ab$ be the counts of each domain element among $\nss$ and $\nst$ \iid samples from $\p$, respectively, and set $X_{\nss,\nst}(\p)=f(N_1M_1+\dots+N_\ab M_\ab)$. Then, for any $\p,\q$ such that $\p\succeq\q$, $X_{\nss,\nst}(\p)$ stochastically dominates $X_{\nss,\nst}(\q)$.
+% \end{theorem}
+We will prove a more general theorem first; before showing how to instantiate it to take advantage of~\cref{lemma:linfty:test}:
 \begin{theorem}
   \label{theo:bipartite:collision-based}
-The bipartite collision-based tester (\cref{algo:bipartite:collision-based}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = \nss+\nst$ and time complexity $O(\ns)$, provided that $\nss\nst \geq 24\ab/\dst^4$ and $\min(\nss,\nst)\geq 168/\dst^2$.
+The bipartite collision-based tester (\cref{algo:bipartite:collision-based}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/6) = \nss+\nst$ and time complexity $O(\ns)$, provided that $\nss\nst \geq 96\ab/\dst^4$ and $\min(\nss,\nst)\geq 480\min(\ab\norminf{\p}, \sqrt{2\ab})/\dst^2$.
 \end{theorem}
 \begin{proof}
-Fix any $\p\in\distribs{\ab}$; if $\totalvardist{\p}{\uniform_\ab} \geq \dst$, by  stochastic dominance (\cref{theo:stochdominance:symmetricfunction:variant}) it suffices to consider the corresponding $\bar{\p}$, as defined in~\cref{lemma:distance:uniformity:averaging}, which satisfies $\bE{\bar{\p}}{Z_6} = \normtwo{\bar{\p}}^2 \geq \frac{1+4(\dst/2)^2}{\ab} = \frac{1+\dst^2}{\ab}$. We also have our variance bounds from~\cref{eq:var:bipartite:collisions,eq:var:bipartite:collisions:lowinfty}. Define our threshold
+Fix any $\p\in\distribs{\ab}$. We also have our variance bounds from~\cref{eq:var:bipartite:collisions,eq:var:bipartite:collisions:infty}. Define our threshold
 \[
     \tau \eqdef \frac{1+\frac{1}{2}\dst^2}{\ab}
 \]
@@ -1049,20 +1084,42 @@ as in~\cref{algo:bipartite:collision-based}.
     &= \bPr{Z_6 \geq (1+\tfrac{\dst^2}{2})\bE{\uniform_\ab}{Z_6}}  \leq \frac{4\Var_{\uniform_\ab}[Z_6]}{\dst^4\bE{\uniform_\ab}{Z_6}^2} 
     \leq \frac{4\ab}{\nss\nst\dst^4}
     \end{align*}
-    using~\cref{eq:var:bipartite:collisions}; this is less than $1/3$ as long as $\nss\nst \geq 12\ab/\dst^4$.
-    \item In the ``far'' case, defining $\alpha$ by $\bE{\bar{\p}}{Z_6} = \frac{1+\alpha^2}{\ab}$ (so that $\alpha^2\geq \dst^2$), the probability to err by outputting \accept is
+    using~\cref{eq:var:bipartite:collisions}; this is less than $1/6$ as long as $\nss\nst \geq 24\ab/\dst^4$.
+    \item In the ``far'' case, define $\alpha$ by $\bE{\bar{\p}}{Z_6} = \frac{1+\alpha^2}{\ab}$, so that $\alpha^2\geq \dst^2$ but also
+    $
+        \norminf{\p} \leq \normtwo{\p} = \sqrt{(1+\alpha^2)/\ab}
+    $. The probability to err by outputting \accept is
     \begin{align*}
         \bP{\p}{Z_6 < \tau}  
         &\leq \bP{\bar{\p}}{Z_6 <  \tau} 
         = \bP{\bar{\p}}{Z_6 <  \frac{1+\frac{1}{2}\dst^2}{1+\alpha^2} \bE{\bar{\p}}{Z_6} } \\
         &\leq \bP{\bar{\p}}{Z_6 <  \Paren{1 - \frac{\alpha^2}{2(1+\alpha^2)}} \bE{\bar{\p}}{Z_6} } \\
         &\leq \frac{4(1+\alpha^2)^2}{\alpha^4}\cdot \frac{\Var_{\p}[Z_6]}{\bE{\bar{\p}}{Z_6}^2} \\
-        &\leq \frac{\ab}{\nss\nst}\cdot \frac{4(1+\alpha^2)}{\alpha^4} + \frac{\nss+\nst}{\nss\nst}\cdot \frac{28}{\alpha^2}  \\
-        &\leq \frac{8\ab}{\nss\nst\dst^4} + \frac{56}{\min(\nss,\nst)\dst^2}
+        &\leq \frac{\ab}{\nss\nst}\cdot \frac{4(1+\alpha^2)}{\alpha^4} + \frac{\nss+\nst}{\nss\nst}\cdot \frac{20\ab\norminf{\p}}{\alpha^2}  \\
+        &\leq \frac{8\ab}{\nss\nst\dst^4} + \frac{40}{\min(\nss,\nst)}\cdot \min\Paren{ \frac{\ab\norminf{\p}}{\alpha^2}, \frac{\sqrt{\ab}\sqrt{1+\alpha^2}}{\alpha^2} } \\
+        &\leq \frac{8\ab}{\nss\nst\dst^4} + \frac{40}{\min(\nss,\nst)\dst^2}\min\Paren{\ab\norminf{\p}, \sqrt{2\ab}}
     \end{align*}
-    using~\cref{eq:var:bipartite:collisions:lowinfty}, then $\alpha^2\geq \dst^2$ (and $\dst \leq 1$) and $\nss+\nst\leq 2\max(\nss,\nst)$. This is less than $1/6+1/6=1/3$ as long as (1)~$\nss\nst \geq 24\ab/\dst^4$ and~(2) $\min(\nss,\nst) \geq 168/\dst^2$.
+    using~\cref{eq:var:bipartite:collisions:infty}, then $\nss+\nst\leq 2\max(\nss,\nst)$, then $\alpha^2\geq \dst^2$ and that the function $x\mapsto \frac{1}{x^2}\sqrt{1+x^2}$ is decreasing (and $\dst \leq 1$). This is less than $1/12+1/12=1/6$ as long as (1)~$\nss\nst \geq 96\ab/\dst^4$ and~(2) $\min(\nss,\nst) \geq 480\min\Paren{\ab\norminf{\p}, \sqrt{2\ab}}/\dst^2$.
 \end{itemize}
-  The above analysis shows that both errors are less than $1/3$ for any $\ns = \nss+\nst$ such that $\nss\nst \geq \lceil{24\ab/\dst^4}\rceil$ and $\min(\nss,\nst) \geq \clg{168/\dst^2}$; this concludes the proof.
+  The above analysis shows that both errors are less than $1/6$ for any $\ns = \nss+\nst$ satisfying the two conditions from the statement; this concludes the proof.
+\end{proof}
+\noindent By choosing $\nss=\nst=\frac{\ns}{2}$, we first obtain:
+\begin{corollary}
+  \label{theo:bipartite:collision-based:notradeoff}
+The bipartite collision-based tester (\cref{algo:bipartite:collision-based}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/6) = \bigO{\sqrt{\ab}/\dst^2}$ and time complexity $O(\ns)$.
+\end{corollary}
+Perhaps more interesting is combining~\cref{theo:bipartite:collision-based,lemma:linfty:test}, which leads to the next result:
+\begin{corollary}
+  \label{theo:bipartite:collision-based}
+The bipartite collision-based tester (\cref{algo:bipartite:collision-based}) combined with the $\lp[\infty]$ testing algorithm (\cref{algo:linfty}) form a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = \nss+\nst$ and time complexity $O(\ns)$, provided that $\nss\nst \geq 4800\ab/\dst^4$ and $\max(\nss,\nst)\leq \ab^{2/3}$.
+\end{corollary}
+\begin{proof}
+Without loss of generality, suppose that $\nst\leq\nss\leq \ab^{2/3}$. The overall algorithm runs~\cref{algo:linfty} on $S_1$, and records the output as $b_1\in\{0,1\}$; and in parallel runs~\cref{algo:bipartite:collision-based} on the multisets $S_1$ and $S_2$, and records the output as $b_2\in\{0,1\}$. The output of the algorithm is then $b_1b_2$, \ie the \textsf{AND} the two decisions: it declares ``uniform'' only if both sub-algorithms declared it.
+\begin{itemize}
+    \item In the uniform case, by a union bound both algorithms return $\accept$ with probability at least $1-(1/6+1/6)=2/3$, as desired.
+    \item In the ``far'' case, we have two possibilities. If $\norminf{\p} > 10/\nsu$, then~\cref{algo:linfty} will return $b_1=\reject$ with probability at least $5/6$, and then regardless of the output of~\cref{algo:bipartite:collision-based} we have $b_1b_2=0$ and will return $\reject$. If $\norminf{\p} \leq 10/\nsu$, however, then we have $\nss\nst \geq 96\ab/\dst^4$ and $\min(\nss,\nst)\geq 480\ab\norminf{\p}/\dst^2$, and so~\cref{algo:bipartite:collision-based} will return $b_2=\reject$ with probability at least $5/6$. Either way, we return \reject with probability at least $5/6>2/3$.
+\end{itemize}
+This concludes the proof.
 \end{proof}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1119,7 +1176,7 @@ when $\p$ is far from uniform. From~\cref{eq:expect:empirical:weight}, we can ex
   \label{lemma:gap:z7}
 If $\ns \leq \ab$, we have
 \[
-    \Delta(\p) \geq \frac{\ns}{16\ab}\totalvardist{\p}{\uniform_\ab}^2\,.
+    \Delta(\p) \geq \frac{\nss}{16\ab}\totalvardist{\p}{\uniform_\ab}^2\,.
 \]
 \end{lemma}
 We will here introduce (and use) another concept we have not seen yet, that of \emph{negative association} between random variables. This is a stronger notion than negative correlation, and is very useful when dealing with random variables which are dependent ``but in a way which helps us'' (to prove concentration):
@@ -1241,8 +1298,18 @@ The empirical subset weighting tester (\cref{algo:empirical:subset}) is a testin
 In this section, we have covered and analyzed seven different algorithms for uniformity testing;\footnote{There may (and surely are) other possible algorithms one could consider, of course; yet, we hope that this chapter provided a good and representative overview of the ideas, techniques, and tools one could use to analyze such algorithms.} some, such as the collision-based tester and the bipartite collision tester, or the unique element tester and the empirical distance tester, were related, and many (but not all) relied on the use of $\lp[2]$ distance as a proxy for total variation distance. Before concluding this section, let us have a look at some of their differences, and specific advantages of each of them.
 
 \begin{itemize}
-  \item The collision-based tester, besides being a very natural idea (which turns out to yield the optimal sample complexity!), is as a byproduct an estimator of the $\lp[2]$ norm of the distribution, \ie, its collision probability. This could be useful by itself, if one is interested in this quantity for its own sake. Perhaps more importantly, the use of $\lp[2]$ as proxy (via Cauchy--Schwarz), combined with monotonicity of $\lp[p]$ norms ($\lp[2]\leq \lp[1]$), implies that this tester actually provides some amount of \emph{tolerance} (robustness to model misspecification): instead of just between $\p=\uniform_\ab$ and $\totalvardist{\p}{\uniform_\ab} \geq \dst$, it enables one to distinguish between $\totalvardist{\p}{\uniform_\ab} \leq \dst/(2\sqrt{\ab})$ and $\totalvardist{\p}{\uniform_\ab} \geq \dst$. This seemingly small tolerance happens to be quite helpful in many settings. Of course, the same comment applies to the bipartite collision tester, but also to the random binary hashing tester (which also relies on, and estimates, the squared $\lp[2]$ distance).
-  \item Both the unique elements tester and the empirical distance tester have \emph{low sensitivity}, meaning that changing the value of a single one of the $\ns$ samples cannot change the value of the resulting statistic ($Z_2$ or $Z_4$) by much: roughly, $\asymp 2/\ns$. While the different renormalization makes it a little tricky to compare, the collision-based tester, for instance, has much worse sensitivity, as changing one sample can have a much larger effect on the statistic (since $Z_1$ is a quadratic function of the sample counts). Having low sensitivity, which is essentially an $\lp[1]$ Lipschitzness guarantee, in turn is very desirable to obtain robust algorithms (\ie robust to data corruption, adversarial or not), or, importantly, to obtain \emph{differentially private} algorithms~\citep{DworkMNS06}, since the amount of random noise added to ensure data privacy is directly related to this sensivity. In particular, the unique elements tester and the empirical distance tester each have been used to obtain optimal, or near-sample-optimal, differentially private uniformity testing algorithms~\citep{AcharyaSZ18,AliakbarpourDR18}.
+  \item The collision-based tester, besides being a very natural idea (which turns out to yield the optimal sample complexity!), is as a byproduct an estimator of the $\lp[2]$ norm of the distribution, \ie  its collision probability. This could be useful by itself, if one is interested in this quantity for its own sake. Perhaps more importantly, the use of $\lp[2]$ as proxy (via Cauchy--Schwarz), combined with monotonicity of $\lp[p]$ norms ($\lp[2]\leq \lp[1]$), implies that this tester actually provides some amount of \emph{tolerance} (robustness to model misspecification): instead of just between $\p=\uniform_\ab$ and $\totalvardist{\p}{\uniform_\ab} \geq \dst$, it enables one to distinguish between $\totalvardist{\p}{\uniform_\ab} \leq \dst/(2\sqrt{\ab})$ and $\totalvardist{\p}{\uniform_\ab} \geq \dst$. This seemingly small tolerance happens to be quite helpful in many settings. Of course, the same comment applies to the bipartite collision tester, but also to the random binary hashing tester (which also relies on, and estimates, the squared $\lp[2]$ distance).
+  \item Both the unique elements tester and the empirical distance tester have \emph{low sensitivity}, meaning that changing the value of a single one of the $\ns$ samples cannot change the value of the resulting statistic ($Z_2$ or $Z_4$) by much: roughly, $\asymp 1/\ns$ or $\asymp 1/\ab$. While the different renormalization makes it a little tricky to compare, the collision-based tester, for instance, has much worse sensitivity, as changing one sample can have a much larger effect on the statistic (since $Z_1$ is a quadratic function of the sample counts). Having low sensitivity, which is essentially an $\lp[1]$ Lipschitzness guarantee, in turn is very desirable to obtain robust algorithms (\ie robust to data corruption, adversarial or not), or, importantly, to obtain \emph{differentially private} algorithms~\citep{DworkMNS06}, since the amount of random noise added to ensure data privacy is directly related to this sensitivity. In particular, the unique elements tester and the empirical distance tester each have been used to obtain optimal, or near-sample-optimal, differentially private uniformity testing algorithms~\citep{AcharyaSZ18,AliakbarpourDR18}.
+  \item This low sensitivity is one of the aspects which allows the empirical distance tester to achieve the optimal ``high-probability bound,'' that is, the optimal dependence on the error probability $\errprob$. Indeed, while our bounds for $\errprob=1/3$, combined with the standard amplification from~\cref{lemma:error:proba:amplification}, yield the upper bound
+  \begin{equation}
+      \ns(\ab,\dst,\errprob) = \bigO{\frac{\sqrt{\ab}}{\dst^2}\log\frac{1}{\errprob}}
+  \end{equation}
+  on the sample complexity of uniformity testing for general $\errprob\in(0,1]$, the ``right'' bound is
+  \begin{equation}
+    \label{eq:optimal:dep:delta}
+  \ns(\ab,\dst,\errprob) = \bigTheta{\frac{1}{\dst^2}\Paren{\sqrt{\ab\log\frac{1}{\errprob}}+\log\frac{1}{\errprob}}}
+  \end{equation}
+  which can be much smaller for vanishing $\errprob$, \eg $\errprob = 1/2^{\Omega(\ab)}$. The bound~\cref{eq:optimal:dep:delta} is achieved by the empirical distance tester, but with a different analysis to prove concentration around the mean: namely, instead of a Chebyshev-based (variance) bound, one can use instead the so-called \emph{bounded differences inequality} (McDiarmid's inequality) and its ``Bernstein-type variant'' (bounded variances inequality)~\citep[Chapters~5.4 and 8]{DubhashiP09} to show that the statistic $Z_4$ concentrates very tightly around its mean. The low sensivity of $Z_4$, as it happens, plays a crucial role when applying those bounds.
   \item The random binary hashing testing, albeit not sample-optimal, only requires to store a \emph{single} bit of information per sample. (Moreover, this can be generalized to $\numbits$ bits by hashing to $2^\numbits$ elements instead of two, leveraging~\cref{theo:random:dct:hashing}.) This can be very valuable in memory-limited or communication-limited settings (we will get back to this in~\cref{chap:constrained}), or in the case of \emph{local} differential privacy~\citep{KLNRS:11}, where this can be used to obtain a sample-optimal locally private uniformity testing algorithm~\citep{AcharyaCFST21} (as optimally privatizing \emph{one} bit is much easier than a full $\log\ab$-bit sample).
   \item Finally, the $\chi^2$ tester\dots just works. It also nicely generalizes to other problems (identity testing, as we will see in~\cref{sec:identity}; or even, with appropriate modifications, to ``closeness testing'' (two-sample goodness-of-fit) or other related testing tasks. Among other enjoyable properties, its asymptotic distribution (as the number of samples $\ns\to\infty$) can be obtained, letting us (asymptotically) obtain confidence intervals. It also does provide, as the collision-based tester, some amount of tolerance, in the so-called $\chi^2$ divergence; we will see in~\cref{chap:algorithmic:frameworks} how this $\chi^2$-divergence tolerance can be used as a blackbox to obtain testing algorithms for other properties than uniformity.
 \end{itemize}
@@ -1291,8 +1358,18 @@ mity testing.}
 \begin{question}\label{ex:uniformity:bipartite}
   Follow the analysis of~\cref{theo:collision-based} to derive, for the bipartite collisions tester, the guarantee~\cref{eq:uniform:bipartite:firstattempt} from the variance bound~\cref{eq:var:bipartite:collisions}.
 \end{question}
+\begin{question}\label{ex:nomallet}
+  Show that, in contrast to what we did in the empirical distance tester case (\cref{sec:uniformity:empirical}), one cannot invoke stochastic dominance in the analysis of the bipartite collision tester to obtain the wishful variance bound~\cref{eq:var:bipartite:collisions:lowinfty} instead of~\cref{eq:var:bipartite:collisions:infty}. Specifically, show that it fails even for $\ab=2$: if $M\sim\binomial{\nss}{p}$, $N\sim\binomial{\nst}{p}$ and $M'\sim\binomial{\nss}{q}$, $N'\sim\binomial{\nst}{q}$ (all independent) with $1/2\leq q < p \leq 1$, it is \emph{not} true that
+  \[
+      MN+(\nss-M)(\nst-N) \succeq M'N'+(\nss-M')(\nst-N')
+  \]
+  \emph{Hint: consider the case $\nss=1$, and $\bPr{MN+(\nss-M)(\nst-N)\geq 1}$ as a function of $p$.}
+\end{question}
 \begin{question}\label{ex:identity:averaging:stochastic} 
     It is known that $x\preceq y$ if, and only if, $x=Ay$ for some doubly stochastic matrix $A$~\citep[Theorem~2.1]{Arnold87}. Check that the averaging from~\cref{lemma:distance:uniformity:averaging} indeed corresponds to multiplying the pmf $\p$ (seen as a vector) by such a matrix.
+\end{question}
+\begin{question}\label{ex:linftycheck}
+  Generalize~\cref{lemma:linfty:test} to relax the condition $\nsu \leq \ab^{2/3}$ to $\nsu \leq \ab^{(s-1)/s}$, for any fixed (constant) integer $s\geq 3$, by considering $s$-collisions instead of $3$-collisions in~\cref{algo:linfty}. How does the $\lp[\infty]$ guarantee bound in (ii) change with $s$?
 \end{question}
 \begin{question}
   Recall that our $\chi^2$-based statistic (\cref{eq:def:z3}) was analyzed under the Poissonized sampling model, which led us to define it with a $-\occur_i$ term in the numerator. We will show that this term is necessary: that is, under the Poissonization assumption, consider the ``simpler'' statistic
@@ -1337,33 +1414,6 @@ m\sum_{i < j} &x_i x_j \Paren{ (1-x_i - x_j)^{m-1} - (1-x_i)^m(1-x_j)^m} \\
 concluding the proof.
 \end{proof}
 
-The next proof is that of our ``stochastic dominance mallet'' from~\cref{sec:uniformity:bipartite}:
-\begin{theorem}[\cref{theo:stochdominance:symmetricfunction:variant}, restated]
-  Let $f\colon \R\to\R$ by a non-decreasing function. For a probability distribution $\p\in\distribs{\ab}$ and $\nss,\nst\in\N$, define the random variable $X_{\nss,\nst}(\p)$ as follows: let $N_1,\dots,N_\ab$ and $M_1,\dots,M_\ab$ be the counts of each domain element among $\nss$ and $\nst$ \iid samples from $\p$, respectively, and set $X_{\nss,\nst}(\p)=f(N_1M_1+\dots+N_\ab M_\ab)$. Then, for any $\p,\q$ such that $\p\succeq\q$, $X_{\nss,\nst}(\p)$ stochastically dominates $X_{\nss,\nst}(\q)$.
-\end{theorem}
-\begin{proof}
-First, since $f$ is non-decreasing, it suffices to show the result for the identity function (as $\bPr{U\geq V}=1$ implies $\bPr{f(U)\geq f(V)}=1$). 
-
-As stochastic domination is transitive, and majorization between vectors is equivalent to the existence of a sequence of so-called ``Robin Hood operations''~--~where $\p$ is slowly transformed into $\q$ by only (partially) averaging the probability of two elements $i,j$ at a time, transferring some probability mass from the heavier to the lighter~\citep[Chapter~2]{Arnold87}, it is enough to consider the case where $\p$, $\q$ only differ in two elements. That is, $\p(\ell)=\q(\ell)$ for all $\ell\notin\{i,j\}$, while $\p(i) > \q(i)$ and $\p(j) < \q(j)$ (and $\p(i)+\p(j)=\q(i)+\q(j)$).
-
-This in turn means that $(M_i+M_j, N_i+N_j, (N_\ell,M_\ell)_{\ell\notin\{i,j\}})$ has the same distribution under $\p$ and $\q$, and so, overall, it suffices to show stochastic dominance of $M_iN_i+M_jN_j$ under $\p$ over the same quantity under $\q$, conditioned on $M_i+M_j=m, N_i+N_j=n$ (for all $m,n$).
-
-Under this conditioning, $M_i$ and $N_i$ are independent and distributed as $\binomial{m}{p}$ and $\binomial{n}{p}$ under $\p$, and as $\binomial{m}{q}$ and $\binomial{n}{q}$ under $\q$, where we set
-$p \eqdef \frac{\p(i)}{\p(i)+\p(j)}$ 
-and
-$q \eqdef \frac{\q(i)}{\p(i)+\p(j)}$. Note that this implies $p > q \geq 1/2$. Thus, the question eventually boils down to proving stochastic dominance for Binomials: namely, that
-\[
-    \bPr{MN+(m-M)(n-N) \geq t} \geq \bPr{M'N'+(m-M')(n-N') \geq t}
-\]
-for all $t\in \R$, where $M,N$ are independent $\binomial{m}{p}$ and $\binomial{n}{p}$, and $M',N'$ independent $\binomial{m}{q}$ and $\binomial{n}{q}$; and $p>q\geq 1/2$.
-
-\tbc
-% To prove this last statement, observe that the case $m=n=1$ can be shown from the identity $MN+(1-M)(1-N) = \indic{M=N}$, and the fact that $\bPr{M=N}=p^2+(1-p)^2 \geq q^2+(1-q)^2 = \bPr{M'=N'}$. The general case $m,n\geq 1$ then follows from rewriting the binomials as sum of \iid Bernoullis $M=\sum_{\ell=1}^m X_i$, $N=\sum_{\ell=1}^n Y_i$, so that
-% \[
-%     MN+(m-M)(n-N) = \sum_{\ell=1}^m\sum_{\ell'=1}^n ( X_\ell Y_{\ell'} + (1-X_\ell)(1-Y_{\ell'}) )\,;
-% \]
-% and use the case $m=n=1$ along with the fact that addition of independent summands preserves stochastic dominance~\citep{MathSE-massai}.
-\end{proof}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
