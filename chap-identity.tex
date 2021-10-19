@@ -433,7 +433,7 @@ as in~\cref{algo:unique-elements}.
 \]
 using moments of a Binomial random variable and~\cref{eq:relation:collisionprob:distance:uniform}.\exercise{Check it!} This does look like a reasonable way to estimate the distance to uniformity \emph{via} the $\lp[2]$ distance again\dots{} unfortunately, the variance will be quite annoying, due to the correlations between terms of the sums.
 
-To make the task easier, it is helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, which will greatly simplifies the analysis. Then, under this (slightly different) sampling model the $\occur_i$'s become independent, with $\occur_i\sim\poisson{\ns\p(i)}$: this is called \emph{Poissonization}\index{Poissonization}, and can be done more or less without loss of generality since a $\poisson{\ns}$ random variable will be between $0.99\ns$ and $1.01\ns$ with overwhelming probability. (See~\cref{sec:poissonization} for more on Poissonization, and why we can use it ``without loss of generality'').
+To make the task easier, it is helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, which will greatly simplifies the analysis. Then, under this (slightly different) sampling model the $\occur_i$'s become independent, with $\occur_i\sim\poisson{\ns\p(i)}$: this is called \emph{Poissonization}\index{Poissonization}, and can be done more or less without loss of generality since a $\poisson{\ns}$ random variable will be between $0.99\ns$ and $1.01\ns$ with overwhelming probability. (See~\cref{app:poissonization} for more on Poissonization, and why we can use it ``without loss of generality'').
 
 \begin{algorithm}[ht!]
   \begin{algorithmic}[1]
@@ -478,14 +478,14 @@ where, of course, $\uniform_\ab(i) = 1/\ab$ for all $i\in[\ab]$. Recalling that,
   \bEE{((X-\mu)^2-X)^2} = (\lambda-\mu)^4 + 2\lambda^2 + 4\lambda(\lambda-\mu)^2
   $.
 \end{claim}
-Given this, by linearity of expectation we immediately get
+Given this, by linearity of expectation we immediately get\footnote{Here, $\chisquare{\p}{\q}$ denotes the \emph{chi-square divergence} between distributions $\p$ and $\q$; for a refresher on this notion of distance, the reader is referred to~\cref{app:distances}.}
 \begin{align}
     \bEE{Z_3} 
     &= \sum_{i=1}^\ab \frac{\bEE{(\occur_i-\ns\uniform_\ab(i))^2- \occur_i}}{\ns\uniform_\ab(i)}
     = \ns\sum_{i=1}^\ab \frac{(\p(i)-\uniform_\ab(i))^2}{\uniform_\ab(i)} \notag\\
     &= \ns\cdot\chisquare{\p}{\uniform_\ab} \label{eq:expectation:z3:chisquare}
 \end{align}
-which here can further be simplified by $\chisquare{\p}{\uniform_\ab} = \ab\normtwo{\p-\uniform_\ab}^2$, as the denominator is constant and equal to $1/\ab$; this establishes~\cref{eq:expectation:z3}.\cmargin{Introduce $\chi^2$ before.}
+which here can further be simplified by $\chisquare{\p}{\uniform_\ab} = \ab\normtwo{\p-\uniform_\ab}^2$, as the denominator is constant and equal to $1/\ab$; this establishes~\cref{eq:expectation:z3}.
 
 Turning to the variance, we want to relate $\Var[Z_3]$ to known quantities, and in particular $\bEE{Z_3}$. To do so, we use independence of the $\occur_i$'s followed by the second part of the above claim to get
 \begin{align}
@@ -589,7 +589,7 @@ That's the thing, though: the devil is in the $o(1)$ details. Sure, $\expect{Z_4
       \Return \accept \Comment{Uniform}
     \EndIf
   \end{algorithmic}
-  \caption{\label{algo:empirical:plugin}\sc Empirical Distance Tester}
+  \caption{\label{algo:empirical:plugin}\sc empirical-distance tester}
 \end{algorithm}
 
 For simplicity of exposition, we focus here on the case $\ns \leq \ab$, though the analysis of the test can be performed for extended to all parameter regimes -- see~\citet{DiakonikolasGPP18} for the full general case. The argument proceeds in two steps: first, computing and bounding the expectation of $Z_4$ under the uniform and the far cases separately is not going to really work, so instead we will bound the expectation gap $\Delta(\p)\eqdef \bE{\p}{Z_4}-\bE{\uniform_{\ab}}{Z_4}$ directly (a little like in the case of the unique elements-based tester). Then, once the gap in expectation is established, we will once again argue concentration of $Z_4$ as usual by a variance-based (Chebyshev's inequality) argument~--~but this time diversifying our toolkit and using a different tool, the Efron--Stein lemma, to bound the variance.
@@ -1295,12 +1295,12 @@ The empirical subset weighting tester (\cref{algo:empirical:subset}) is a testin
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Discussion}
   \label{ssec:uniformity:discussion}
-In this section, we have covered and analyzed seven different algorithms for uniformity testing;\footnote{There may (and surely are) other possible algorithms one could consider, of course; yet, we hope that this chapter provided a good and representative overview of the ideas, techniques, and tools one could use to analyze such algorithms.} some, such as the collision-based tester and the bipartite collision tester, or the unique element tester and the empirical distance tester, were related, and many (but not all) relied on the use of $\lp[2]$ distance as a proxy for total variation distance. Before concluding this section, let us have a look at some of their differences, and specific advantages of each of them.
+In this section, we have covered and analyzed seven different algorithms for uniformity testing;\footnote{There may (and surely are) other possible algorithms one could consider, of course; yet, we hope that this chapter provided a good and representative overview of the ideas, techniques, and tools one could use to analyze such algorithms.} some, such as the collision-based tester and the bipartite collision tester, or the unique element tester and the empirical-distance tester, were related, and many (but not all) relied on the use of $\lp[2]$ distance as a proxy for total variation distance. Before concluding this section, let us have a look at some of their differences, and specific advantages of each of them.
 
 \begin{itemize}
   \item The collision-based tester, besides being a very natural idea (which turns out to yield the optimal sample complexity!), is as a byproduct an estimator of the $\lp[2]$ norm of the distribution, \ie  its collision probability. This could be useful by itself, if one is interested in this quantity for its own sake. Perhaps more importantly, the use of $\lp[2]$ as proxy (via Cauchy--Schwarz), combined with monotonicity of $\lp[p]$ norms ($\lp[2]\leq \lp[1]$), implies that this tester actually provides some amount of \emph{tolerance} (robustness to model misspecification): instead of just between $\p=\uniform_\ab$ and $\totalvardist{\p}{\uniform_\ab} \geq \dst$, it enables one to distinguish between $\totalvardist{\p}{\uniform_\ab} \leq \dst/(2\sqrt{\ab})$ and $\totalvardist{\p}{\uniform_\ab} \geq \dst$. This seemingly small tolerance happens to be quite helpful in many settings. Of course, the same comment applies to the bipartite collision tester, but also to the random binary hashing tester (which also relies on, and estimates, the squared $\lp[2]$ distance).
-  \item Both the unique elements tester and the empirical distance tester have \emph{low sensitivity}, meaning that changing the value of a single one of the $\ns$ samples cannot change the value of the resulting statistic ($Z_2$ or $Z_4$) by much: roughly, $\asymp 1/\ns$ or $\asymp 1/\ab$. While the different renormalization makes it a little tricky to compare, the collision-based tester, for instance, has much worse sensitivity, as changing one sample can have a much larger effect on the statistic (since $Z_1$ is a quadratic function of the sample counts). Having low sensitivity, which is essentially an $\lp[1]$ Lipschitzness guarantee, in turn is very desirable to obtain robust algorithms (\ie robust to data corruption, adversarial or not), or, importantly, to obtain \emph{differentially private} algorithms~\citep{DworkMNS06}, since the amount of random noise added to ensure data privacy is directly related to this sensitivity. In particular, the unique elements tester and the empirical distance tester each have been used to obtain optimal, or near-sample-optimal, differentially private uniformity testing algorithms~\citep{AcharyaSZ18,AliakbarpourDR18}.
-  \item This low sensitivity is one of the aspects which allows the empirical distance tester to achieve the optimal ``high-probability bound,'' that is, the optimal dependence on the error probability $\errprob$. Indeed, while our bounds for $\errprob=1/3$, combined with the standard amplification from~\cref{lemma:error:proba:amplification}, yield the upper bound
+  \item Both the unique elements tester and the empirical-distance tester have \emph{low sensitivity}, meaning that changing the value of a single one of the $\ns$ samples cannot change the value of the resulting statistic ($Z_2$ or $Z_4$) by much: roughly, $\asymp 1/\ns$ or $\asymp 1/\ab$. While the different renormalization makes it a little tricky to compare, the collision-based tester, for instance, has much worse sensitivity, as changing one sample can have a much larger effect on the statistic (since $Z_1$ is a quadratic function of the sample counts). Having low sensitivity, which is essentially an $\lp[1]$ Lipschitzness guarantee, in turn is very desirable to obtain robust algorithms (\ie robust to data corruption, adversarial or not), or, importantly, to obtain \emph{differentially private} algorithms~\citep{DworkMNS06}, since the amount of random noise added to ensure data privacy is directly related to this sensitivity. In particular, the unique elements tester and the empirical-distance tester each have been used to obtain optimal, or near-sample-optimal, differentially private uniformity testing algorithms~\citep{AcharyaSZ18,AliakbarpourDR18}.
+  \item This low sensitivity is one of the aspects which allows the empirical-distance tester to achieve the optimal ``high-probability bound,'' that is, the optimal dependence on the error probability $\errprob$. Indeed, while our bounds for $\errprob=1/3$, combined with the standard amplification from~\cref{lemma:error:proba:amplification}, yield the upper bound
   \begin{equation}
       \ns(\ab,\dst,\errprob) = \bigO{\frac{\sqrt{\ab}}{\dst^2}\log\frac{1}{\errprob}}
   \end{equation}
@@ -1309,7 +1309,7 @@ In this section, we have covered and analyzed seven different algorithms for uni
     \label{eq:optimal:dep:delta}
   \ns(\ab,\dst,\errprob) = \bigTheta{\frac{1}{\dst^2}\Paren{\sqrt{\ab\log\frac{1}{\errprob}}+\log\frac{1}{\errprob}}}
   \end{equation}
-  which can be much smaller for vanishing $\errprob$, \eg $\errprob = 1/2^{\Omega(\ab)}$. The bound~\cref{eq:optimal:dep:delta} is achieved by the empirical distance tester, but with a different analysis to prove concentration around the mean: namely, instead of a Chebyshev-based (variance) bound, one can use instead the so-called \emph{bounded differences inequality} (McDiarmid's inequality) and its ``Bernstein-type variant'' (bounded variances inequality)~\citep[Chapters~5.4 and 8]{DubhashiP09} to show that the statistic $Z_4$ concentrates very tightly. The low sensitivity of $Z_4$, as it happens, plays a crucial role when applying those bounds.
+  which can be much smaller for vanishing $\errprob$, \eg $\errprob = 1/2^{\Omega(\ab)}$. The bound~\cref{eq:optimal:dep:delta} is achieved by the empirical-distance tester, but with a different analysis to prove concentration around the mean: namely, instead of a Chebyshev-based (variance) bound, one can use instead the so-called \emph{bounded differences inequality} (McDiarmid's inequality) and its ``Bernstein-type variant'' (bounded variances inequality)~\citep[Chapters~5.4 and 8]{DubhashiP09} to show that the statistic $Z_4$ concentrates very tightly. The low sensitivity of $Z_4$, as it happens, plays a crucial role when applying those bounds.
   \item The random binary hashing testing, albeit not sample-optimal, only requires to store a \emph{single} bit of information per sample. (Moreover, this can be generalized to $\numbits$ bits by hashing to $2^\numbits$ elements instead of two, leveraging~\cref{theo:random:dct:hashing}.) This can be very valuable in memory-limited or communication-limited settings (we will get back to this in~\cref{chap:constrained}), or in the case of \emph{local} differential privacy~\citep{KLNRS:11}, where this can be used to obtain a sample-optimal locally private uniformity testing algorithm~\citep{AcharyaCFST21} (as optimally privatizing \emph{one} bit is much easier than a full $\log\ab$-bit sample).
   \item Finally, the $\chi^2$ tester\dots just works. It also nicely generalizes to other problems (identity testing, as we will see in~\cref{sec:identity}; or even, with appropriate modifications, to ``closeness testing'' (two-sample goodness-of-fit) or other related testing tasks. Among other enjoyable properties, its asymptotic distribution (as the number of samples $\ns\to\infty$) can be obtained, letting us (asymptotically) obtain confidence intervals. It also does provide, as the collision-based tester, some amount of tolerance, in the so-called $\chi^2$ divergence; we will see in~\cref{chap:algorithmic:frameworks} how this $\chi^2$-divergence tolerance can be used as a blackbox to obtain testing algorithms for other properties than uniformity.
 \end{itemize}
@@ -1337,6 +1337,8 @@ mity testing.}
 
 \tbc
 
+\cref{ex:nomallet} (and thus the failure of stochastic dominance for the bipartite collision tester) is due to Moritz Schauer, who provided a counterexample to stochastic dominance in this case~\citep{MathSE-schauer}.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exercises}
@@ -1359,7 +1361,7 @@ mity testing.}
   Follow the analysis of~\cref{theo:collision-based} to derive, for the bipartite collisions tester, the guarantee~\cref{eq:uniform:bipartite:firstattempt} from the variance bound~\cref{eq:var:bipartite:collisions}.
 \end{question}
 \begin{question}\label{ex:nomallet}
-  Show that, in contrast to what we did in the empirical distance tester case (\cref{sec:uniformity:empirical}), one cannot invoke stochastic dominance in the analysis of the bipartite collision tester to obtain the wishful variance bound~\cref{eq:var:bipartite:collisions:lowinfty} instead of~\cref{eq:var:bipartite:collisions:infty}. Specifically, show that it fails even for $\ab=2$: if $M\sim\binomial{\nss}{p}$, $N\sim\binomial{\nst}{p}$ and $M'\sim\binomial{\nss}{q}$, $N'\sim\binomial{\nst}{q}$ (all independent) with $1/2\leq q < p \leq 1$, it is \emph{not} true that
+  Show that, in contrast to what we did in the empirical-distance tester case (\cref{sec:uniformity:empirical}), one cannot invoke stochastic dominance in the analysis of the bipartite collision tester to obtain the wishful variance bound~\cref{eq:var:bipartite:collisions:lowinfty} instead of~\cref{eq:var:bipartite:collisions:infty}. Specifically, show that it fails even for $\ab=2$: if $M\sim\binomial{\nss}{p}$, $N\sim\binomial{\nst}{p}$ and $M'\sim\binomial{\nss}{q}$, $N'\sim\binomial{\nst}{q}$ (all independent) with $1/2\leq q < p \leq 1$, it is \emph{not} always true that
   \[
       MN+(\nss-M)(\nst-N) \succeq M'N'+(\nss-M')(\nst-N')
   \]
