@@ -1138,11 +1138,11 @@ where, as before, $\occur_j$ is the number of occurrences of $j$ among the $\nss
 \end{equation}
 which should be roughly (making a few not necessarily warranted approximations) $\expect{\p(S)}\approx \nss\normtwo{\p}^2$. Under the uniform distribution, this is exactly $(1-(1-1/\ab)^{\nss})\approx \nss/\ab$, where the approximation is valid for $\nss\ll \ab$.
 
-Great: we have a new estimator for (more or less) the $\lp[2]$ norm! Now, assuming things went well, as the end of this first stage we have a set $S$ such that $\p(S)$ is approximately either $\nss/\ab$ or $\nss\normtwo{\p}^2\geq \nss(1+\Omega(\dst^2))/\ab$ (we just argued that this is what happens \emph{in expectation}).\footnote{Some more details are required to argue that $\p(S)$ does concentrate enough around its expectation.} So, let's do a second stage! Take the next $\nst \eqdef \ns-\nss$ samples, and count the number of them which fall in $S$: this is allows you to estimate $\p(S)$  up to an additive $\nss\dst^2/\ab$, as long as
+Great: we have a new estimator for (more or less) the $\lp[2]$ norm. Now, assuming things went well, as the end of this first stage we have a set $S$ such that $\p(S)$ is approximately either $\nss/\ab$ or $\nss\normtwo{\p}^2\geq \nss(1+\Omega(\dst^2))/\ab$ (we just argued that this is what happens \emph{in expectation}).\footnote{The tricky part, of course, will be to argue that $\p(S)$ does concentrate enough around its expectation for this to also happen with constant probability.} So, let's do a second stage! Take the next $\nst \eqdef \ns-\nss$ samples, and count the number of them which fall in $S$: this is allows you to estimate $\p(S)$  up to an additive $\nss\dst^2/\ab$, as long as
 \[
       \nst \gg \frac{\ab}{\nss\dst^4}
 \]
-(see~\cref{lemma:bias:coin:test} below). This lets us retrieve the same condition $\nss\nst\gg \ab/\dst^4$ as in the previous section; and, similarly, for $\nss=\ns/2$ this leads to the optimal $\ns \asymp \sqrt{\ab}/\dst^2$! Only drawback: we need $\nss\ll \ab$ for our approximations to be valid~--~indeed, after that, $\expect{\p(S)}$ cannot be approximately $\nss\normtwo{\p}^2$ anymore: the former is at most one, the latter at least $\nss/\ab$. This is, at its core, the same issue as with the ``unique elements'' algorithm from~\cref{sec:uniformity:unique}, and this imposes the condition $\dst \gg 1/\ab^{1/4}$.
+(see~\cref{lemma:bias:coin:test} below). This lets us retrieve the same condition $\nss\nst\gg \ab/\dst^4$ as in the previous section; and, similarly, for $\nss=\nst=\ns/2$ this leads to the optimal $\ns \asymp \sqrt{\ab}/\dst^2$! Only drawback: we need $\nss\ll \ab$ for our approximations to be valid~--~indeed, after that, $\expect{\p(S)}$ cannot be approximately $\nss\normtwo{\p}^2$ anymore: the former is at most one, the latter at least $\nss/\ab$. This is, at its core, the same issue as with the ``unique elements'' algorithm from~\cref{sec:uniformity:unique}, and this imposes the condition $\dst \gg 1/\ab^{1/4}$.
 
 \begin{algorithm}[ht!]
   \begin{algorithmic}[1]
@@ -1325,8 +1325,10 @@ mity testing.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}
 \cite{Ingster86}
-\cite{GoldreichR00}
-\cite{BatuFRSW00}
+
+In the theoretical computer science community, distribution testing was first introduced in an influential paper by~\citet{GoldreichGR98}, which formally defined the broader field of property testing; \citet{GoldreichR00} then specifically considered the question of testing uniformity of an unknown probability distribution (in an~$\lp[2]$ sense), using the collision-based tester to test whether a random walk had (approximately) reached its stationary distribution.
+
+This was, however, only implicitly using uniformity testing as a subroutine in the context of testing some property (expansion) of a graph. The work of \citet{BatuFRSW00} first considers distribution testing for its own sake, 
 \cite{Paninski08}
 \cite{ChanDVV14}
 \cite{AcharyaDK15}
