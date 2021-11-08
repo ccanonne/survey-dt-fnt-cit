@@ -1,10 +1,25 @@
+In this chapter, we take an in-depth look at one of the most natural and ``basic'' properties to test, \emph{uniformity}: 
+\begin{framed}
+Is the unknown distribution \emph{the} uniform distribution $\uniform_\ab$ over the domain $[\ab]$, or does it significantly deviate from being uniform?
+\end{framed}
+Formally, recalling~\cref{def:testing}, we define uniformity testing by letting $\property_\ab \eqdef \{\uniform_\ab\}$ (a singleton), and $\class_\ab=\distribs{\ab}$. Of course, while the uniform distribution is a rather fundamental one, one might instead have a different reference distribution in mind, \eg a particular Binomial distribution, or a Zipf one, or an arbitrary probability distribution provided as a vector of $\ab$ probabilities. This generalization is known (in the computer science community) as \emph{identity testing}, and also goes by the name of \emph{one-sample goodness-of-fit}. While identity testing might seem to be a strictly more general problem than uniformity testing, the two are closely related. Clearly, identity testing is at least as hard as uniformity testing; but it turns out that a converse holds, and that uniformity is also the ``hardest'' case of identity testing, in a very strong sense. Namely, as we will see in~\cref{sec:identity}, any testing algorithm for uniformity implies one for identity testing, with essentially the same sample complexity!\footnote{There is a small print, of course, and some constant factors are lost.}
+
+Before delving into the details of this chapter, two more comments. First, ``uniformity testing'' refers to testing whether the unknown distribution $\p$ is uniform \emph{on the whole, known domain}: the different question of testing whether $\p$ is uniform on its (unknown) \emph{support}, \ie, testing $\property_\ab \eqdef \setOfSuchThat{\uniform_S}{ S \subseteq [\ab]}$ is known as \emph{generalized} uniformity testing~\citep{BatuC17}, and has a strictly higher sample complexity.
+
+Second, the formulation of identity testing crucially assumes that the reference distribution is fully known to the algorithm. One can also consider the task of testing, given samples from two distributions $\p,\q$ (both unknown), whether $\p=\q$ or $\totalvardist{\p}{\q}>\dst$. This question, \emph{closeness testing} (or \emph{two-sample goodness-of-fit}), which we briefly alluded to in~\cref{chap:what}), can be seen to be at least as hard as identity testing: any algorithm for closeness testing can be used to perform identity testing by generating \iid samples from the known reference distribution $\q$.\footnote{This adds a computational overhead, but as far as sample complexity is concerned this is not a problem.} But closeness testing, again, is \emph{strictly} harder than identity testing: while, as we will see, the latter has sample complexity \smash{$\Theta\big({\sqrt{\ab}/\dst^2\big)}$}, the former requires \smash{$\Theta\big({\ab^{2/3}/\dst^{4/3}+\sqrt{\ab}/\dst^2}\big)$} samples~\citep{ChanDVV14}, which is much larger as long as $\dst \gg 1/\ab^{1/4}$.\medskip
+
+
+In the rest of the chapter, the most detailed of this monograph, we will go through an in-depth overview of uniformity and identity testing, with a full derivation of many results. We will start in~\cref{sec:uniformity} by describing and analyzing seven different uniformity testing algorithms, before turning in~\cref{sec:identity} to identity testing. There, we will describe the aforementioned reduction between uniformity and identity testing, which lets us use any of the algorithms from~\cref{sec:uniformity} to solve the more general problem; as well as a testing algorithm to perform identity testing directly, without reducing it to uniformity. The goal of this chapter is not to provide a list of various testing algorithms to the reader, then left to ponder what to do with it; but rather to highlight some general techniques and ideas in the course of their analysis, applicable beyond these specific examples.
+
+%\cnote{In-depth chapter with derivation of many results. Focus on one-sample testing.}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Uniformity testing}
   \label{sec:uniformity}
 %\cnote{Thorough presentation of the many algorithms for uniformity testing, with proofs, and relative advantages of each.}
 
-It is known~\citep{Paninski08} that the sample complexity of uniformity testing with distance parameter $\dst\in(0,1]$ is $\Theta(\sqrt{\ab}/\dst^2)$, which is, for a large range of parameters, significantly smaller than the domain size $\ab$. This means that we can reliably infer interesting properties of the distribution after observing only a negligible fraction of the domain elements! That is quite surprising, and nice. Now, \emph{how do we perform uniformity testing?}  And what should we keep in mind while doing so?
+The sample complexity of uniformity testing with distance parameter $\dst\in(0,1]$ is known to be $\Theta(\sqrt{\ab}/\dst^2)$~\citep{Paninski08}; this is, for a large range of parameters, significantly smaller than the domain size $\ab$, and in particular \emph{much} better than the learning baseline of~\cref{theo:learningbaseline}. This also means that we can reliably infer interesting properties of the distribution after observing only a negligible fraction of the domain elements! That is quite surprising, and nice. Now, \emph{how do we perform uniformity testing?}  And what should we keep in mind while doing so?
 
 
 Although the sample complexity is of course a key aspect, there are several things to consider in a testing algorithm. To name a few:
@@ -1068,7 +1083,7 @@ $
 % \end{theorem}
 We will prove a more general theorem first; before showing how to instantiate it to take advantage of~\cref{lemma:linfty:test}:
 \begin{theorem}
-  \label{theo:bipartite:collision-based}
+  \label{theo:bipartite:collision-based:general}
 The bipartite collision-based tester (\cref{algo:bipartite:collision-based}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/6) = \nss+\nst$ and time complexity $O(\ns)$, provided that $\nss\nst \geq 96\ab/\dst^4$ and $\min(\nss,\nst)\geq 480\min(\ab\norminf{\p}, \sqrt{2\ab})/\dst^2$.
 \end{theorem}
 \begin{proof}
@@ -1321,14 +1336,16 @@ In this section, we have covered and analyzed seven different algorithms for uni
 \cnote{Discuss the instance-optimal setting as well, and the relation to unifor-
 mity testing.}
 \tbc
+
+\begin{itemize}
+\item chi-square tester
+\item testing via $\lp[2]$ (and why it fails, then the DK16 trick; then, relation to chi-square)
+\item $\lp[1]$ reduction (Goldreich)
+\end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}
-\cite{Ingster86}
-
-In the theoretical computer science community, distribution testing was first introduced in an influential paper by~\citet{GoldreichGR98}, which formally defined the broader field of property testing; \citet{GoldreichR00} then specifically considered the question of testing uniformity of an unknown probability distribution (in an~$\lp[2]$ sense), using the collision-based tester to test whether a random walk had (approximately) reached its stationary distribution.
-
-This was, however, only implicitly using uniformity testing as a subroutine in the context of testing some property (expansion) of a graph. The work of \citet{BatuFRSW00} first considers distribution testing for its own sake, 
+\citet{GoldreichR00} 
 \cite{Paninski08}
 \cite{ChanDVV14}
 \cite{AcharyaDK15}

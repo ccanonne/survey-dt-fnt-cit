@@ -24,7 +24,7 @@ We begin with the notion of distance we will be concerned about, the total varia
   \[
     \totalvardist{\p}{\q} = \sup_{S\subseteq \domain_\ab} (\p(S)-\q(S))\,.
   \]
-  Given a subset $\class\subseteq\distribs{\ab}$ of distributions, we further define the distance from $\p\in\distribs{\ab}$ to $\class$ as $\totalvardist{\p}{\class} \eqdef \inf_{\q\in\class} \totalvardist{\p}{\q}$, and will say that $\p$ is \emph{$\dst$-far from $\class$} if $\totalvardist{\p}{\class}\geq \dst$.
+  Given a subset $\class\subseteq\distribs{\ab}$ of distributions, we further define the distance from $\p\in\distribs{\ab}$ to $\class$ as $\totalvardist{\p}{\class} \eqdef \inf_{\q\in\class} \totalvardist{\p}{\q}$, and will say that $\p$ is \emph{$\dst$-far from $\class$} if $\totalvardist{\p}{\class} > \dst$.
 \end{definition}
 One can check that $\dtv$ defines a metric on $\distribs{\ab}$, and takes values in $[0,1]$.\exercise{Check it!} Moreover, the total variation distance exhibits several important properties, some of which will be detailed at length in~\cref{app:distances}; we recall a crucial one below.
 
@@ -53,13 +53,51 @@ Assuming that $\p,\q$ are absolutely continuous with respect to some dominating 
 One last piece of terminology: a \emph{property}\index{property} of distributions is a predicate we are interested in (\eg ``is the probability distribution unimodal?''). By identifying the predicate with the set of objects which satisfy it, we can equivalently view a property of distributions as a \emph{subset} of probability distributions (typically, with some interesting structure). Which is what we will do: throughout, a property is just an arbitrary subset of distributions we are interested in. With this in hand, we are ready to provide a formal definition of what a ``testing algorithm'' is.
 \begin{definition}[Testing algorithm]
   \label{def:testing}
-Let $\property= \bigcup_{\ab=1}^\infty \property_\ab$ and $\class= \bigcup_{\ab=1}^\infty \class_\ab$ be two properties of probability distributions, where $\property_\ab, \class_\ab\subseteq \distribs{\ab}$ for all $\ab$; and $\ns\colon\N\times(0,1]\times(0,1]\to\N$, $\tc\colon\N\times(0,1]\times(0,1]\to\N$ be two functions. A \emph{testing algorithm for \property under $\class$ with sample complexity $\ns$ and time complexity $\tc$} is a (possibly randomised) algorithm $\Algo$ which, on input $\ab\in\N,\dst \in(0,1], \errprob\in(0,1]$, and a multiset $S$ of $\ns(\ab,\dst,\errprob)$ elements of $\domain_\ab$, runs in time at most $\tc(\ab,\dst,\errprob)$ and outputs $\mathbf{b} \in\{\reject,\accept\}$ such that the following holds.
+Let $\property= \bigcup_{\ab=1}^\infty \property_\ab$ and $\class= \bigcup_{\ab=1}^\infty \class_\ab$ be two properties of probability distributions, where $\property_\ab, \class_\ab\subseteq \distribs{\ab}$ for all $\ab$; and $\ns\colon\N\times(0,1]\times(0,1]\to\N$, $\tc\colon\N\times(0,1]\times(0,1]\to\N$ be two functions. A \emph{testing algorithm for \property under $\class$ with sample complexity $\ns$ and time complexity $\tc$} is a (possibly randomized) algorithm $\Algo$ which, on input $\ab\in\N,\dst \in(0,1], \errprob\in(0,1]$, and a multiset $S$ of $\ns(\ab,\dst,\errprob)$ elements of $\domain_\ab$, runs in time at most $\tc(\ab,\dst,\errprob)$ and outputs $\mathbf{b} \in\{\reject,\accept\}$ such that the following holds.
 \begin{itemize}
   \item If $S$ is \iid from some $\p\in\property_\ab$, then $\probaDistrOf{S,\Algo}{\mathbf{b}=\accept} \geq 1-\errprob$;
-  \item If $S$ is \iid from some $\p\in\class_\ab$ such that $\totalvardist{\p}{\property_\ab} \geq \dst$, then $\probaDistrOf{S,\Algo}{\mathbf{b}=\reject} \geq 1-\errprob$,
+  \item If $S$ is \iid from some $\p\in\class_\ab$ such that $\totalvardist{\p}{\property_\ab} > \dst$, then $\probaDistrOf{S,\Algo}{\mathbf{b}=\reject} \geq 1-\errprob$,
 \end{itemize}
 where in both cases the probability is over the draw of the \iid sample $S$ from the (unknown) $\p$, and the internal randomness of $\Algo$.
 \end{definition}
+\noindent The \emph{sample complexity of testing \property under $\class$} is then the minimum sample complexity $\ns(\ab,\dst,\errprob)$ achievable by a testing algorithm.\smallskip
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[htbp]\centering
+
+\tikzset {_3eubqr20l/.code = {\pgfsetadditionalshadetransform{ \pgftransformshift{\pgfpoint{0 bp } { 0 bp }  }  \pgftransformrotate{0 }  \pgftransformscale{2.64 }  }}}
+\pgfdeclarehorizontalshading{_y5uoy9rpz}{150bp}{rgb(0bp)=(0.99,0.97,0.93);
+rgb(54.285714285714285bp)=(0.99,0.97,0.93);
+rgb(61.96428571428571bp)=(0.98,0.95,0.95);
+rgb(100bp)=(0.98,0.95,0.95)}
+\tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
+
+\begin{tikzpicture}[x=0.75pt,y=0.75pt,yscale=-1.3,xscale=1.3]
+%uncomment if require: \path (0,300); %set diagram left start at 0, and has height of 300
+
+%Shape: Polygon Curved [id:ds24835565753561872] 
+\draw  [draw opacity=0.05][shading=_y5uoy9rpz,_3eubqr20l] (228.87,88.88) .. controls (266.87,64.88) and (266.87,111.88) .. (282.87,123.88) .. controls (298.87,135.88) and (360.87,96.88) .. (335.87,141.88) .. controls (310.87,186.88) and (389.87,249.88) .. (305.87,226.88) .. controls (221.87,203.88) and (251.87,247.88) .. (208.87,236.88) .. controls (165.87,225.88) and (201.87,193.88) .. (183.87,172.88) .. controls (165.87,151.88) and (157.87,118.88) .. (191.87,123.88) .. controls (225.87,128.88) and (190.87,112.88) .. (228.87,88.88) -- cycle ;
+%Shape: Circle [id:dp2977666721327956] 
+\draw  [draw opacity=0][fill={rgb, 255:red, 253; green, 170; blue, 30 }  ,fill opacity=0.70 ][general shadow={fill={rgb, 255:red, 245; green, 166; blue, 35 },shadow xshift=0pt,shadow yshift=0pt, opacity=0 }] (242,165.5) .. controls (248,147) and (253,132) .. (271.5,132) .. controls (290,132) and (305,147) .. (308,165.5) .. controls (310,184) and (290,199) .. (271.5,199) .. controls (253,199) and (238,184) .. (242,165.5) -- cycle ;
+%Shape: Circle [id:dp2977666721327956] 
+\draw  [draw opacity=0.05, scale=0.8,xshift=51pt,yshift=31pt][fill={rgb, 255:red, 253; green, 170; blue, 30 }  ,fill opacity=0.99 ][general shadow={fill={rgb, 255:red, 245; green, 166; blue, 35 },shadow xshift=0pt,shadow yshift=0pt, opacity=0 }] (242,165.5) .. controls (248,147) and (253,132) .. (271.5,132) .. controls (290,132) and (305,147) .. (308,165.5) .. controls (310,184) and (290,199) .. (271.5,199) .. controls (253,199) and (238,184) .. (242,165.5) -- cycle ;
+%Shape: Ellipse [id:dp5805520465941827] 
+%\draw  [draw opacity=0][fill={rgb, 255:red, 233; green, 152; blue, 19 }  ,fill opacity=1 ] (265.43,186.22) .. controls (261.59,181.1) and (265.3,171.81) .. (273.73,165.48) .. controls (282.16,159.14) and (292.12,158.15) .. (295.97,163.27) .. controls (299.81,168.39) and (296.1,177.67) .. (287.67,184.01) .. controls (279.23,190.35) and (269.28,191.34) .. (265.43,186.22) -- cycle ;
+%Shape: Block Arc [id:dp4643699266244976] 
+%\draw  [draw opacity=0.0][fill={rgb, 255:red, 255; green, 255; blue, 255 }  ,fill opacity=1 ] (181.64,151.16) .. controls (181.68,147.43) and (182.42,143.85) .. (183.93,140.65) .. controls (186.88,134.44) and (192.19,130.86) .. (198.43,130.09) -- (201.36,139.03) .. controls (196.68,139.19) and (192.72,141.5) .. (190.65,145.86) .. controls (189.57,148.15) and (189.12,150.76) .. (189.23,153.51) -- cycle ;
+%Shape: Block Arc [id:dp28641962733560566] 
+%\draw  [draw opacity=0.0][fill={rgb, 255:red, 255; green, 255; blue, 255 }  ,fill opacity=1 ] (209.55,189.06) .. controls (207.11,187.92) and (204.68,186.55) .. (202.32,184.94) .. controls (197.19,181.46) and (192.99,177.29) .. (189.87,172.88) -- (197.79,170.62) .. controls (200.18,173.44) and (203.18,176.15) .. (206.68,178.53) .. controls (208.26,179.61) and (209.87,180.57) .. (211.49,181.4) -- cycle ;
+\node at (160,100) (nodeclass) {$\distribs{\ab}$};
+\node at (240,120) (nodeclass) {$\class_\ab$};
+\node at (245,175) (nodeclass) {\scriptsize$\dst$};
+\node at (275,165) (nodeproperty) {$\property_\ab$};
+\end{tikzpicture}
+\caption{An example of property to test. Here, $\property_\ab\subseteq \class_\ab\subseteq \distribs{\ab}$, where the property $\property_\ab$ is depicted as the inner orange area (``yolk''), and the ``egg white'' is the  area of rejection, \ie the subset of $\class_\ab$ at total variation distance at least $\dst$ from $\property_\ab$.\label{fig:propertytesting}}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Adapted from https://tex.stackexchange.com/questions/74168/how-can-i-draw-an-egg-using-tikz/598086#598086
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 A few remarks are in order. First, in most of our applications we will take $\class_\ab=\distribs{\ab}$, so that the unknown distribution $\p$ is \emph{a priori} arbitrary, and the goal is to check whether it belongs to the subset (property) of interest $\property_\ab$. However, this need not always be the case, and we may want to choose $\class_\ab$ differently to perform hypothesis testing \emph{under structural assumptions}: for instance, to test whether an unknown unimodal distribution is actually Binomial (in this case, $\property_\ab \subsetneq \class_\ab\subsetneq \distribs{\ab}$), or if say a log-concave distribution is monotone (in which case there is no inclusion relation between $\property_\ab$ and $\class_\ab$, and both are strict subsets of $\distribs{\ab}$).
 
 Another important point is that, while our main focus will be on \emph{discrete} distributions,~\cref{def:testing} allows for continuous distributions as well. Finally, the above definition is quite flexible, and can be seen to allow for testing \emph{multiple} distributions: for instance, taking $\domain_\ab=[\ab]\times[\ab]$, $\class_\ab \eqdef \setOfSuchThat{ \p\in\distribs{\ab} }{ \p=\p_1\otimes\p_2 }$ (product distributions), and $\property_\ab \eqdef \setOfSuchThat{\p_1\otimes\p_2 \in \class_\ab}{\p_1=\p_2}$, we obtain the question of two-sample testing (a.k.a.\ closeness testing), which asks to test whether two unknown distributions over $[\ab]$ are equal, or far from each other.
@@ -79,24 +117,48 @@ where we used our setting of $m$ in the last inequality.
 Importantly, this logarithmic dependence is not always the right one: as we will see in~\cref{chap:identity}, there exist natural problems for which the right dependence on the error probability only scales as $\sqrt{\log(1/\errprob)}$.
 
 \paragraph{The learning baseline.}
-\tbc
+Before setting out to design specific algorithms for various testing tasks and analyze their performance, it is good to have some sort of baseline to compare the result to. The most natural one is the \emph{testing-by-learning} approach, which can essentially be summarized as follows: the sample complexity of testing $\property= \bigcup_{\ab=1}^\infty \property_\ab$ under $\class= \bigcup_{\ab=1}^\infty \class_\ab$ is at most the sample complexity of, given $\ab$, \emph{learning} an arbitrary distribution from $\property_\ab\cup\class_\ab$. More specifically, we have the following:
+\begin{lemma}[Testing by Learning]
+  Fix any $\property= \bigcup_{\ab=1}^\infty \property_\ab$ and $\class= \bigcup_{\ab=1}^\infty \class_\ab$, and let $\ns_{\mathcal{L}}(\ab,\dst,\errprob)$ denote the sample complexity of learning an arbitrary probability distribution from $\property_\ab\cup\class_\ab\subseteq \distribs{\ab}$ to total variation $\dst$ with error probability at most $\errprob$. Then, the sample complexity $\ns$ of testing \property under $\class$ satisfies
+  \[
+      \ns(\ab,\dst,\errprob) \leq \ns_{\mathcal{L}}(\ab,\tfrac{\dst}{2},\errprob)\,.
+  \]
+  This is not necessarily achieved by a computationally efficient tester.
+\end{lemma}
+\begin{proof}
+Fix a learning algorithm $\Algo$ for $\property_\ab\cup\class_\ab$ with sample complexity $\ns\eqdef \ns_{\mathcal{L}}(\ab,\tfrac{\dst}{2},\errprob)$. By running it on $\ns$ \iid samples from $\p$ (which we are promised either belongs to $\property_\ab$ or $\class_\ab$), we obtain a distribution $\hat{\p}$ such that $\totalvardist{\hat{\p}}{\p} \leq \dst/2$ with probability at least $1-\delta$. Assuming this is the case, then (i)~if $\p\in\property_\ab$, then of course $\totalvardist{\hat{\p}}{\property} \leq \dst/2$; while (ii)~if $\totalvardist{\p}{\property} > \dst$, by the triangle inequality (since total variation distance is a metric) we must have $\totalvardist{\hat{\p}}{\property} > \dst/2$. 
+
+But we have an explicit description of $\hat{\p}$ in our hands, so we can check which of the two cases holds -- this may not be computationally efficient, but does not require any additional sample from $\p$. Thus, we have a \emph{bona fide} testing algorithm for \property under $\class$.
+\end{proof}
+Importantly, this baseline is with respect to the sample complexity of learning distributions from $\property_\ab\cup\class_\ab$, \emph{not} just $\property_\ab$: the latter is in general much larger! For instance, if $\property_\ab$ is a singleton but $\class_\ab=\distribs{\ab}$ (\eg as in identity testing, which we shall see in~\cref{chap:identity}) then learning $\property_\ab$ has sample complexity $0$, but learning $\property_\ab\cup\class_\ab=\distribs{\ab}$ has sample complexity $\Omega(\ab)$. This leads us to our baseline: since $\property_\ab\cup\class_\ab\subseteq \distribs{\ab}$, the sample complexity of \emph{any} distribution testing problem is at most the sample complexity of learning an arbitrary distribution over a known domain of the same size, which we record below:
+\begin{theorem}[Learning baseline]
+  \label{theo:learningbaseline}
+  The sample complexity of learning an arbitrary probability distribution from $\distribs{\ab}$ to total variation $\dst$ with error probability at most $\errprob$ is
+  \[
+      \ns_{\mathcal{L}}(\ab,\dst,\errprob) = \bigTheta{\frac{\ab+\log(1/\errprob)}{\dst^2}}\,,
+  \]
+  giving an upper bound on the sample complexity of any testing problem.
+\end{theorem}
+The proof can be found in various places; \eg~\citet{KOPS:15,Canonne20:learning:short}. This testing-by-learning baseline, which is linear in the domain size $\ab$, motivates the name commonly given to testing algorithms which achieve significantly better sample complexity: \emph{sublinear algorithms}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Why total variation distance?}
 
 The standard formulation of distribution testing, as stated in~\cref{def:testing}, is tied to a specific metric between probability distribution: the total variation distance (\cref{def:tv}). It is natural to wonder of that choice is arbitrary, and, if not, what motivates it.
-
-\tbc
 \begin{itemize}
-  \item Very stringent -- strong guarantee
-  \item Well-behaved: actual metric (triangle inequality), bounded
-  \item Data processing inequality (\cref{fact:dpi}): robust to postprocessing
-  \item Relation to hypothesis testing
+  \item Total variation distance provides a \emph{very strong guarantee}, and for instance is the most stringent of all $\lp[p]$ norms. This has practical consequences: if a source of data passes the test, then it will by nearly ``as good as if it had the desired property'' as far as \emph{any} algorithm is concerned. 
+  \item It is \emph{well-behaved}: total variation distance defines a proper metric, and thus satisfies for instance the triangle inequality (which cannot be said about, for instance, Kullback--Leibler divergence). It is also nicely bounded, and will not take infinite values due to pathological reasons.
+  \item It satisfies the \emph{data processing inequality} (\cref{fact:dpi}), which means it is robust to preprocessing. If data comes from two sources close in total variation distance, then post-processing this data cannot make their distribution statistically further apart. This is not the case for, among others, the $\lp[2]$ metric.
+  \item Its relation to hypothesis testing: total variation distance has a natural and precise interpretation in terms of \emph{distinguishability}. This is formalized in~\cref{lemma:pearsonneyman}, and makes total variation distance the ``right'' notion of distance in applications such as cryptography, and when arguing about indistinguishability of data sources.
+  \item Its connection to other distance measures. Total variation distance enjoys various inequalities relating it to other distance measures such as Kullback--Leibler divergence, $\lp[p]$ metrics, Hellinger distance, Kolmogorov distance, and Wasserstein (Earthmover) metric. Some of those are elaborated upon in~\cref{app:distances}.
 \end{itemize}
 
-% Relation to hypothesis testing
+Of course, total variation distance also has its drawbacks: it is sometimes too stringent, especially when considering distributions over continuous domains: in that case, absent further assumptions on the unknown continuous density, the testing problem becomes trivially impossible~\citep{LeCam73}. It also does not ``tensorize'' well (as opposed to, say, Hellinger distance or Kullback--Leibler divergence), meaning that the total variation distance between product measures does not have a nice form with respect to the total variation distances between individual marginals. And indeed, there are pros and cons to each choice; although in this case the above should convince you that the pros vastly outnumber the cons.
+
+\paragraph{Relation to hypothesis testing.} As aforementioned, there is a natural connection between total variation distance and hypothesis testing, which we recall below. 
 \begin{lemma}[Pearson--Neyman]
+  \label{lemma:pearsonneyman}
   Any (possibly randomized) statistical test which distinguishes between $\p_0$ and $\p_1$ from a single sample must have Type~I (false positive) and Type-II (false negative) errors satisfying
   \[
       \text{Type~I} + \text{Type~II} \geq 1- \totalvardist{\p_0}{\p_1}
@@ -123,7 +185,6 @@ where we denote by $R$ the internal randomness of $\Algo$. Since, for any fixed 
 \end{align*}
 as claimed. Finally, it is immediate from the definition of total variation distance that the proposed test satisfies $\text{Type~I} + \text{Type~II} = 1 + \p_0(S^\ast) - \p_1(S^\ast) = 1- \totalvardist{\p_0}{\p_1}$.
 \end{proof}
-\tbc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{The road not taken: tolerant testing}
@@ -131,7 +192,7 @@ as claimed. Finally, it is immediate from the definition of total variation dist
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}
-Hypothesis testing has a long and rich history in Statistics, starting with the work of~\citet{Pearson1900} introducing the $\chi^2$ test, and leading to substantial advances over the next century. While it is difficult and slightly dangerous to reduce twelve decades of intense research and study in a few sentences,\footnote{Which is exactly what the following paragraph will set out to do regardless.} standard approaches in Statistics share a few common features. First, they are \emph{asymptotic} in nature (as opposite to focusing on finite-sample guarantees), establishing and studying the limiting distribution of a given test as the sample size goes to infinity. This enables one to compute confidence intervals, and obtain a swath of information from the limiting distribution; but by itself provides little insight regarding the intermediate, finite-sample regime. Second, they tend to focus on the so-called Type~I error (significance of the test), \ie the probability to mistakenly reject the null hypothesis $\mathcal{H}_0$, and only after fixing this significance level set out to minimize the Type~II error (that is, maximize the \emph{power} of the test), which is the probability to mistakenly accept the alternative hypothesis $\mathcal{H}_1$. This is, again, an oversimplification; the reader should refer to, \eg~\citet{BalakrishnanW18} for a complementary and more detailed view. Nonetheless, these features are two of the most salient points of contrast with the very recent and related take on hypothesis testing from the theoretical computer science community, \emph{distribution testing}, which perhapsshares most similarity with the work of Ingster~\citep{Ingster86,Ingster97}.
+Hypothesis testing has a long and rich history in Statistics, starting with the work of~\citet{Pearson1900} introducing the $\chi^2$ test, and leading to substantial advances over the next century. While it is difficult and slightly dangerous to reduce twelve decades of intense research and study in a few sentences,\footnote{Which is exactly what the following paragraph will set out to do regardless.} standard approaches in Statistics share a few common features. First, they are \emph{asymptotic} in nature (as opposite to focusing on finite-sample guarantees), establishing and studying the limiting distribution of a given test as the sample size goes to infinity. This enables one to compute confidence intervals, and obtain a swath of information from the limiting distribution; but by itself provides little insight regarding the intermediate, finite-sample regime. Second, they tend to focus on the so-called Type~I error (significance of the test), \ie the probability to mistakenly reject the null hypothesis $\mathcal{H}_0$, and only after fixing this significance level set out to minimize the Type~II error (that is, maximize the \emph{power} of the test), which is the probability to mistakenly accept the alternative hypothesis $\mathcal{H}_1$. This is, again, an oversimplification; the reader should refer to, \eg~\citet{BalakrishnanW18} for a complementary and more detailed view. Nonetheless, these features are two of the most salient points of contrast with the very recent and related take on hypothesis testing from the theoretical computer science community, \emph{distribution testing}, which perhaps shares most similarity with the work of Ingster~\citep{Ingster86,Ingster97}.
 
 Distribution testing was first introduced in an influential paper by~\citet{GoldreichGR98}, which formally defined the broader field of property testing; \citet{GoldreichR00} then specifically considered the question of testing uniformity of an unknown probability distribution (in an~$\lp[2]$ sense), using the collision-based tester to test whether a random walk had (approximately) reached its stationary distribution.
 

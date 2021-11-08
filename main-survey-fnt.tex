@@ -2,7 +2,7 @@
 %
 %
 %JOURNAL CODE  SEE DOCUMENTATION
-\documentclass[biber]{nowfnt} % creates the journal version, needs biber version
+\documentclass[biber,draft]{nowfnt} % creates the journal version, needs biber version
 %wrapper for book and ebook are created automatically.
 \usepackage{imakeidx}
 \usepackage[utf8]{inputenc}
@@ -11,13 +11,14 @@
 \def\withnotes{1}
 \usepackage{ccanonne}
 
+\usetikzlibrary{shadows}
 \usepackage{framed}
 \usepackage{tabularx}
 
 %%%%%%%%%%%%%%%%% Exercises %%%%%%%%%%%%%%%%%
 \newtheorem{question}{Exercise}[chapter]
 
-\newcommand{\exinline}[1]{(\refstepcounter{question}Exercise~\thequestion\label{#1})}
+%\newcommand{\exinline}[1]{(\refstepcounter{question}Exercise~\thequestion\label{#1})}
 
 \crefname{question}{Exercise}{Exercises}
 \Crefname{question}{Exercise}{Exercises}
@@ -106,6 +107,7 @@ to highlight the unifying techniques.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{What is distribution testing?}
+  \label{chap:what}
 \input{chap-what}
 
 
@@ -113,9 +115,6 @@ to highlight the unifying techniques.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Testing goodness-of-fit of univariate distributions}
   \label{chap:identity}
-
-\cnote{In-depth chapter with derivation of many results. Focus on one-sample
-testing.}
 \input{chap-identity}
 
 
@@ -213,6 +212,7 @@ measurements). Talk about adaptive schemes?}
 
 \chapter{Poissonization}
   \label{app:poissonization}
+\tbc
 
 %BACKMATTER SEE DOCUMENTATION
 \backmatter  % references, restarts sample
