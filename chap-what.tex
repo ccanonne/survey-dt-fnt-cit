@@ -92,8 +92,9 @@ rgb(100bp)=(0.98,0.95,0.95)}
 \node at (245,175) (nodeclass) {\scriptsize$\dst$};
 \node at (275,165) (nodeproperty) {$\property_\ab$};
 \end{tikzpicture}
-\caption{An example of property to test. Here, $\property_\ab\subseteq \class_\ab\subseteq \distribs{\ab}$, where the property $\property_\ab$ is depicted as the inner orange area (``yolk''), and the ``egg white'' is the  area of rejection, \ie the subset of $\class_\ab$ at total variation distance at least $\dst$ from $\property_\ab$.\label{fig:propertytesting}}
+\caption[An example of property to test. Here, $\property_\ab\subseteq \class_\ab\subseteq \distribs{\ab}$, where the property $\property_\ab$ is depicted as the inner orange area (``yolk''), and the ``egg white'' is the  area of rejection, \ie the subset of $\class_\ab$ at total variation distance at least $\dst$ from $\property_\ab$.]{An example of property to test. Here, $\property_\ab\subseteq \class_\ab\subseteq \distribs{\ab}$, where the property $\property_\ab$ is depicted as the inner orange area (``yolk''), and the ``egg white'' is the  area of rejection, \ie the subset of $\class_\ab$ at total variation distance at least $\dst$ from $\property_\ab$.\label{fig:propertytesting}\footnotemark}
 \end{figure}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Adapted from https://tex.stackexchange.com/questions/74168/how-can-i-draw-an-egg-using-tikz/598086#598086
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -101,7 +102,9 @@ rgb(100bp)=(0.98,0.95,0.95)}
 A few remarks are in order. First, in most of our applications we will take $\class_\ab=\distribs{\ab}$, so that the unknown distribution $\p$ is \emph{a priori} arbitrary, and the goal is to check whether it belongs to the subset (property) of interest $\property_\ab$. However, this need not always be the case, and we may want to choose $\class_\ab$ differently to perform hypothesis testing \emph{under structural assumptions}: for instance, to test whether an unknown unimodal distribution is actually Binomial (in this case, $\property_\ab \subsetneq \class_\ab\subsetneq \distribs{\ab}$), or if say a log-concave distribution is monotone (in which case there is no inclusion relation between $\property_\ab$ and $\class_\ab$, and both are strict subsets of $\distribs{\ab}$).
 
 Another important point is that, while our main focus will be on \emph{discrete} distributions,~\cref{def:testing} allows for continuous distributions as well. Finally, the above definition is quite flexible, and can be seen to allow for testing \emph{multiple} distributions: for instance, taking $\domain_\ab=[\ab]\times[\ab]$, $\class_\ab \eqdef \setOfSuchThat{ \p\in\distribs{\ab} }{ \p=\p_1\otimes\p_2 }$ (product distributions), and $\property_\ab \eqdef \setOfSuchThat{\p_1\otimes\p_2 \in \class_\ab}{\p_1=\p_2}$, we obtain the question of two-sample testing (a.k.a.\ closeness testing), which asks to test whether two unknown distributions over $[\ab]$ are equal, or far from each other.
-
+%%%%%%%%%%%%
+\footnotetext{TikZ code for \cref{fig:propertytesting} adapted from~\url{https://tex.stackexchange.com/a/598086/31516}.}
+%%%%%%%%%%%%
 \paragraph{Dependence on the error probability $\errprob$.} Our definition of testing algorithm leaves the error probability $\errprob$ as a free parameter; however, it is quite common in the distribution testing literature to set it as some arbitrary constant smaller than $1/2$ (usually $1/3$). Indeed, by a standard argument,\index{probability amplification} an error probability $1/3$ can be driven down to arbitrary $\errprob$ at the price of a $\bigO{\log(1/\errprob)}$ factor in the sample complexity. 
 \begin{lemma}[Error probability amplification]
   \label{lemma:error:proba:amplification}
@@ -188,7 +191,11 @@ as claimed. Finally, it is immediate from the definition of total variation dist
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{The road not taken: tolerant testing}
-\tbc
+In~\cref{def:testing} and throughout this survey, we focus on the standard formulation version of testing, where the unknown distribution $\p$ either \emph{belongs} to the property $\cP_\ab$ or is far from it. A natural generalization of this, allowing for some ``tolerance'' to noise or misspecification in the former case, would be to ask to distinguish $\p$ \emph{close} to $\cP_\ab$ from $\p$ far from it. This is called \emph{tolerant testing}~\cite{ParnasRR06}, and is formalized by introducing two parameters $0\leq \dst' < \dst \leq 1$, and relaxing the first item of~\cref{def:testing} to 
+\begin{quote}
+If $S$ is \iid from some $\p\in\distribs{\ab}$ such that $\totalvardist{\p}{\property_\ab} \leq \dst'$, then $\probaDistrOf{S,\Algo}{\mathbf{b}=\accept} \geq 1-\errprob$;
+\end{quote}
+(Note then that our regular, ``non-tolerant'' testing corresponds to taking $\dst'=0$.) The tolerant testing task, sometimes called in Statistics testing with an \emph{imprecise null}, typically requires a much higher sample complexity than the non-tolerant one~\citep{VV:11:stoc}, and both algorithms and lower bounds are obtained via significantly different techniques. For this reason, we will not here discuss tolerant testing in much, or indeed any detail: the interested reader is referred to, \eg~\citet{WuY20} for a primer on some of those techniques, and to~\citet{CanonneJKL21} and references within for an overview of results on tolerant goodness-of-fit testing.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}

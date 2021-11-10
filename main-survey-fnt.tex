@@ -15,6 +15,15 @@
 \usepackage{framed}
 \usepackage{tabularx}
 
+% Footnote without marker
+\newcommand\extrafootertext[1]{%
+    \bgroup
+    \renewcommand\thefootnote{\fnsymbol{footnote}}%
+    \renewcommand\thempfootnote{\fnsymbol{mpfootnote}}%
+    \footnotetext[0]{#1}%
+    \egroup
+}
+
 %%%%%%%%%%%%%%%%% Exercises %%%%%%%%%%%%%%%%%
 \newtheorem{question}{Exercise}[chapter]
 
