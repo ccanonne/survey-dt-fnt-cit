@@ -1354,6 +1354,9 @@ mity testing.}
 \cite{HuangM13}
 \cite{AcharyaCT19b,AcharyaCHST20,AminJM20}
 
+
+The case of uniformity (or, more broadly, identity testing) for \emph{continuous} densities has been considered by Ingster (see~\citet{Ingster97}, and references within), under smoothness assumptions on the unknown density. As mentioned in~\cref{chap:what}, such assumptions are necessary to obtain non-trivial bounds: as an example, for Lipschitz densities over $[0,1]$ (corresponding to the Sobolev space $W^{1,\infty})$, Ingster's results establish a tight sample complexity of $\bigTheta{1/\dst^{5/2}}$, attained by a $\chi^2$ test. He further showed that in the adaptive setting (as discussed on~p.\pageref{chap:what:adaptive}), the sample complexity scales as $\bigTheta{\log\log(1/(\dst(\p)\lor \dst))/(\dst(\p)\lor \dst)^{5/2}}$.
+
 \tbc
 
 \cref{ex:nomallet} (and thus the failure of stochastic dominance for the bipartite collision tester) is due to Moritz Schauer, who provided a counterexample to stochastic dominance in this case~\citep{MathSE-schauer}.
@@ -1389,15 +1392,31 @@ mity testing.}
 \begin{question}\label{ex:identity:averaging:stochastic} 
     It is known that $x\preceq y$ if, and only if, $x=Ay$ for some doubly stochastic matrix $A$~\citep[Theorem~2.1]{Arnold87}. Check that the averaging from~\cref{lemma:distance:uniformity:averaging} indeed corresponds to multiplying the pmf $\p$ (seen as a vector) by such a matrix.
 \end{question}
-\begin{question}\label{ex:linftycheck}
+\begin{question}[$\star$]\label{ex:linftycheck}
   Generalize~\cref{lemma:linfty:test} to relax the condition $\nsu \leq \ab^{2/3}$ to $\nsu \leq \ab^{(s-1)/s}$, for any fixed (constant) integer $s\geq 3$, by considering $s$-collisions instead of $3$-collisions in~\cref{algo:linfty}. How does the $\lp[\infty]$ guarantee bound in (ii) change with $s$?
 \end{question}
-\begin{question}
+\begin{question}[$\star$]
   Recall that our $\chi^2$-based statistic (\cref{eq:def:z3}) was analyzed under the Poissonized sampling model, which led us to define it with a $-\occur_i$ term in the numerator. We will show that this term is necessary: that is, under the Poissonization assumption, consider the ``simpler'' statistic
   \[
       Z'_3 \eqdef \sum_{i=1}^\ab \frac{(\occur_i-\ns/\ab)^2}{\ns/\ab}\,.
   \]
   Show that its expectation is $\ns\ab\normtwo{\p-\uniform_\ab}^2 +\ab$ (so the expectation \emph{gap} remains the same), but that the variance now contains an extra term $\frac{\ab^2}{\ns}$. What sample complexity does this yield?
+\end{question}
+\begin{question}[$\star$]\label{ex:unif:adaptive}
+Combine the doubling search technique discussed in~\cref{chap:what:adaptive} with the sample complexity of uniformity testing given in~\cref{eq:optimal:dep:delta} to prove the following. There is an adaptive uniformity testing algorithm which, on input $\ab$ and $\dst\in(0,1]$, and access to samples from an unknown distribution $\p\in\distribs{\ab}$:
+\begin{itemize}
+  \item correctly distinguishes between (1)~$\p=\uniform_\ab$ and (2)~$\dst(\p)\eqdef \totalvardist{\p}{\uniform_\ab} > \dst$, with probability at least $2/3$;
+  \item always takes at most 
+    \[
+      \bigO{\frac{1}{\dst^2}\Paren{\sqrt{\ab \log \log \frac{1}{\dst} } + \log \log \frac{1}{\dst} }}
+    \] samples; but also
+  \item if $\dst(\p) > \dst$, takes at most
+    \[
+      \bigO{\frac{1}{\dst(\p)^2}\Paren{\sqrt{\ab \log \log \frac{1}{\dst(\p)} } + \log \log \frac{1}{\dst(\p)} }}
+    \] samples, with probability at least $2/3$; and, finally,
+  \item show that this constant-probability bound on the number of samples also holds \emph{in expectation.}
+\end{itemize}
+That is, in the ``far'' case this algorithm never does much worse (up to a $\log\log$ factor) than an ideal algorithm provided with the exact value $\dst(\p)$ and asked to distinguish between $\p=\uniform_\ab$ and $\totalvardist{\p}{\uniform_\ab} = \dst(\p)$.
 \end{question}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

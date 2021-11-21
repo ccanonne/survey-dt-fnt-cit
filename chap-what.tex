@@ -13,7 +13,7 @@ Adopting a Computer Science viewpoint, we will also assume that the ``size'' of 
 \paragraph{A note.} For simplicity, throughout this survey we will sweep under the rug many measure-theoretic subtleties, and assume probability distributions, probability density functions (pdf), and probability mass functions (pmf) exist whenever required, and are suitably well-behaved. We will also typically identify a probability distribution with its pdf or pmf, and by a slight abuse of notation use $\p$ indifferently for the distribution itself and its pdf. Most, if not all, of those subtleties can be handled by inserting the words ``Radon--Nikodym,'' ``measurable,'' and ``counting measure'' in suitable places and order.
 
 \section{Formulation, and relation to Hypothesis Testing}
-
+\label{sec:formulation}
 
 In what follows, $\ab\in\N$ will be used to parametrize the domain of the probability distributions: namely, $\distribs{\ab}$ will denote the set of probability distributions over a (known) domain $\domain_\ab$.
 
@@ -143,6 +143,22 @@ Importantly, this baseline is with respect to the sample complexity of learning 
   giving an upper bound on the sample complexity of any testing problem.
 \end{theorem}
 The proof can be found in various places; \eg~\citet{KOPS:15,Canonne20:learning:short}. This testing-by-learning baseline, which is linear in the domain size $\ab$, motivates the name commonly given to testing algorithms which achieve significantly better sample complexity: \emph{sublinear algorithms}.
+
+\paragraph{Worst-case distance parameter $\dst$.} \label{chap:what:adaptive}
+As defined, a testing algorithm must reject all distributions which are at distance greater than $\dst$ from the property, where $\dst$ is provided as an input parameter. In particular, the requirement is oblivious to the \emph{true} distance $\dst(\p) \eqdef \totalvardist{\p}{\property_\ab} > \dst$ of the unknown distribution $\p$ to the property, and the sample complexity is just expressed as a function of the ``worst-case'' $\dst$. Instead of this, one may want an \emph{adaptive} algorithm which only takes the number of samples ``needed'' to reject, as a function of $\dst(\p)$: after all, in cases where $\dst(\p) \gg \dst$, one may reject after taking much fewer samples.
+
+As it turns out, our focus on ``worst-case $\dst$'' readily implies this adaptive setting, via the use of a \emph{doubling search}. The idea is quite simple: given a testing algorithm $\Algo$, we create an adaptive testing algorithm $\Algo'$ by repeatedly trying to guess the true distance $\dst(\p)$, starting at $\dst_0=1$ and halving our current guess $\dst_j$ at every stage until we reach $\dst_L = \dst$, and calling $\Algo$ for every guess, with parameters $\ab$, $\dst_j$, and a suitable probability of failure $\errprob_j$ at stage $j$. If any of these (at most $L\eqdef \clg{\log(1/\dst)}$) calls leads to a rejection, $\Algo'$ outputs \reject; otherwise, it outputs $\accept$. The key is to choose $\errprob_j$ suitably so that (1) by a union bound all invocations of $\Algo$ are correct with probability at least $1-\errprob$, but (2)~the union bound does not cost too much in terms of sample complexity. A standard way to do so is to set $\errprob_j \eqdef \frac{\errprob}{2(j+1)^2}$ (though many other choices of convergent series would do), so that $\sum_{j=0}^\infty \errprob_j \leq \errprob$.
+
+The resulting sample complexity will then be, in the case $\dst(\p) > \dst$,
+\[
+    \sum_{j=0}^{\clg{\log(1/\dst(\p))}} \ns(\ab, \dst_j, \errprob_j)
+    = \sum_{j=0}^{\clg{\log(1/\dst(\p))}} \ns\Paren{\ab, 2^{-j}, \frac{\errprob}{2(j+1)^2}}\,,
+\]
+where $\ns(\cdot,\cdot,\cdot)$ denotes the sample complexity of $\Algo$. Under very mild conditions on $\ns$, this will be of the order $\ns\Paren{\ab, \dst(\p), \frac{\errprob}{\log(1/\dst(\p))}}$, and recalling that the dependence on the error probability is at worst logarithmic, this means that adapting to the true value of $\dst(\p)$ incurs a cost at most doubly logarithmic in $\dst(\p)$. Of course, when $\p\in\property_\ab$, our adaptive algorithm $\Algo'$ should run for all of the $L\eqdef \clg{\log(1/\dst)}$ iterations (until $\dst_L$) in order to output $\accept$, in which case the sample complexity will be bounded as
+\[
+    \sum_{j=0}^{\clg{\log(1/\dst)}} \ns\Paren{\ab, 2^{-j}, \frac{\errprob}{2(j+1)^2}}\,.
+\]
+We will see a concrete example of this technique in~\cref{ex:unif:adaptive}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
