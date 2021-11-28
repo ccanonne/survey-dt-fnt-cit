@@ -1345,7 +1345,7 @@ mity testing.}
 \item $\lp[1]$ reduction (Goldreich)
 
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The return of $\chi^2$}
 
 
@@ -1354,11 +1354,13 @@ We will only make a small change to our statistic $Z_3$ from~\cref{ssec:uniformi
   \label{eq:def:z:chisquare:identity}
     Z = \sum_{i=1}^\ab \frac{(\occur_i-\ns\q(i))^2- \occur_i}{\ns\q(i)}\,;
 \end{equation}
-that is, we now have $\q(i)$ instead of $\uniform_\ab(i)=1/\ab$ in the numerator and denominator, and as before $\occur_i$ denotes the number of occurrences of $i\in[\ab]$ among our $\poisson{\ns}$ samples. We will face a technical hurdle, due to the fact that $\q(i)$ in the denominator, while known, could be arbitrarily close to $0$, which would make the variance of $Z$ blow up for no particularly good reason.  Fortunately, there is an easy fix: we can just replace $\q$ by the mixture 
+that is, we now have $\q(i)$ instead of $\uniform_\ab(i)=1/\ab$ in the numerator and denominator, and as before $\occur_i$ denotes the number of occurrences of $i\in[\ab]$ among our $\poisson{\ns}$ samples. 
+
+This is where we face a technical hurdle, due to the fact that $\q(i)$ in the denominator, while known, could be arbitrarily close to $0$, which would make the variance of $Z$ blow up for no particularly good reason. Fortunately, there is an easy fix: we can just replace $\q$ by the mixture 
 \[
   \q' \eqdef \frac{1}{2}\q+\frac{1}{2}\uniform_\ab
 \]
-which will guarantee that each element has probability at least $1/(2\ab)$ under $\q'$. Moreover, given samples from an unknown distribution $\p$ it is easy to generate the same number of samples from the (also unknown) distribution $\p'  \eqdef \frac{1}{2}\p+\frac{1}{2}\uniform_\ab$.\exercise{We will check this in~\cref{ex:mixture:sample}.} If $\p=\q$, then of course $\p'=\q'$, and if $\totalvardist{\p}{\q} > \dst$ then $\totalvardist{\p'}{\q'} > \dst/2$, since.
+which will guarantee that each element has probability at least $1/(2\ab)$ under $\q'$. Moreover, given samples from an unknown distribution $\p$ it is easy to generate the same number of samples from the (also unknown) distribution $\p'  \eqdef \frac{1}{2}\p+\frac{1}{2}\uniform_\ab$.\exercise{We will check this in~\cref{ex:mixture:sample}.} If $\p=\q$, then of course $\p'=\q'$, and if $\totalvardist{\p}{\q} > \dst$ then $\totalvardist{\p'}{\q'} > \dst/2$, since
 \[
   2\totalvardist{\p'}{\q'} = \sum_{i=1}^\ab |\p'(i)-\q'(i)|
   = \sum_{i=1}^\ab \abs{ \frac{1}{2}\p(i)-\frac{1}{2}\q(i) }
@@ -1371,7 +1373,7 @@ That is, this transformation only costs us a constant factor in the distance par
     \Require Multiset of $\ns$ samples $x_1,\dots,x_\ns \in \domain$, parameters $\dst\in(0,1]$ and explicit description of $\q\in\distribs{\ab}$.
     \Comment{Assumes Poissonization}
     \State Independently replace, with probability $1/2$, each $x_i$ by a uniformly random element of $\domain$. \Comment{Generate samples from $\p' = \frac{1}{2}\p+\frac{1}{2}\uniform_\ab$ in time $O(\ns\log\ab)$.}
-    \State Set $\tau \gets \frac{1}{2}\ns\dst^2$
+    \State Set $\tau \gets \frac{1}{2}\ns\dst^2$ \Comment{This is $2\ns(\dst/2)^2$, since the ``mixture trick'' above leads to a factor-2 loss in the distance parameter $\dst$.}
     \State Compute
     \[
         Z = \sum_{j\in\domain} \frac{(\occur_j-\q'(i))^2-\occur_j}{\q'(i)}
@@ -1425,6 +1427,14 @@ Using $\bE{\p}{Z} \geq \ns\dst^2$, we see that this also holds for $\ns \gg \sqr
 The $\chi^2$-based tester (\cref{algo:chisquare}) is a testing algorithm for identity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$ and time complexity $O(\ns\log\ab+\ab)$ in the Poissonized setting.
 \end{theorem}
 \end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reduction to (near)-uniformity testing: $\lp[2]$ distance}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reduction to uniformity testing: $\lp[1]$ distance}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}
