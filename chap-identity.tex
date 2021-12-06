@@ -1376,7 +1376,7 @@ That is, this transformation only costs us a constant factor in the distance par
     \State Set $\tau \gets \frac{1}{2}\ns\dst^2$ \Comment{This is $2\ns(\dst/2)^2$, since the ``mixture trick'' above leads to a factor-2 loss in the distance parameter $\dst$.}
     \State Compute
     \[
-        Z = \sum_{j\in\domain} \frac{(\occur_j-\q'(i))^2-\occur_j}{\q'(i)}
+        Z = \sum_{j\in\domain} \frac{(\occur_j-\ns\q'(i))^2-\occur_j}{\ns\q'(i)}
     \] where $\occur_j \gets \sum_{t=1}^\ns\indic{x_t=j}$ and $\q'(i) \eqdef \frac{\q(i)+1/\ab}{2}$.
     \If{ $Z \geq \tau$ } \Return \reject \Comment{Not $\q$}
     \Else\ 
@@ -1424,12 +1424,50 @@ In the ``far'' case ($\totalvardist{\p}{\q} > \eps/2$), we want $\Var_\p[Z] \ll 
 Using $\bE{\p}{Z} \geq \ns\dst^2$, we see that this also holds for $\ns \gg \sqrt{\ab}/{\dst^2}$. By an argument nearly identical to the proof of~\cref{theo:z3}, we obtain:
 \begin{theorem}
   \label{theo:z}
-The $\chi^2$-based tester (\cref{algo:chisquare}) is a testing algorithm for identity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$ and time complexity $O(\ns\log\ab+\ab)$ in the Poissonized setting.
+The $\chi^2$-based tester (\cref{algo:chisquare:identity}) is a testing algorithm for identity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$ and time complexity $O(\ns\log\ab+\ab)$ in the Poissonized setting.
 \end{theorem}
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Reduction to (near)-uniformity testing: $\lp[2]$ distance}
+
+\begin{theorem}
+  \label{theo:l2:identity:robust}
+The $\chi^2$-based tester (\cref{algo:chisquare}) is a testing algorithm for identity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$ and time complexity $O(\ns\log\ab+\ab)$ in the Poissonized setting.
+\end{theorem}
+
+
+\begin{algorithm}
+  \begin{algorithmic}
+  \Require $\eps\in(0,1)$, $m$ samples from distributions $p,q$, with $X_i,Y_i$ denoting the number of occurrences of the $i$th domain elements in the samples from $p$ and $q$, respectively.
+  \Ensure Returns \textsf{accept} if $\lVert p -q\rVert_2 \leq \eps$ and \textsf{reject} if $\lVert p -q\rVert_2 \geq 2\eps$.
+    \State Define $Z=\sum_{i}(X_i-Y_i)^2-X_i-Y_i.$
+    \State Return  \textsf{reject} if $\frac{\sqrt{Z}}{m} > \sqrt{3}\eps$, \textsf{accept} otherwise.
+  \end{algorithmic}
+  \caption{\label{algo:l2:identity:robust}}
+\end{algorithm}
+
+\begin{algorithm}[ht!]
+  \begin{algorithmic}[1]
+    \Require Multiset of $\ns$ samples $x_1,\dots,x_\ns \in \domain$, parameters $\dst\in(0,1]$ and explicit description of $\q\in\distribs{\ab}$.
+    \Comment{Assumes Poissonization}
+    \State Set $\tau \gets ??\ns^2\dst^2$
+    \State Compute
+    \[
+        Z = \sum_{j\in\domain} \Paren{ (\occur_j-\ns\q(i))^2-\occur_j }
+    \] where $\occur_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
+    \If{ $Z \geq \tau$ } \Return \reject \Comment{Far from $\q$}
+    \Else\ 
+      \Return \accept \Comment{Close to $\q$}
+    \EndIf
+  \end{algorithmic}
+  \caption{\label{algo:chisquare:identity}\sc Robust $\lp[2]$ Tester (for Identity)}
+\end{algorithm}
+
+% \begin{proposition}\label{prop:ggg:2}
+% There exists an absolute constant $c > 0$ such that the above algorithm, when given $\Poi(m)$ samples drawn from two distributions, $p,q$ will, with probability at least $3/4$, 
+% distinguishes between \textsf{(a)} $\lVert p-q\rVert_2 \leq \eps$ and \textsf{(b)} $\lVert p-q\rVert_2 \geq 2\eps$ provided that $m \geq c\frac{\sqrt{b}}{\eps^2}$, where $b$ is an upper bound on $\lVert p\rVert_2^2, \lVert q\rVert_2^2$. (Moreover, one can take $c = 130$.)
+% \end{proposition}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
