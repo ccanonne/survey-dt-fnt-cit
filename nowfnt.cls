@@ -7,9 +7,10 @@
 
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
 \ProvidesClass{nowfnt}
-              [2019/09/11 v0.95b
+              [2021/10/12 v0.95d
                NOW document class]
-
+%change 14.08.2020: use \AfterEndPreamble instead of \AtBeginDocument
+%change 20110112: MC added to get copyright in Abstract footnote 
 \providecommand\nowfntlistofjournals{examplefnt}
 \newcommand\newnowfntjournal[1]{%
   \g@addto@macro\nowfntlistofjournals{,#1}%
@@ -726,7 +727,8 @@
 \newcommand\articledatabox[1]{%
  \AtBeginDocument{%
  \sbox\nowfnt@article@databox{\parbox[b]{\nowfnt@article@databox@wd}
-  {\nowfnt@font@articledata\rule{\nowfnt@article@databox@wd}{0.5pt}\par #1}}}}
+  {\nowfnt@font@articledata\rule{\nowfnt@article@databox@wd}{0.5pt}\par #1\\
+   \copyright\nowfnt@issuecopyrightyear~\nowfnt@issuecopyrightowner}}}}  %% MC added to get copyright in Abstract footnote 20211012
 
 \newcommand\nowfnt@defaulttextcontent{XXXXXXXX}
 
@@ -1564,10 +1566,10 @@
 
 \ifcsname tikzexternalrealjob\endcsname \else
 \ifbool{@nowfntplain}
-{\AtBeginDocument{\maketitle}}
+{\AfterEndPreamble{\maketitle}}
 {
- \AtBeginDocument{\if@nowfntchapter\else\frontmatter \maketitle \clearpage\tableofcontents\fi\mainmatter}
- \AtBeginDocument{\addtocontents{toc}{\protect\thispagestyle{empty}}}
+ \AfterEndPreamble{\if@nowfntchapter\else\frontmatter \maketitle \clearpage\tableofcontents\fi\mainmatter}
+ \AfterEndPreamble{\addtocontents{toc}{\protect\thispagestyle{empty}}}
  }
 \fi
 \endinput

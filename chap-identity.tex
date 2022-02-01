@@ -9,7 +9,7 @@ Before delving into the details of this chapter, two more comments. First, ``uni
 Second, the formulation of identity testing crucially assumes that the reference distribution is fully known to the algorithm. One can also consider the task of testing, given samples from two distributions $\p,\q$ (both unknown), whether $\p=\q$ or $\totalvardist{\p}{\q}>\dst$. This question, \emph{closeness testing} (or \emph{two-sample goodness-of-fit}), which we briefly alluded to in~\cref{chap:what}), can be seen to be at least as hard as identity testing: any algorithm for closeness testing can be used to perform identity testing by generating \iid samples from the known reference distribution $\q$.\footnote{This adds a computational overhead, but as far as sample complexity is concerned this is not a problem.} But closeness testing, again, is \emph{strictly} harder than identity testing: while, as we will see, the latter has sample complexity \smash{$\Theta\big({\sqrt{\ab}/\dst^2\big)}$}, the former requires \smash{$\Theta\big({\ab^{2/3}/\dst^{4/3}+\sqrt{\ab}/\dst^2}\big)$} samples~\citep{ChanDVV14}, which is much larger as long as $\dst \gg 1/\ab^{1/4}$.\medskip
 
 
-In the rest of the chapter, the most detailed of this monograph, we will go through an in-depth overview of uniformity and identity testing, with a full derivation of many results. We will start in~\cref{sec:uniformity} by describing and analyzing seven different uniformity testing algorithms, before turning in~\cref{sec:identity} to identity testing. There, we will describe the aforementioned reduction between uniformity and identity testing, which lets us use any of the algorithms from~\cref{sec:uniformity} to solve the more general problem; as well as a testing algorithm to perform identity testing directly, without reducing it to uniformity. The goal of this chapter is not to provide a list of various testing algorithms to the reader, then left to ponder what to do with it; but rather to highlight some general techniques and ideas in the course of their analysis, applicable beyond these specific examples.
+In the rest of the chapter, we will go through an in-depth overview of uniformity and identity testing, with a full derivation of many results. This is the most detailed section of this monograph. We will start in~\cref{sec:uniformity} by describing and analyzing seven different uniformity testing algorithms, before turning in~\cref{sec:identity} to identity testing. There, we will describe the aforementioned reduction between uniformity and identity testing, which lets us use any of the algorithms from~\cref{sec:uniformity} to solve the more general problem; as well as a testing algorithm to perform identity testing directly, without reducing it to uniformity. The goal of this chapter is not to provide a list of various testing algorithms to the reader, then left to ponder what to do with it; but rather to highlight some general techniques and ideas in the course of their analysis, applicable beyond these specific examples.
 
 %\cnote{In-depth chapter with derivation of many results. Focus on one-sample testing.}
 
@@ -35,7 +35,7 @@ Although the sample complexity is of course a key aspect, there are several thin
 \end{description}
 
 In this chapter, we will have a detailed look at 7 different uniformity testing algorithms, each with its pros and cons. For each of them, we will provide a full proof of their performance, which will help us illustrate several techniques and ideas underlying the analysis of distribution testing algorithms. 
-\cref{tab:summary:uniformity:testing} summarizes the name, and some of the specificities, of those seven algorithms: we will discuss them in more detail in~\cref{ssec:uniformity:discussion}. 
+\cref{tab:summary:uniformity:testing} summarizes the names, and some of the specificities, of those seven algorithms: we will discuss them in more detail in~\cref{ssec:uniformity:discussion}. 
 \begin{table}[ht]\centering\footnotesize
   \def\arraystretch{1.25}%  1 is the default, change whatever you need
 % %   \begin{adjustwidth}{0in}{0in}% adjust the L and R margins by 1 inch
@@ -142,7 +142,7 @@ To handle this last sum despite the lack of independence of the summands, we wil
   \[
     \bEE{\indic{X_s=X_t}\indic{X_{s'}=X_{t'}}} = \bEE{\indic{X_s=X_t}} = \normtwo{\p}^2.
   \]
-  \item The second case is the messier one; still, one can verify that in this case $\indic{X_s=X_t}\indic{X_{s'}=X_{t'}}$ is 1 if, and only if, the three distinct samples corresponding to the 3 distinct indices among $s,t,s',t'$ take the same value, from which
+  \item The second case is the messiest one; still, one can verify that in this case $\indic{X_s=X_t}\indic{X_{s'}=X_{t'}}$ is 1 if, and only if, the three distinct samples corresponding to the 3 distinct indices among $s,t,s',t'$ take the same value, from which
   \[
     \bEE{\indic{X_s=X_t}\indic{X_{s'}=X_{t'}}} = \norm{\p}_3^3.
   \]
@@ -318,7 +318,7 @@ $
 $. At this point, we would like to rely on tools from our arsenal (convexity or concavity for Jensen's inequality, monotonicity, etc.); unfortunately, the function $f$ is not very well-behaved, and is neither concave, convex, or monotone. It does satisfy $f(0)=f(1/\ab)=0$, $f(1)=1$, but that is not quite enough. Instead, we will find a ``good'' lower bound $g$ on $f$, which will allow us to reason more easily: specifically, we will set, for $x\in[0,1]$,
 \[
     g(x) = \frac{\ns-1}{\ab-1}\cdot (x-1/\ab) + \frac{\ns-1}{2(1-1/\ab)}(x-1/\ab)^2\indic{x\leq 1/\ab}\,.
-\]
+\] 
 Let us demystify this choice a little. The first coefficient is simply $f'\Paren{1/\ab}$, while the second has been chosen as the largest possible value such that $g'(0)\geq 0$.\footnote{While we will not require it, this ensures $g$ is nondecreasing, which is nice.} Moreover, when summing $\sum_i g(\p(i))$, the linear term will just cancel out and we will be left with a quadratic term of the form $\sum_i g(\p(i)) \asymp \sum_i (\p(i)-1/\ab)^2\indic{\p(i)\leq 1/\ab}$, which we can hope to relate to $\normtwo{\p-\uniform_\ab}^2$ (the same thing, without the indicator). An illustration of $f$ and $g$ is given in~\cref{fig:z2:fg}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -478,7 +478,7 @@ The bad news is that it does not actually lead to the optimal sample complexity:
   \label{eq:expectation:z3}
     \expect{Z_3} = \ns\ab \normtwo{\p-\uniform_\ab}^2
 \end{equation}
-which is perfect. Analyzing this test boils down, again, to bounding the variance of $Z_3$ and invoking Chebyshev's inequality\dots{} Before doing so, we will make an innocuous change, but which will come quite handy in~\cref{sec:identity} when generalizing beyond the uniform distribution: let us rewrite
+which is perfect. Analyzing this test boils down, again, to bounding the variance of $Z_3$ and invoking Chebyshev's inequality\dots{} Before doing so, we will make a change which looks innocuous, but will come in quite handy in~\cref{sec:identity} when generalizing beyond the uniform distribution: let us rewrite
 \[
     Z_3 = \sum_{i=1}^\ab \frac{(\occur_i-\ns\uniform_\ab(i))^2- \occur_i}{\ns\uniform_\ab(i)}
 \]
@@ -743,7 +743,7 @@ For a vector $x\in \R^\ab$, define $x^{\downarrow}\in\R^\ab$ as the vector with 
 The key relation between vector majorization and stochastic dominance is given in the following theorem:
 \begin{theorem}
   \label{theo:stochdominance:symmetricfunction}
-  Let $f\colon \R^\ab\to\R$ by a symmetrix convex function. For a probability distribution $\p\in\distribs{\ab}$ and $\ns\in\N$, define the random variable $X_\ns(\p)$ as follows: let $N_1,\dots,N_\ab$ be the counts of each domain element among $\ns$ \iid samples from $\p$, and set $X_\ns(\p)=f(N_1,\dots,N_\ab)$. Then, for any $\p,\q$ such that $\p\succeq\q$, $X_\ns(\p)$ stochastically dominates $X_\ns(\q)$.
+  Let $f\colon \R^\ab\to\R$ by a symmetric convex function. For a probability distribution $\p\in\distribs{\ab}$ and $\ns\in\N$, define the random variable $X_\ns(\p)$ as follows: let $N_1,\dots,N_\ab$ be the counts of each domain element among $\ns$ \iid samples from $\p$, and set $X_\ns(\p)=f(N_1,\dots,N_\ab)$. Then, for any $\p,\q$ such that $\p\succeq\q$, $X_\ns(\p)$ stochastically dominates $X_\ns(\q)$.
 \end{theorem}
 We will not prove this theorem, but instead use it as follows. First, we show that for every $\p$ which is far from uniform there exists some $\bar{\p}$ which majorizes $\p$, is still far from uniform, and importantly has small $\lp[\infty]$ norm: 
 \begin{lemma}
@@ -817,7 +817,7 @@ It is unclear whether one could avoid using the first (very convenient) ``stocha
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Random binary hashing} 
-Now we turn to a tester that is \emph{not} sample-optimal~--~but has other advantages, and whose analysis contains a couple insighful aspects. The main idea is that, while large domains are complicated, if there is one thing we know how to do optimally it is estimating the bias of a coin. That is, we know how to handle the case $\ab=2$:
+Now we turn to a tester that is \emph{not} sample-optimal~--~but has other advantages, and whose analysis contains a couple of insighful aspects. The main idea is that, while large domains are complicated, if there is one thing we know how to do optimally it is estimating the bias of a coin. That is, we know how to handle the case $\ab=2$:
 \begin{fact}[Bias of a coin]\exercise{Prove this!~\cref{ex:uniformity:bias:coin}.}
   \label{lemma:bias:coin}
   Given \iid samples from a Bernoulli with unknown parameter $\alpha\in[0,1]$, estimating $\alpha$ to an additive $\eta$ with probability $1-\errprob$ can be done with (and requires) $\bigTheta{\frac{\log(1/\errprob)}{\eta^2}}$ samples.
@@ -872,7 +872,7 @@ $|\p(S)-|S|/\ab| \geq \dst/\sqrt{2\ab}$ with constant probability (over the choi
 \[
     \ns \asymp \frac{1}{(\dst/\sqrt{\ab})^2} = \frac{\ab}{\dst^2}
 \]
-samples by~\cref{lemma:bias:coin}. Of course, there is a catch: we will only detect it when there \emph{is} some bias to detect, \ie when the random set $S$ we choose is ``good;'' which we only proved happens with probability at least $1/48$. But a constant probability to distinguish between uniform and far from uniform is enough: repeating independently the test several times will let us amplify the success probability to $2/3$.
+samples by~\cref{lemma:bias:coin}. Of course, there is a catch: we will only detect it when there \emph{is} some bias to detect, \ie when the random set $S$ we choose is ``good;'' and we only proved this happens with probability at least $1/48$. But a constant probability to distinguish between uniform and far from uniform is enough: independently repeating the test several times will let us amplify the success probability to $2/3$.
 \begin{theorem}
 The binary hashing tester (\cref{{algo:binary:hashing:amplified}}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = O(\ab/\dst^2)$ and time complexity $O(\ns)$.
 \end{theorem}
@@ -1338,12 +1338,11 @@ In this section, we have covered and analyzed seven different algorithms for uni
 \cnote{Discuss the instance-optimal setting as well, and the relation to unifor-
 mity testing.}
 \tbc
-
 \begin{itemize}
 \item chi-square tester
 \item testing via $\lp[2]$ (and why it fails, then the DK16 trick; then, relation to chi-square)
 \item $\lp[1]$ reduction (Goldreich)
-
+\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The return of $\chi^2$}
@@ -1357,9 +1356,10 @@ We will only make a small change to our statistic $Z_3$ from~\cref{ssec:uniformi
 that is, we now have $\q(i)$ instead of $\uniform_\ab(i)=1/\ab$ in the numerator and denominator, and as before $\occur_i$ denotes the number of occurrences of $i\in[\ab]$ among our $\poisson{\ns}$ samples. 
 
 This is where we face a technical hurdle, due to the fact that $\q(i)$ in the denominator, while known, could be arbitrarily close to $0$, which would make the variance of $Z$ blow up for no particularly good reason. Fortunately, there is an easy fix: we can just replace $\q$ by the mixture 
-\[
+\begin{equation}
+	\label{eq:trick:mixture}
   \q' \eqdef \frac{1}{2}\q+\frac{1}{2}\uniform_\ab
-\]
+\end{equation}
 which will guarantee that each element has probability at least $1/(2\ab)$ under $\q'$. Moreover, given samples from an unknown distribution $\p$ it is easy to generate the same number of samples from the (also unknown) distribution $\p'  \eqdef \frac{1}{2}\p+\frac{1}{2}\uniform_\ab$.\exercise{We will check this in~\cref{ex:mixture:sample}.} If $\p=\q$, then of course $\p'=\q'$, and if $\totalvardist{\p}{\q} > \dst$ then $\totalvardist{\p'}{\q'} > \dst/2$, since
 \[
   2\totalvardist{\p'}{\q'} = \sum_{i=1}^\ab |\p'(i)-\q'(i)|
@@ -1426,43 +1426,103 @@ Using $\bE{\p}{Z} \geq \ns\dst^2$, we see that this also holds for $\ns \gg \sqr
   \label{theo:z}
 The $\chi^2$-based tester (\cref{algo:chisquare:identity}) is a testing algorithm for identity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$ and time complexity $O(\ns\log\ab+\ab)$ in the Poissonized setting.
 \end{theorem}
-\end{itemize}
+This was relatively painless, and shows that the general case of identity testing is no harder than uniformity testing~--~up to constant factors. The key insight, here, was to use this ``mixture trick'' (\cref{eq:trick:mixture}) to replace $\q$ by a slightly modified version, $\q'$ with some nice guarantees. (Of course, if in practice the known $\q$ already satisfies $\min_i \q(i) \geq 1/(2\ab)$, this step is not necessary.)\smallskip
 
+
+One can interpret this trick as applying a suitable randomized transformation to the samples (\ie to the input distribution), which maps the reference distribution $\q$ to something a little closer to uniform, while somewhat preserving the pairwise distances between distributions. That is, coming up with a pair of mappings $(\Phi,\Psi)$ with $\Phi\colon\distribs{\ab} \to \distribs{\ab'}$ and $\Psi\colon[\ab]\to[\ab']$, such that (1)~$\Phi(\q)\approx \uniform_{\ab'}$, (2)~$\operatorname{dist}(\Phi(\p),\Phi(\q))\approx \operatorname{dist}(\p,\q)$ for all $\p$, and (3)~$x\sim \Psi(\p)$ whenever $x\sim\p$.
+
+Here, we chose $\ab=\ab'$ and $\Phi(\p) = \frac{1}{2}\p+\frac{1}{2}\uniform_\ab$ (and $\operatorname{dist}$ being the total variation distance, for a rather liberal interpretation of $\approx$), which worked for the $\chi^2$-based tester; in the next two subsections, we will see variants of this idea, applying more generally to any tester.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Reduction to (near)-uniformity testing: $\lp[2]$ distance}
-
+The first idea is, given how convenient $\lp[2]$ distance has proven itself as a proxy for total variation distance when testing uniformity, to attempt to perform \emph{identity} testing in $\lp[2]$ distance as well. This will not quite work, unfortunately, as the $\lp[2]$ guarantee will only translate to a good $\lp[1]$/total variation one when the reference distribution $\q$ is somewhat ``close to uniform'' (in a specific sense: when it has small $\lp[2]$ norm $\normtwo{\q}$). Which is when the type of randomized mapping we just discussed will come in handy, providing a principled way to ensure this condition holds. Our first step is thus to get a good $\lp[2]$ testing algorithm; for simplicity of analysis, we will throughout this section work in the Poissonized sampling setting.
 \begin{theorem}
   \label{theo:l2:identity:robust}
-The $\chi^2$-based tester (\cref{algo:chisquare}) is a testing algorithm for identity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$ and time complexity $O(\ns\log\ab+\ab)$ in the Poissonized setting.
+  Given the explicit description of a probability distribution $\q\in\distribs{\ab}$, parameter $\dst\in(0,1]$, and $\poisson{\ns}$ \iid samples from an unknown $\p\in\distribs{\ab}$,~\cref{algo:l2:identity} runs in time $O(\ns\log \ns + \ab)$ and 
+  distinguishes between $\normtwo{\p-\q} \leq \dst$ and $\normtwo{\p-\q} \geq 2\dst$ with probability at least $2/3$ as long as $\ns \geq 100\max\Paren{\normtwo{\q}/\dst^2, 2/\dst}$.
 \end{theorem}
+\begin{algorithm}[ht!]
+  \begin{algorithmic}[1]
+    \Require Multiset of $\ns$ samples $x_1,\dots,x_\ns \in \domain$, parameters $\dst\in(0,1]$ and explicit description of $\q\in\distribs{\ab}$.
+    \Comment{Assumes Poissonization}
+    \State Set $\tau \gets 2\ns^2\dst^2$
+    \State Compute
+    \[
+        Z = \sum_{j\in\domain} \Paren{(\occur_j-\ns\q(i))^2-\occur_j}
+    \] where $\occur_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
+    \If{ $Z \geq \tau$ } \Return \reject \Comment{Far from $\q$ (in $\lp[2]$)}
+    \Else\ 
+      \Return \accept \Comment{Close to $\q$ (in $\lp[2]$)}
+    \EndIf
+  \end{algorithmic}
+  \caption{\label{algo:l2:identity}\sc Robust $\lp[2]$ Tester (for Identity)}
+\end{algorithm}
+\begin{proof}
+Before computing the expectation and variance of the statistic $Z$ from~\cref{algo:l2:identity}, which does look a lot like a simpler version of~\cref{algo:chisquare,algo:chisquare:identity} (we ``just'' omitted the denominators!), we will make a simple observations observations. Namely, that by the reverse triangle inequality, if $\normtwo{\p} \geq 2\normtwo{\q}$ then $\normtwo{\p-\q} \geq \frac{1}{2}\normtwo{\p}$. 
+
+Turning to the analysis of the moments of $Z$, we can simply recall~\cref{claim:uniformity:moments:poisson} and capitalize on all our previous hard work:
+\begin{align}
+	\bE{\p}{Z} = \ns^2 \normtwo{\p-\q}^2
+\end{align}
+and
+\begin{align}
+	\Var_{\p}[Z] &= \sum_{i=1}^\ab \Paren{ 2\ns^2 \p(i)^2 + 4\ns^3 \p(i)(\p(i)-\q(i))^2 } \notag \\
+	&\leq 2\ns^2 \normtwo{\p}^2 + 4\ns^3 \normtwo{\p}\normtwo{\p-\q}^2
+\end{align}
+where the second inequality just uses $\p(i) \leq \norminf{\p} \leq \normtwo{\p}$. We are now ready to conclude:
+\begin{itemize}
+	\item If $\normtwo{\p-\q} \leq \dst$, then $\bE{\p}{Z} \leq \ns^2\dst^2$ and by Markov's inequality
+	\[
+		\bPr{Z \geq 3\ns^2\dst^2 } \leq \frac{\bE{\p}{Z}}{3\ns^2\dst^2} \leq \frac{1}{3}
+	\]
+	(we did not even need Chebyshev!).
+	\item If $\normtwo{\p-\q} \geq 2\dst$, then $\bE{\p}{Z} \geq 4\ns^2\dst^2$ and by Chebyshev's 
+	\[
+		\bPr{Z < 3\ns^2\dst^2 } \leq \frac{16\Var_{\p}[Z]}{\bE{\p}{Z}^2} \leq 
+		\frac{32\normtwo{\p}^2}{\ns^2\normtwo{\p-\q}^4} + \frac{64\normtwo{\p}}{\ns\normtwo{\p-\q}^2}
+	\]
+	(this time we did). This is where our earlier observation will come in handy: indeed, it guarantees that $\normtwo{\p} \leq 2\max\Paren{\normtwo{\q}, \normtwo{\p-\q}}$, and so
+	\begin{align*}
+		\bPr{Z < 3\ns^2\dst^2 } &\leq 
+		64\max\Paren{\frac{\normtwo{\q}^2}{16\ns^2\dst^4},\frac{1}{4\ns^2\dst^2}} + 128\max\Paren{\frac{\normtwo{\q}}{4\ns\dst^2},\frac{1}{2\ns\dst}} \\
+		&= \max\Paren{\frac{4\normtwo{\q}^2}{\ns^2\dst^4}+\frac{32\normtwo{\q}}{\ns\dst^2},\frac{16}{\ns^2\dst^2} + \frac{64}{\ns\dst}}
+	\end{align*}
+	which can be seen to be at most $1/3$ for $\ns \geq \max\Paren{100\normtwo{\q}/\dst^2, 200/\dst}$.
+\end{itemize}
+This concludes the proof of the theorem.
+\end{proof}
+To see how useful~\cref{theo:l2:identity:robust} is, let us apply it to uniformity testing to rederive the optimal sample complexity. After all, as mentioned above, in the particular case $\q=\uniform_\ab$ the statistic $Z$ of~\cref{theo:l2:identity:robust} is simply a rescaling of $Z_3$ from~\cref{algo:chisquare}, and its analysis is eerily similar (relying on~\cref{claim:uniformity:moments:poisson})~--~so it should not be surprising that the guarantees they provide match.
+
+Applying~\cref{theo:l2:identity:robust} with $\normtwo{\q} = 1/\sqrt{\ab}$ and distance paraneter $\dst' \eqdef \dst/\sqrt{\ab}$ (from the relation TV/$\lp[2]$,~\cref{eq:relation:l1:l2:cs}), we can distinguish between
+$\normtwo{\p-\uniform_\ab} \leq \dst/\sqrt{\ab}$ and $\normtwo{\p-\uniform_\ab} \geq 2\dst/\sqrt{\ab}$
+with 
+\[
+	\ns \asymp \max\Paren{\frac{1/\sqrt{\ab}}{\dst'^2}, \frac{1}{\dst'}} \asymp \frac{\sqrt{\ab}}{\dst^2}
+\]
+samples, as promised. This then implies a uniformity testing algorithm with a small extra guarantee in the ``close'' case: distinguishing between $\normtwo{\p-\uniform_\ab} \leq \dst/\sqrt{\ab}$ and $\totalvardist{\p}{\uniform_\ab} \geq \dst$. More generally,~\cref{theo:l2:identity:robust} will allow us to obtain this type of sample complexity for identity testing \emph{as long as the reference $\q$ has $\lp[2]$ norm $\normtwo{\q} \lesssim 1/\sqrt{\ab}$.}
 
 
+\iffalse
 \begin{algorithm}
   \begin{algorithmic}
-  \Require $\eps\in(0,1)$, $m$ samples from distributions $p,q$, with $X_i,Y_i$ denoting the number of occurrences of the $i$th domain elements in the samples from $p$ and $q$, respectively.
+  \Require $\dst\in(0,1)$, $\ns$ samples from distribution $\p$, with $X_i$ denoting the number of occurrences of the $i$th domain elements in the samples from $\p$.
   \Ensure Returns \textsf{accept} if $\lVert p -q\rVert_2 \leq \eps$ and \textsf{reject} if $\lVert p -q\rVert_2 \geq 2\eps$.
     \State Define $Z=\sum_{i}(X_i-Y_i)^2-X_i-Y_i.$
     \State Return  \textsf{reject} if $\frac{\sqrt{Z}}{m} > \sqrt{3}\eps$, \textsf{accept} otherwise.
   \end{algorithmic}
   \caption{\label{algo:l2:identity:robust}}
 \end{algorithm}
-
-\begin{algorithm}[ht!]
-  \begin{algorithmic}[1]
-    \Require Multiset of $\ns$ samples $x_1,\dots,x_\ns \in \domain$, parameters $\dst\in(0,1]$ and explicit description of $\q\in\distribs{\ab}$.
-    \Comment{Assumes Poissonization}
-    \State Set $\tau \gets ??\ns^2\dst^2$
-    \State Compute
-    \[
-        Z = \sum_{j\in\domain} \Paren{ (\occur_j-\ns\q(i))^2-\occur_j }
-    \] where $\occur_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
-    \If{ $Z \geq \tau$ } \Return \reject \Comment{Far from $\q$}
-    \Else\ 
-      \Return \accept \Comment{Close to $\q$}
-    \EndIf
-  \end{algorithmic}
-  \caption{\label{algo:chisquare:identity}\sc Robust $\lp[2]$ Tester (for Identity)}
-\end{algorithm}
+\begin{claim}
+  \label{claim:closeness:moments:poisson}
+  Let $\mu, \lambda \geq 0$. If $X\sim\poisson{\lambda}$ and $Y\sim\poisson{\mu}$ are independent r.v.'s, then 
+  $
+  \bEE{(X-Y)^2-X-Y} = (\lambda-\mu)^2
+  $
+  and 
+  $
+  \bEE{((X-Y)^2-X-Y)^2} = (\lambda-\mu)^4 + 2(\lambda+\mu)^2 + 4(\lambda+\mu)(\lambda-\mu)^2
+  $.
+\end{claim}
+\fi
 
 % \begin{proposition}\label{prop:ggg:2}
 % There exists an absolute constant $c > 0$ such that the above algorithm, when given $\Poi(m)$ samples drawn from two distributions, $p,q$ will, with probability at least $3/4$, 
@@ -1556,6 +1616,22 @@ Given two probability distributions $\p,\q$, an integer $\ns\geq 1$, and a param
   \item Sample $\occur \sim \poisson{\ns}$, and draw $\occur$ \iid samples from $\p$. Then, for each $1\leq i\leq \occur$, independently sample $B_i\sim\bernoulli{\alpha}$: if $B_i=1$, replace the $i$-th sample by a new (and independent from everything else) sample drawn from $\q$.
 \end{itemize}
 Show that these two processes result in the same distribution.
+\end{question}
+\begin{question}[$\star$]\label{ex:l2:closeness}
+Establish the analogue of~\cref{theo:l2:identity:robust} for the \emph{two-distribution} case (when both $\p,\q$ are unknown, and you are given $\ns$ \iid samples from each). Specifically, consider the statistic
+$Z'=\sum_{i=1}^\ab \Paren{(X_i-Y_i)^2-X_i-Y_i}$
+for which you will have to establish the following counterpart of~\cref{claim:uniformity:moments:poisson}:
+\begin{claim}
+If $X\sim\poisson{\lambda}$ and $Y\sim\poisson{\mu}$ are independent, then 
+  $
+  \bEE{(X-Y)^2-X-Y} = (\lambda-\mu)^2
+  $
+  and 
+  $
+  \bEE{((X-Y)^2-X-Y)^2} = (\lambda-\mu)^4 + 2(\lambda+\mu)^2 + 4(\lambda+\mu)(\lambda-\mu)^2
+  $.
+\end{claim}
+\noindent Show that the sample complexity is $O(\max\Paren{\normtwo{\p},\normtwo{\q}}/\dst^2)$. Try to establish the (incomparable) bound $O(\min\Paren{\normtwo{\p},\normtwo{\q}}/\dst^2+1/\dst)$.
 \end{question}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

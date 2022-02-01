@@ -2,7 +2,7 @@
 %
 %
 %JOURNAL CODE  SEE DOCUMENTATION
-\documentclass[biber,draft]{nowfnt} % creates the journal version, needs biber version
+\documentclass[biber]{nowfnt} % creates the journal version, needs biber version
 %wrapper for book and ebook are created automatically.
 \usepackage{imakeidx}
 \usepackage[utf8]{inputenc}
@@ -14,6 +14,8 @@
 \usetikzlibrary{shadows}
 \usepackage{framed}
 \usepackage{tabularx}
+\usepackage[nocfg]{nomencl}
+\makenomenclature
 
 % Footnote without marker
 \newcommand\extrafootertext[1]{%
@@ -90,8 +92,6 @@ clement.canonne@sydney.edu.au
  }
 
 %BIBLIOGRAPHY FILE
-%\addbibresource{sample.bib}
-%\addbibresource{testfnt.bib}
 \addbibresource{bibliography.bib}
 
 % \usepackage{mwe}
@@ -113,6 +113,17 @@ the topics in the area; but will provide self-contained proofs and derivations o
 to highlight the unifying techniques.
 \end{abstract}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\nomenclature[1]{$a_n \lesssim b_n$}{There exists a constant $C>0$ such that $a_n\leq C\cdot b_n$ for every $n$. Similar to $a_n = O(b_n)$, but not necessarily asymptotic, and easier to write.}
+\nomenclature[2]{$a_n \asymp b_n$}{Both $a_n \lesssim b_n$ and $b_n \lesssim a_n$. Similar to $a_n = \Theta(b_n)$, but not necessarily asymptotic, and easier to write.}
+\nomenclature[3]{$a_n = O(b_n)$}{There exist a constant $C>0$ and a value $n_0$ such that $a_n\leq C\cdot b_n$ for every $n \geq n_0$.}
+\nomenclature[4]{$a_n = \Omega(b_n)$}{There exist a constant $C>0$ and a value $n_0$ such that $a_n\geq C\cdot b_n$ for every $n \geq n_0$. This is equivalent to $b_n = \Omega(a_n)$.}
+\nomenclature[5]{$a_n = \Theta(b_n)$}{Both $a_n = \Omega(b_n)$ and $a_n = O(b_n)$.}
+%\nomenclature{$x\sim \p$}{$x$ is sampled from the probability distribution $\p$}
+\nomenclature[6]{$a_n {\displaystyle\operatorname*{\sim}_{n\to \infty}} b_n$}{Asymptotic equivalence: $\lim_{n\to\infty} \frac{a_n}{b_n} = 1$ (stronger than $a_n = \Theta(b_n)$, as the ``hidden constant'' is $1$).}
+\nomenclature[7]{$a_n \gg b_n$}{(Informal) $a_n$ is much larger than, or ``sufficiently'' large compared to, $b_n$.}
+\printnomenclature
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{What is distribution testing?}

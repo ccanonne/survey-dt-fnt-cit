@@ -1,17 +1,21 @@
-%% $UFDate: 2017-01-06 15:25:03 +0100 -- Commit: 019545e (HEAD -> master) -- master$
+%% $UFDate: $
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{nowfnt-biblatex}
-          [2019/03/12 v1.1a biblatex styling]
+          [2020/09/04 v1.1e biblatex styling]
 %A copy of now-biblatex.sty. Try to keep in sync
 % 30.01.2018 changed extrayear to extraday.
+% 18.08.2020 switch numeric to ieee style.
+% disable adaption for numeric style.
+%
 
 \ifdefstring\nowfnt@journalbibstyle{numeric}
- {\def\nowfnt@journalcitestyle{numeric}}
- {\def\nowfnt@journalcitestyle{authoryear}}
-\RequirePackage[backend=biber,
-               style=authoryear,
-               citestyle=\nowfnt@journalcitestyle,
-               dashed=false,natbib=true,firstinits,uniquename=false,uniquelist=false,maxcitenames=2]{biblatex}
+ {\RequirePackage[backend=biber,
+                citestyle=ieee,bibstyle=now-ieee,isbn=false,
+               dashed=false,natbib=true,giveninits,uniquename=false,uniquelist=false]{biblatex}}
+ {\RequirePackage[backend=biber,
+                style=authoryear,
+               dashed=false,natbib=true,giveninits,uniquename=false,uniquelist=false,maxcitenames=2]{biblatex}
+ }
 \RequirePackage[autostyle]{csquotes}
 \patchcmd{\bibsetup}{\interlinepenalty=5000}{\interlinepenalty=10000}{}{} %no pagebreak in reference
 \defbibheading{bibliography}[References]{%
@@ -19,30 +23,56 @@
     \addcontentsline{toc}{chapter}{#1}%
     \markboth{\MakeUppercase{#1}}{\MakeUppercase{#1}}}
 
-\ifdefstring\nowfnt@journalbibstyle{numeric}
- {%
-  \DeclareFieldFormat{labelnumberwidth}{\mkbibbrackets{#1}}
-  \defbibenvironment{bibliography}  % from numeric.bbx
-  {\list
-    {\printtext[labelnumberwidth]{%
-      \printfield{prefixnumber}%
-      \printfield{labelnumber}}}
-    {\setlength{\labelwidth}{\labelnumberwidth}%
-        \setlength{\leftmargin}{\labelwidth}%
-        \setlength{\labelsep}{\biblabelsep}%
-        \addtolength{\leftmargin}{\labelsep}%
-        \setlength{\itemsep}{\bibitemsep}%
-        \setlength{\parsep}{\bibparsep}}%
-        \renewcommand*{\makelabel}[1]{\hss##1}}
-  {\endlist}
-  {\item}
-  }{}
+\DeclareSourcemap{
+    \maps{
+        \map[overwrite]{%
+           \step[fieldset=note,null]%
+         }%
+        }
+    }
+
+
+%\ifdefstring\nowfnt@journalbibstyle{numeric}
+% {%
+%  \AtEveryBibitem{\clearfield{extradate}}%
+%  \DeclareFieldFormat{labelnumberwidth}{\mkbibbrackets{#1}}
+%  \defbibenvironment{bibliography}  % from numeric.bbx
+%  {\list
+%    {\printtext[labelnumberwidth]{%
+%      \printfield{prefixnumber}%
+%      \printfield{labelnumber}}}
+%    {\setlength{\labelwidth}{\labelnumberwidth}%
+%        \setlength{\leftmargin}{\labelwidth}%
+%        \setlength{\labelsep}{\biblabelsep}%
+%        \addtolength{\leftmargin}{\labelsep}%
+%        \setlength{\itemsep}{\bibitemsep}%
+%        \setlength{\parsep}{\bibparsep}}%
+%        \renewcommand*{\makelabel}[1]{\hss##1}}
+%  {\endlist}
+%  {\item}
+%  }{}
 
 \DefineBibliographyStrings{english}{%
   urlseen = {accessed on},
 }
+
+\urlstyle{same}
+
+\bibitemsep\parskip
+
+%For fiddling with twocolumn breaks:
+
+\newcommand\breakbibliographyafter[1]{%%
+  \ifcsname raggedend\endcsname \raggedend\fi
+  \renewbibmacro{finentry}{%
+   \iffieldequalstr{entrykey}{#1}%<- key after which you want the break
+    {\finentry\pagebreak}
+    {\finentry}}}
+
 \ExecuteBibliographyOptions{maxbibnames=99}
 \ExecuteBibliographyOptions[proceedings]{useeditor=false}
+
+\ifdefstring\nowfnt@journalbibstyle{numeric}{\endinput}{}
 
 \DeclareFieldFormat{series}{\mkbibemph{#1}}% publication series
 \DeclareFieldFormat[misc,report]{title}{\mkbibquote{#1\isdot}}
@@ -61,7 +91,7 @@
     \iffieldundef{\thefield{datelabelsource}year}
       {}
       {\setunit{\addperiod\space}
-       \printtext{%
+       \printtext[parens]{%
          \iffieldsequal{year}{\thefield{datelabelsource}year}
            {\ifcsname printdateextralabel\endcsname
              \printdateextralabel
@@ -130,23 +160,13 @@
    \setunit{\addcomma\space}%
    \printfield{eid}}
 
+
 \renewbibmacro*{note+pages}{%
   \printfield{note}%
-  \newunit}
+  \newunit
+  }
 
 \DeclareFieldFormat{pages}{#1}
 
-\urlstyle{same}
 
-\bibitemsep\parskip
-%\AtBeginBibliography{\flushbottom}??
-%\AtNextBibliography{\flushbottom}??
-%For fiddling with twocolumn breaks:
-
-\newcommand\breakbibliographyafter[1]{%%
-  \ifcsname raggedend\endcsname \raggedend\fi
-  \renewbibmacro{finentry}{%
-   \iffieldequalstr{entrykey}{#1}%<- key after which you want the break
-    {\finentry\pagebreak}
-    {\finentry}}}
 \endinput
