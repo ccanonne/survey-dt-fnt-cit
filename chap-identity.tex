@@ -817,7 +817,7 @@ It is unclear whether one could avoid using the first (very convenient) ``stocha
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Random binary hashing} 
-Now we turn to a tester that is \emph{not} sample-optimal~--~but has other advantages, and whose analysis contains a couple of insighful aspects. The main idea is that, while large domains are complicated, if there is one thing we know how to do optimally it is estimating the bias of a coin. That is, we know how to handle the case $\ab=2$:
+Now we turn to a tester that is \emph{not} sample-optimal~--~but has other advantages, and whose analysis contains a couple insighful aspects. The main idea is that, while large domains are complicated, if there is one thing we know how to do optimally it is estimating the bias of a coin. That is, we know how to handle the case $\ab=2$:
 \begin{fact}[Bias of a coin]\exercise{Prove this!~\cref{ex:uniformity:bias:coin}.}
   \label{lemma:bias:coin}
   Given \iid samples from a Bernoulli with unknown parameter $\alpha\in[0,1]$, estimating $\alpha$ to an additive $\eta$ with probability $1-\errprob$ can be done with (and requires) $\bigTheta{\frac{\log(1/\errprob)}{\eta^2}}$ samples.
@@ -872,7 +872,7 @@ $|\p(S)-|S|/\ab| \geq \dst/\sqrt{2\ab}$ with constant probability (over the choi
 \[
     \ns \asymp \frac{1}{(\dst/\sqrt{\ab})^2} = \frac{\ab}{\dst^2}
 \]
-samples by~\cref{lemma:bias:coin}. Of course, there is a catch: we will only detect it when there \emph{is} some bias to detect, \ie when the random set $S$ we choose is ``good;'' and we only proved this happens with probability at least $1/48$. But a constant probability to distinguish between uniform and far from uniform is enough: independently repeating the test several times will let us amplify the success probability to $2/3$.
+samples by~\cref{lemma:bias:coin}. Of course, there is a catch: we will only detect it when there \emph{is} some bias to detect, \ie when the random set $S$ we choose is ``good;'' which we only proved happens with probability at least $1/48$. But a constant probability to distinguish between uniform and far from uniform is enough: repeating independently the test several times will let us amplify the success probability to $2/3$.
 \begin{theorem}
 The binary hashing tester (\cref{{algo:binary:hashing:amplified}}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = O(\ab/\dst^2)$ and time complexity $O(\ns)$.
 \end{theorem}
@@ -1434,7 +1434,9 @@ One can interpret this trick as applying a suitable randomized transformation to
 Here, we chose $\ab=\ab'$ and $\Phi(\p) = \frac{1}{2}\p+\frac{1}{2}\uniform_\ab$ (and $\operatorname{dist}$ being the total variation distance, for a rather liberal interpretation of $\approx$), which worked for the $\chi^2$-based tester; in the next two subsections, we will see variants of this idea, applying more generally to any tester.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Reduction to (near)-uniformity testing: $\lp[2]$ distance}
-The first idea is, given how convenient $\lp[2]$ distance has proven itself as a proxy for total variation distance when testing uniformity, to attempt to perform \emph{identity} testing in $\lp[2]$ distance as well. This will not quite work, unfortunately, as the $\lp[2]$ guarantee will only translate to a good $\lp[1]$/total variation one when the reference distribution $\q$ is somewhat ``close to uniform'' (in a specific sense: when it has small $\lp[2]$ norm $\normtwo{\q}$). Which is when the type of randomized mapping we just discussed will come in handy, providing a principled way to ensure this condition holds. Our first step is thus to get a good $\lp[2]$ testing algorithm; for simplicity of analysis, we will throughout this section work in the Poissonized sampling setting.
+The first idea is, given how convenient $\lp[2]$ distance has proven itself as a proxy for total variation distance when testing uniformity, to attempt to perform \emph{identity} testing in $\lp[2]$ distance as well. This will not quite work, unfortunately, as the $\lp[2]$ guarantee will only translate to a good $\lp[1]$/total variation one when the reference distribution $\q$ is somewhat ``close to uniform'' (in a specific sense: when it has small $\lp[2]$ norm $\normtwo{\q}$). Which is when the type of randomized mapping we just discussed will come in handy, providing a principled way to ensure this condition holds. 
+
+\paragraph{A good $\lp[2]$ tester.} Our first step is thus to get a good $\lp[2]$ testing algorithm; for simplicity of analysis, we will throughout this section work in the Poissonized sampling setting, and establish the following theorem:
 \begin{theorem}
   \label{theo:l2:identity:robust}
   Given the explicit description of a probability distribution $\q\in\distribs{\ab}$, parameter $\dst\in(0,1]$, and $\poisson{\ns}$ \iid samples from an unknown $\p\in\distribs{\ab}$,~\cref{algo:l2:identity} runs in time $O(\ns\log \ns + \ab)$ and 
@@ -1524,11 +1526,72 @@ samples, as promised. This then implies a uniformity testing algorithm with a sm
 \end{claim}
 \fi
 
-% \begin{proposition}\label{prop:ggg:2}
-% There exists an absolute constant $c > 0$ such that the above algorithm, when given $\Poi(m)$ samples drawn from two distributions, $p,q$ will, with probability at least $3/4$, 
-% distinguishes between \textsf{(a)} $\lVert p-q\rVert_2 \leq \eps$ and \textsf{(b)} $\lVert p-q\rVert_2 \geq 2\eps$ provided that $m \geq c\frac{\sqrt{b}}{\eps^2}$, where $b$ is an upper bound on $\lVert p\rVert_2^2, \lVert q\rVert_2^2$. (Moreover, one can take $c = 130$.)
-% \end{proposition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{From arbitrary $\q$ to small $\lp[2]$ norm.} Since the theorem we just established (\cref{theo:l2:identity:robust}) is particularly well suited to reference distributions $\q$ which are ``close to uniform'' in the sense of having very small $\lp[2]$ norm, it would be very convenient if we could assume this ``without loss of generality'' of every reference $\q$. Of course, this is not true~--~but, as we will see, there is a neat transformation $\Phi$ which will essentially give us this, at nearly no cost.
 
+Namely, define, for every $i \in [\ab]$, the value $\ab_i \eqdef \flr{ \ab\q(i) } + 1$; and, accordingly, 
+\begin{equation}
+	\label{def:phi:mapping:l2:domain}
+	\ab' \eqdef \sum_{i=1}^\ab \ab_i \leq \sum_{i=1}^\ab (\ab\q(i) + 1) = 2\ab\,.
+\end{equation}
+The tranformation $\Phi_\q$ will map a distribution $\p\in\distribs{\ab}$ to a distribution $\Phi_\q(\p)\in\distribs{\ab'}$ which, for each $i\in[\ab]$, has $\ab_i \geq 1$ elements with probability $\p(i)/\ab_i$:
+\begin{equation}
+	\label{def:phi:mapping:l2}
+	\Phi_\q(\p)(j) = \sum_{i=1}^\ab \frac{\p(i)}{\ab_i} \indic{ j\in S_i }, \qquad j \in [\ab']
+\end{equation}
+where $S_i \eqdef \{ 1+\sum_{\ell=1}^{i-1} \ab_\ell,\dots, \sum_{\ell=1}^i \ab_\ell \}$ for all $i\in[\ab]$.
+\begin{example}
+If $\ab=2$ and $\q(1)=1/3, \q(2)=2/3$, then $\ab_1 = 1$, $\ab_2 = 2$, $\ab'=3$, and for any $\p\in\distribs{2}$ we have $\Phi_\q(\p)\in\distribs{3}$ with
+\[
+	\Phi_\q(\p)(1) = \p(1), \quad \Phi_\q(\p)(2)=\Phi_\q(\p)(3) = \frac{\p(2)}{2}\,,
+\]
+and $S_1=\{1\}$, $S_2=\{2,3\}$.
+\end{example}
+One advantage of the transformation $\Phi_\q$ described in~\cref{def:phi:mapping:l2} is its efficiency: knowing $\q$, one can compute all $\ab_i$ in time linear in $\ab$. Moreover, given samples from any (unknown) distribution $\p\in\distribs{\ab}$, one can easily simulate samples from $\Phi_\q(\p)$ with the following randomized mapping $\Psi_\q\colon[\ab]\to[\ab']$:
+\begin{description}
+	\item[$\Psi_\q$:] Given $i \in [\ab]$, return one of the $\ab_i$ elements from $S_i$ uniformly at random.
+\end{description}
+One can check that, if $x\sim\p$, then $\Psi_\q(x)\sim\Phi_\q(\p)$. Thus, so far we have defined a pair of mappings $(\Phi_\q,\Psi_\q)$, which depend on our reference distribution $\q$ and allow us to go from distributions and samples over $[\ab]$ to distributions and samples over a slightly larger domain $[\ab']$. What did we gain in doing so?
+
+The next two lemmas will provide the answer, by showing that (1)~the transformation $\Phi_\q$ \emph{preserves distances between distributions}, and that (2)~after applying $\Phi_\q$ to our reference distribution $\q$, \emph{the ``new'' reference distribution $\Phi_\q(\q)$ has small $\lp[2]$ norm.} Which is great, as these two properties are exactly what we need to apply the $\lp[2]$ tester from~\cref{theo:l2:identity:robust}! 
+
+\begin{lemma}[Distances are preserved]
+	For any $\p_1,\p_2\in\distribs{\ab}$, we have
+	\[	
+		\totalvardist{\Phi_\q(\p_1)}{\Phi_\q(\p_2)} = \totalvardist{\p_1}{\p_2}\,.
+	\]
+\end{lemma}
+\begin{proof}
+Unrolling the definitions, since $[\ab'] = \disjunion_{i=1}^\ab S_i$ we have
+\begin{align*}
+	2\totalvardist{\Phi_\q(\p_1)}{\Phi_\q(\p_2)}
+	&= \sum_{i=1}^{\ab} \sum_{j\in S_i} \abs{\Phi_\q(\p_1)(j)-\Phi_\q(\p_2)(j)} \\
+	&= \sum_{i=1}^{\ab} \sum_{j\in S_i} \frac{\abs{\p_1(i)-\p_2(i)}}{\ab_i}\\
+	&= \sum_{i=1}^{\ab} \abs{\p_1(i)-\p_2(i)} \\
+	&= 2\totalvardist{\p_1}{\p_2}\,,
+\end{align*}
+where we used the fact that $\ab_i = |S_i|$ for all $i\in[\ab]$.
+\end{proof}
+
+\begin{lemma}[$\Phi_\q(\q)$ is nice]
+	We have
+	\[	
+		\normtwo{\Phi_\q(\q)} \leq \frac{\sqrt{2}}{\sqrt{\ab'}}\,.
+	\]
+\end{lemma}
+\begin{proof}
+This is again a game of unrolling:
+\begin{align*}
+	\normtwo{\Phi_\q(\q)}^2 
+	= \sum_{i=1}^{\ab} \sum_{j\in S_i} \Phi_\q(\q)(j)^2
+	= \sum_{i=1}^{\ab} \sum_{j\in S_i} \frac{\q(i)^2}{\ab_i^2}
+	= \sum_{i=1}^{\ab} \frac{\q(i)^2}{\ab_i}
+	\leq \sum_{i=1}^{\ab} \frac{\q(i)}{\ab} = \frac{1}{\ab}
+\end{align*}
+where the inequality follows from $\ab_i = 1+\flr{\ab\q(i)} \geq \ab\q(i)$. To conclude, recall from~\cref{def:phi:mapping:l2:domain} that $\ab' \leq 2\ab$.
+\end{proof}
+
+\todonoteinline{Add an exercise to show that $\normtwo{\Phi_\q(\p)-\Phi_\q(\q)}^2 \approx \frac{1}{\ab}\chisquare{\p}{\q}$.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Reduction to uniformity testing: $\lp[1]$ distance}

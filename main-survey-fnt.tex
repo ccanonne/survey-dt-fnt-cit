@@ -1,3 +1,7 @@
+%%%% IMPORTANT: to generate the nomenclature
+%% makeindex main-survey-fnt.nlo -s nomencl.ist -o main-survey-fnt.nls
+
+
 % !Mode:: "TeX:DE:UTF-8:Main"
 %
 %
@@ -54,6 +58,10 @@
 \newcommand{\nst}{\textcolor{red}{\ns_2}}
 \newcommand{\nsu}{\textcolor{red}{\ns_3}}
 \newcommand{\occur}{\textcolor{red}{N}}
+
+
+%% Subsections in the ToC (set to 1 for sections only)
+\setcounter{tocdepth}{2}
 
 %ARTICLE TITLE
 \title{Topics and Techniques in Distribution Testing}
