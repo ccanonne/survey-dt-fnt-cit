@@ -1328,7 +1328,7 @@ In this section, we have covered and analyzed seven different algorithms for uni
   \end{equation}
   which can be much smaller for vanishing $\errprob$, \eg $\errprob = 1/2^{\Omega(\ab)}$. The bound~\cref{eq:optimal:dep:delta} is achieved by the empirical-distance tester, but with a different analysis to prove concentration around the mean: namely, instead of a Chebyshev-based (variance) bound, one can use instead the so-called \emph{bounded differences inequality} (McDiarmid's inequality) and its ``Bernstein-type variant'' (bounded variances inequality)~\citep[Chapters~5.4 and 8]{DubhashiP09} to show that the statistic $Z_4$ concentrates very tightly. The low sensitivity of $Z_4$, as it happens, plays a crucial role when applying those bounds.
   \item The random binary hashing testing, albeit not sample-optimal, only requires to store a \emph{single} bit of information per sample. (Moreover, this can be generalized to $\numbits$ bits by hashing to $2^\numbits$ elements instead of two, leveraging~\cref{theo:random:dct:hashing}.) This can be very valuable in memory-limited or communication-limited settings (we will get back to this in~\cref{chap:constrained}), or in the case of \emph{local} differential privacy~\citep{KLNRS:11}, where this can be used to obtain a sample-optimal locally private uniformity testing algorithm~\citep{AcharyaCFST21} (as optimally privatizing \emph{one} bit is much easier than a full $\log\ab$-bit sample).
-  \item Finally, the $\chi^2$ tester\dots just works. It also nicely generalizes to other problems (identity testing, as we will see in~\cref{sec:identity}; or even, with appropriate modifications, to ``closeness testing'' (two-sample goodness-of-fit) or other related testing tasks. Among other enjoyable properties, its asymptotic distribution (as the number of samples $\ns\to\infty$) can be obtained, letting us (asymptotically) obtain confidence intervals. It also does provide, as the collision-based tester, some amount of tolerance, in the so-called $\chi^2$ divergence; we will see in~\cref{chap:algorithmic:frameworks} how this $\chi^2$-divergence tolerance can be used as a blackbox to obtain testing algorithms for other properties than uniformity.
+  \item Finally, the $\chi^2$ tester\dots just works. It also nicely generalizes to other problems (identity testing, as we will see in~\cref{sec:identity}; or even, with appropriate modifications, to ``closeness testing'' (two-sample goodness-of-fit) or other related testing tasks. Among other enjoyable properties, its asymptotic distribution (as the number of samples $\ns\to\infty$) can be obtained, letting us (asymptotically) obtain confidence intervals. It also does provide, as the collision-based tester, some amount of tolerance, in the so-called $\chi^2$ divergence; while beyond the scope of this survey, this $\chi^2$-divergence tolerance can be used as a blackbox to obtain testing algorithms for other properties than uniformity~\citep{AcharyaDK15}.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1346,7 +1346,7 @@ mity testing.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The return of $\chi^2$}
-
+	\label{ssec:chisquare:identity}
 
 We will only make a small change to our statistic $Z_3$ from~\cref{ssec:uniformity:chisquare}, to replace the uniform distribution by our reference distribution $\q$; the analysis itself, besides a simple ``trick,'' will also be almost identical. We will again work here in the Poissonized sampling model, and let
 \begin{equation}
@@ -1434,6 +1434,7 @@ One can interpret this trick as applying a suitable randomized transformation to
 Here, we chose $\ab=\ab'$ and $\Phi(\p) = \frac{1}{2}\p+\frac{1}{2}\uniform_\ab$ (and $\operatorname{dist}$ being the total variation distance, for a rather liberal interpretation of $\approx$), which worked for the $\chi^2$-based tester; in the next two subsections, we will see variants of this idea, applying more generally to any tester.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Reduction to (near)-uniformity testing: $\lp[2]$ distance}
+	\label{ssec:l2:reduction}
 The first idea is, given how convenient $\lp[2]$ distance has proven itself as a proxy for total variation distance when testing uniformity, to attempt to perform \emph{identity} testing in $\lp[2]$ distance as well. This will not quite work, unfortunately, as the $\lp[2]$ guarantee will only translate to a good $\lp[1]$/total variation one when the reference distribution $\q$ is somewhat ``close to uniform'' (in a specific sense: when it has small $\lp[2]$ norm $\normtwo{\q}$). Which is when the type of randomized mapping we just discussed will come in handy, providing a principled way to ensure this condition holds. 
 
 \paragraph{A good $\lp[2]$ tester.} Our first step is thus to get a good $\lp[2]$ testing algorithm; for simplicity of analysis, we will throughout this section work in the Poissonized sampling setting, and establish the following theorem:
@@ -1609,7 +1610,7 @@ With these two lemmas, we can combine the transformation $(\Phi_\q,\Psi_\q)$ wit
 \end{algorithm}
 %%%%%%%%%%%%%%%%
 \begin{theorem}
-  \label{theo:z}
+  \label{theo:l2:reduction}
 The $\lp[2]$-reduction-based tester (\cref{algo:l2:reduction:identity}) is a (time-efficient) testing algorithm for identity with sample complexity $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$ in the Poissonized setting.\footnote{We do not state its exact time complexity here, as this would involve annoying considerations on how to efficiently represent $\Phi_\q,\Psi_\q$, and the complexity of sampling from the randomized function $\Psi_\q$.}
 \end{theorem}
 \begin{proof}
@@ -1623,15 +1624,17 @@ By~\cref{theo:l2:identity:robust},~\cref{algo:l2:identity} will then distinguish
 \]
 Since $\ab'\normtwo{\Phi_\q(\q)} \leq \sqrt{2\ab'}$ by~\cref{lemma:l2:reduction:l2norm} and $\ab'\leq 2\ab$ by~\cref{def:phi:mapping:l2:domain}, the right-hand-side is at most $200\sqrt{\ab}/\eps^2$, and so having $\ns \geq 200\sqrt{\ab}/\eps^2$ suffices.
 \end{proof}
-
-\todonoteinline{Add an exercise to show that $\normtwo{\Phi_\q(\p)-\Phi_\q(\q)}^2 \approx \frac{1}{\ab}\chisquare{\p}{\q}$.}
+To conclude this subsection, it is worth highlighting the connection between this $\lp[2]$ reduction and the $\chi^2$-based tester from~\cref{theo:z}. Indeed, while we focused on the fact that the tranformation $\Phi_\q$ preserved the total variation distance between distributions (\cref{lemma:l2:reduction:distances}), one can also see it as \emph{converting $\chi^2$ divergences (to $\q$) to $\lp[2]$ distances}: $\chisquare{\p}{\q}\approx \ab\normtwo{\Phi_\q(\p)-\Phi_\q(\q)}^2$.\exercise{See~\cref{ex:l2:reduction:chisquare}.} Thus, in this sense,~\cref{algo:chisquare:identity} can be seen as an ``unrolled'' version of~\cref{algo:l2:reduction:identity}, where the mapping $\Phi_\q$ is explicitly expanded into~\cref{algo:l2:identity}, converting $\lp[2]$ testing of $\Phi_\q(\p),\Phi_\q(\q)$ into $\chi^2$ testing of $\p,\q$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Reduction to uniformity testing: $\lp[1]$ distance}
+So far, we have seen in~\cref{ssec:chisquare:identity} a transformation which brought the reference distribution $\q$ (and, actually, \emph{all} distributions) a little closer to uniform, while preserving the total variation distances up to a factor $2$ (\cref{eq:trick:mixture}); and, in~\cref{ssec:l2:reduction}, a different transformation which brought down the $\lp[2]$ norm of the reference $\q$ to ``near-uniform levels'' while exactly preserving the total variation distances. In this section, we will describe a third mapping, which transforms the reference $\q$ to the \emph{actual} uniform distribution (on a slightly larger domain), while \emph{also} exactly preserving total variation distances.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}
+\tbc
 \citet{GoldreichR00} 
 \cite{Paninski08}
 \cite{ChanDVV14}
@@ -1728,6 +1731,17 @@ If $X\sim\poisson{\lambda}$ and $Y\sim\poisson{\mu}$ are independent, then
   $.
 \end{claim}
 \noindent Show that the sample complexity is $O(\max\Paren{\normtwo{\p},\normtwo{\q}}/\dst^2)$. Try to establish the (incomparable) bound $O(\min\Paren{\normtwo{\p},\normtwo{\q}}/\dst^2+1/\dst)$.
+\end{question}
+\begin{question}\label{ex:l2:reduction:chisquare}
+Show that the transformation $\Phi$ from~\cref{ssec:l2:reduction} (\cref{def:phi:mapping:l2}) ``maps $\chi^2$ divergence to $\lp[2]$ distance'' in the following, approximate way: for any $\p,\q\in\distribs{\ab}$, 
+\[
+	\normtwo{\Phi_\q(\p)-\Phi_\q(\q)}^2 = \sum_{i\in\domain}\frac{(\p(i)-\q(i))^2}{1+\flr{\ab\q(i)}\,.}
+\]
+Conclude that, assuming $\min_i \q(i) \geq 1/(2\ab)$ (as we could in~\cref{ssec:chisquare:identity} after using the ``mixture trick'' of~\cref{eq:trick:mixture}), 
+\[
+	\frac{1}{2}\chisquare{\p}{\q}\leq \ab\normtwo{\Phi_\q(\p)-\Phi_\q(\q)}^2 \leq \chisquare{\p}{\q}
+\]
+for every $\p\in\distribs{\ab}$.
 \end{question}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
