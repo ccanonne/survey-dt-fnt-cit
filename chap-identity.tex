@@ -1508,9 +1508,9 @@ samples, as promised. This then implies a uniformity testing algorithm with a sm
 \begin{algorithm}
   \begin{algorithmic}
   \Require $\dst\in(0,1)$, $\ns$ samples from distribution $\p$, with $X_i$ denoting the number of occurrences of the $i$th domain elements in the samples from $\p$.
-  \Ensure Returns \textsf{accept} if $\lVert p -q\rVert_2 \leq \eps$ and \textsf{reject} if $\lVert p -q\rVert_2 \geq 2\eps$.
+  \Ensure Returns \textsf{accept} if $\lVert p -q\rVert_2 \leq \dst$ and \textsf{reject} if $\lVert p -q\rVert_2 \geq 2\eps$.
     \State Define $Z=\sum_{i}(X_i-Y_i)^2-X_i-Y_i.$
-    \State Return  \textsf{reject} if $\frac{\sqrt{Z}}{m} > \sqrt{3}\eps$, \textsf{accept} otherwise.
+    \State Return  \textsf{reject} if $\frac{\sqrt{Z}}{m} > \sqrt{3}\dst$, \textsf{accept} otherwise.
   \end{algorithmic}
   \caption{\label{algo:l2:identity:robust}}
 \end{algorithm}
@@ -1622,21 +1622,25 @@ By~\cref{theo:l2:identity:robust},~\cref{algo:l2:identity} will then distinguish
 \[
 	\ns \geq 100\max\Paren{\normtwo{\Phi_\q(\q)}/\dst'^2, 2/\dst'} = 100\max\Paren{\ab'\normtwo{\Phi_\q(\q)}/\dst^2, \sqrt{\ab'}/\dst}\,.
 \]
-Since $\ab'\normtwo{\Phi_\q(\q)} \leq \sqrt{2\ab'}$ by~\cref{lemma:l2:reduction:l2norm} and $\ab'\leq 2\ab$ by~\cref{def:phi:mapping:l2:domain}, the right-hand-side is at most $200\sqrt{\ab}/\eps^2$, and so having $\ns \geq 200\sqrt{\ab}/\eps^2$ suffices.
+Since $\ab'\normtwo{\Phi_\q(\q)} \leq \sqrt{2\ab'}$ by~\cref{lemma:l2:reduction:l2norm} and $\ab'\leq 2\ab$ by~\cref{def:phi:mapping:l2:domain}, the right-hand-side is at most $200\sqrt{\ab}/\dst^2$, and so having $\ns \geq 200\sqrt{\ab}/\eps^2$ suffices.
 \end{proof}
 To conclude this subsection, it is worth highlighting the connection between this $\lp[2]$ reduction and the $\chi^2$-based tester from~\cref{theo:z}. Indeed, while we focused on the fact that the tranformation $\Phi_\q$ preserved the total variation distance between distributions (\cref{lemma:l2:reduction:distances}), one can also see it as \emph{converting $\chi^2$ divergences (to $\q$) to $\lp[2]$ distances}: $\chisquare{\p}{\q}\approx \ab\normtwo{\Phi_\q(\p)-\Phi_\q(\q)}^2$.\exercise{See~\cref{ex:l2:reduction:chisquare}.} Thus, in this sense,~\cref{algo:chisquare:identity} can be seen as an ``unrolled'' version of~\cref{algo:l2:reduction:identity}, where the mapping $\Phi_\q$ is explicitly expanded into~\cref{algo:l2:identity}, converting $\lp[2]$ testing of $\Phi_\q(\p),\Phi_\q(\q)$ into $\chi^2$ testing of $\p,\q$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Reduction to uniformity testing: $\lp[1]$ distance}
+	\label{ssec:l1:reduction}
 So far, we have seen in~\cref{ssec:chisquare:identity} a transformation which brought the reference distribution $\q$ (and, actually, \emph{all} distributions) a little closer to uniform, while preserving the total variation distances up to a factor $2$ (\cref{eq:trick:mixture}); and, in~\cref{ssec:l2:reduction}, a different transformation which brought down the $\lp[2]$ norm of the reference $\q$ to ``near-uniform levels'' while exactly preserving the total variation distances. In this section, we will describe a third mapping, which transforms the reference $\q$ to the \emph{actual} uniform distribution (on a slightly larger domain), while \emph{nearly} preserving total variation distances.
 
 The advantage of this particular transformation is that it provides an actual \emph{reduction}, in the formal computer science sense, from identity testing to uniformity testing. After applying this mapping, one can use any uniformity testing algorithm (\eg any of those we saw in~\cref{sec:uniformity}) \emph{as a blackbox}, without any modification, to perform the testing. As an algorithm designer, or (in the case of the author of this survey) a somewhat lazy person, this is particularly satisfying.
 
 This transformation will be done in three steps:\footnote{Recall that $\Phi_\q$ denotes a mapping between probability distributions, while $\Psi_\q$ is the corresponding (randomized) mapping between samples: for any distribution $\p$, applying $\Psi_\q$ on a sample $x\sim\p$ yields a sample $\Psi_\q(x)$ distributed according to $\Phi_\q(\p)$. Importantly, computing $\Psi_\q(x)$ only requires knowledge of $\q$, and \emph{not} of $\p$.} (1)~a mapping $(\Phi^{(1)}_\q,\Psi^{(1)}_\q)$ which transforms any ``well-behaved'' reference distribution $\q$ over $[\ab+1]$ into the uniform distribution over some larger domain $[\ab']$, and exactly preserves total variation distances; (2)~a mapping $(\Phi^{(2)}_\q,\Psi^{(2)}_\q)$, which transforms any ``not-too-badly behaved'' reference $\q$ over $[\ab]$ into a ``well-behaved'' (in the sense of (1)) distribution over $[\ab+1]$, roughly preserving the distances; and, finally, a simple mapping $(\Phi^{(3)}_\q,\Psi^{(3)}_\q)$ which transforms an arbitrary reference distribution $\q$ over $[\ab]$ into a ``not-too-badly behaved'' (in the sense of (2)) distribution over the same domain, also roughly preserving the distances. Combining the three will give us the overall mappings
-\begin{align*}
-	\Phi_\q\eqdef \Phi^{(1)}_\q\circ\Phi^{(2)}_\q\circ\Phi^{(3)}_\q &\colon \distribs{\ab} \to\distribs{\ab} \to\distribs{\ab+1} \to \distribs{\ab'} \\
-	\Psi_\q\eqdef \Psi^{(1)}_\q\circ\Psi^{(2)}_\q\circ\Psi^{(3)}_\q &\colon [\ab] \to[\ab] \to[\ab+1] \to [\ab']
-\end{align*}
+\begin{equation}
+	\label{eq:l1:reduction:composition}
+	\begin{aligned}
+		\Phi_\q\eqdef \Phi^{(1)}_\q\circ\Phi^{(2)}_\q\circ\Phi^{(3)}_\q &\colon \distribs{\ab} \to\distribs{\ab} \to\distribs{\ab+1} \to \distribs{\ab'} \\
+		\Psi_\q\eqdef \Psi^{(1)}_\q\circ\Psi^{(2)}_\q\circ\Psi^{(3)}_\q &\colon [\ab] \to[\ab] \to[\ab+1] \to [\ab']
+	\end{aligned}
+\end{equation}
 such that $\Phi_\q(\q)=\uniformOn{\ab'}$, and $\totalvardist{\Phi_\q(\p_1)}{\Phi_\q(\p_2)} \approx \totalvardist{\p_1}{\p_2}$ for all $\p_1,\p_2\in\distribs{\ab}$. Moreover, we will also have $\ab'\asymp\ab$: the domain size does not increase by more than a constant factor.
 
 \paragraph{From well-behaved to uniform.} In~\cref{ssec:l2:reduction}, the main idea was to associate each element $i\in[\ab]$ with a set of $\ab_i=1+\flr{\ab\q(i)}$ elements $S_i$, so that upon sampling $i$ we would return an element of $S_i$ uniformly at random. This reduction has almost all properties we wanted, except that it did not map $\q$ to the uniform distribution on $[\ab'] = \disjunion_i S_i$: only to something with small $\lp[2]$ norm. The reason for this boils down to our choice of $\ab_i$, and, more specifically looking at~\cref{def:phi:mapping:l2}, to the sad fact that
@@ -1722,7 +1726,39 @@ and $\Psi^{(3)}_\q$ is just the randomized function which returns a uniformly ra
 \end{description}
 We then have, as in~\cref{ssec:chisquare:identity}, that $\smash{\totalvardist{\Phi^{(3)}_\q(\p_1)}{\Phi^{(3)}_\q(\p_2)}}\geq \frac{1}{2}\totalvardist{\p_1}{\p_2}$ for all $\p_1,\p_2$, and that $\min_i \smash{\Phi^{(3)}_\q(\q)(i)} \geq 1/(2\ab)$.
 
-\paragraph{Putting it together.}
+\paragraph{Putting it together.} Combining the 3 mappings described and analyzed above for $\ab'\eqdef 4\ab$, we get the following:
+\begin{theorem}
+	Given an arbitrary reference distribution $\q\in\distribs{\ab}$, the pair $(\Phi_\q,\Psi_\q)$ defined in~\cref{eq:l1:reduction:composition} maps distributions and samples over $[\ab]$ to distributions and samples over $[4\ab]$, and satisfies
+	(1)~$\Phi_\q(\q) = \uniformOn{4\ab}$;
+	(2)~for every $\p_1,\p_2\in\distribs{\ab}$, 
+	\[
+		\totalvardist{\Phi_\q(\p_1)}{\Phi_\q(\p_2)}\geq \frac{1}{4}\totalvardist{\p_1}{\p_2}\,.
+	\]
+\end{theorem}
+As a direct consequence, we get the following general theorem:
+\begin{theorem}
+  \label{theo:l1:reduction}
+The uniformity-reduction-based tester (\cref{algo:l1:reduction:identity}) is a testing algorithm for identity with sample complexity $\ns(\ab,\dst,1/3) = \ns_U(4\ab,\dst/4,1/3)$, where $\ns_U$ denotes the sample complexity of the chosen uniformity testing algorithm. In particular, by choosing any optimal uniformity testing algorithm, one obtains $\ns(\ab,\dst,1/3) = O(\sqrt{\ab}/\dst^2)$.
+\end{theorem}
+%%%%%%%%%%%%%%%%
+\begin{algorithm}[ht!]
+  \begin{algorithmic}[1]
+    \Require Multiset of $\ns$ samples $x_1,\dots,x_\ns \in \domain$, parameters $\dst\in(0,1]$ and explicit description of $\q\in\distribs{\ab}$.
+        \Comment{Assumes Poissonization if the uniformity testing algorithm used in~\cref{algo:l1:reduction:identity:choice}  does.}
+    \State Compute the mappings $\Psi_\q$ as in~\cref{eq:l1:reduction:composition}, for $\ab'\gets 4\ab$
+    \State Convert samples $x_1,\dots,x_\ns \in \domain$ to samples $x'_1,\dots,x'_\ns \in \domain' \eqdef [\ab']$, where $x'_i \gets \Psi_\q(x_i)$. \Comment{Requires randomness: $\Psi_\q$ is randomized.}
+    \State\label{algo:l1:reduction:identity:choice} Invoke \emph{any} uniformity tester over $[\ab']$ on $x'_1,\dots,x'_\ns$, with distance parameter $\dst/4$.
+    \If{ the uniformity tester returns \reject } \Return \reject \Comment{Not $\q$}
+    \Else\ 
+      \Return \accept \Comment{Equal to $\q$}
+    \EndIf
+  \end{algorithmic}
+  \caption{\label{algo:l1:reduction:identity}\sc Identity Tester via Uniformity Reduction}
+\end{algorithm}
+%%%%%%%%%%%%%%%%
+To conclude this section, let us discuss some aspects of this reduction. The first is its generality: since the reduction only requires knowledge of the reference distribution $\q$ and defers the testing to any uniformity testing of one's choosing, one can apply it in other settings than the ``standard'' one where samples are fully available: for instance, in some of the constrained measurements settings discussed in~\cref{chap:constrained}. This means that in these cases as well, one can focus on getting a good uniformity testing algorithm, and then see it extended immediately to identity testing ``for free''!
+
+The second is its cost. The above argument transforms the identity testing question with parameters $(\ab,\dst)$ to uniformity testing with parameters $(4\ab, \dst/4)$. Since the cost of the latter scales as $\sqrt{\ab}/\dst^2$, the ``blowup'' in sample complexity between uniformity and identity testing is $\sqrt{4}/(1/4)^2 = 32$. This might seem a lot! Yet, we did not make here any attempt at optimizing the parameters: one can check (see~\cref{ex:l1:reduction:parameters}) that choosing better parameters reduces this blowup to ``only'' a factor $\approx 12.2$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1835,6 +1871,18 @@ Conclude that, assuming $\min_i \q(i) \geq 1/(2\ab)$ (as we could in~\cref{ssec:
 	\frac{1}{2}\chisquare{\p}{\q}\leq \ab\normtwo{\Phi_\q(\p)-\Phi_\q(\q)}^2 \leq \chisquare{\p}{\q}
 \]
 for every $\p\in\distribs{\ab}$.
+\end{question}
+\begin{question}[$\star\star$]\label{ex:l1:reduction:parameters}
+Generalize the transformation $\Phi$ from~\cref{ssec:l1:reduction} in two ways: first, by replacing the mixture $\Phi^{(3)}_\q(\p) = \frac{1}{2}\p+\frac{1}{2}\uniformOn{\ab}$ by $\alpha\p+(1-\alpha)\uniformOn{\ab}$, where $\alpha\in(0,1)$. Second, by replacing the choice $\ab'=4\ab$ in $\Phi^{(2)}(\p)$ by $\ab'=\beta\ab$, for some integer $\beta$ such that $\beta(1-\alpha)\geq 1$.
+\begin{enumerate}
+  \item By tracking down the various restrictions on $\alpha,\beta$ and their use across $\Phi^{(1)}$, $\Phi^{(2)}$, and $\Phi^{(3)}$, show that doing so now maps identity testing with parameters $(\ab,\dst)$ to uniformity testing with parameters 
+  \[
+  	\Paren{\beta\ab,\alpha\Paren{1-\frac{1}{\beta(1-\alpha)}}\dst}
+  \]
+  \item Check that setting $(\alpha,\beta)=(1/2,4)$ as in~\cref{ssec:l1:reduction} recovers~\cref{theo:l1:reduction}, and the blowup factor of $32$ discussed at the end of the section.
+  \item Recalling that the sample complexity scales as $\sqrt{\ab}/\dst^2$, optimize over $(\alpha,\beta)$ to find the optimal choice of parameters, and prove that the resulting blowup is $\approx 12.2$. %% alpha = 4/5, beta=25
+  \item What would be the optimal choice of $(\alpha,\beta)$, and the corresponding blowup, in a setting where the sample complexity of uniformity testing scales as $\ab/\dst^2$ instead of $\sqrt{\ab}/\dst^2$? (This is not that far-fetched: we will see in~\cref{sec:domain:compression} an example of such a setting.)  %alpha=2/3, beta=9, blowup 46
+\end{enumerate}
 \end{question}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
