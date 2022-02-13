@@ -1628,8 +1628,101 @@ To conclude this subsection, it is worth highlighting the connection between thi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Reduction to uniformity testing: $\lp[1]$ distance}
-So far, we have seen in~\cref{ssec:chisquare:identity} a transformation which brought the reference distribution $\q$ (and, actually, \emph{all} distributions) a little closer to uniform, while preserving the total variation distances up to a factor $2$ (\cref{eq:trick:mixture}); and, in~\cref{ssec:l2:reduction}, a different transformation which brought down the $\lp[2]$ norm of the reference $\q$ to ``near-uniform levels'' while exactly preserving the total variation distances. In this section, we will describe a third mapping, which transforms the reference $\q$ to the \emph{actual} uniform distribution (on a slightly larger domain), while \emph{also} exactly preserving total variation distances.
+So far, we have seen in~\cref{ssec:chisquare:identity} a transformation which brought the reference distribution $\q$ (and, actually, \emph{all} distributions) a little closer to uniform, while preserving the total variation distances up to a factor $2$ (\cref{eq:trick:mixture}); and, in~\cref{ssec:l2:reduction}, a different transformation which brought down the $\lp[2]$ norm of the reference $\q$ to ``near-uniform levels'' while exactly preserving the total variation distances. In this section, we will describe a third mapping, which transforms the reference $\q$ to the \emph{actual} uniform distribution (on a slightly larger domain), while \emph{nearly} preserving total variation distances.
 
+The advantage of this particular transformation is that it provides an actual \emph{reduction}, in the formal computer science sense, from identity testing to uniformity testing. After applying this mapping, one can use any uniformity testing algorithm (\eg any of those we saw in~\cref{sec:uniformity}) \emph{as a blackbox}, without any modification, to perform the testing. As an algorithm designer, or (in the case of the author of this survey) a somewhat lazy person, this is particularly satisfying.
+
+This transformation will be done in three steps:\footnote{Recall that $\Phi_\q$ denotes a mapping between probability distributions, while $\Psi_\q$ is the corresponding (randomized) mapping between samples: for any distribution $\p$, applying $\Psi_\q$ on a sample $x\sim\p$ yields a sample $\Psi_\q(x)$ distributed according to $\Phi_\q(\p)$. Importantly, computing $\Psi_\q(x)$ only requires knowledge of $\q$, and \emph{not} of $\p$.} (1)~a mapping $(\Phi^{(1)}_\q,\Psi^{(1)}_\q)$ which transforms any ``well-behaved'' reference distribution $\q$ over $[\ab+1]$ into the uniform distribution over some larger domain $[\ab']$, and exactly preserves total variation distances; (2)~a mapping $(\Phi^{(2)}_\q,\Psi^{(2)}_\q)$, which transforms any ``not-too-badly behaved'' reference $\q$ over $[\ab]$ into a ``well-behaved'' (in the sense of (1)) distribution over $[\ab+1]$, roughly preserving the distances; and, finally, a simple mapping $(\Phi^{(3)}_\q,\Psi^{(3)}_\q)$ which transforms an arbitrary reference distribution $\q$ over $[\ab]$ into a ``not-too-badly behaved'' (in the sense of (2)) distribution over the same domain, also roughly preserving the distances. Combining the three will give us the overall mappings
+\begin{align*}
+	\Phi_\q\eqdef \Phi^{(1)}_\q\circ\Phi^{(2)}_\q\circ\Phi^{(3)}_\q &\colon \distribs{\ab} \to\distribs{\ab} \to\distribs{\ab+1} \to \distribs{\ab'} \\
+	\Psi_\q\eqdef \Psi^{(1)}_\q\circ\Psi^{(2)}_\q\circ\Psi^{(3)}_\q &\colon [\ab] \to[\ab] \to[\ab+1] \to [\ab']
+\end{align*}
+such that $\Phi_\q(\q)=\uniformOn{\ab'}$, and $\totalvardist{\Phi_\q(\p_1)}{\Phi_\q(\p_2)} \approx \totalvardist{\p_1}{\p_2}$ for all $\p_1,\p_2\in\distribs{\ab}$. Moreover, we will also have $\ab'\asymp\ab$: the domain size does not increase by more than a constant factor.
+
+\paragraph{From well-behaved to uniform.} In~\cref{ssec:l2:reduction}, the main idea was to associate each element $i\in[\ab]$ with a set of $\ab_i=1+\flr{\ab\q(i)}$ elements $S_i$, so that upon sampling $i$ we would return an element of $S_i$ uniformly at random. This reduction has almost all properties we wanted, except that it did not map $\q$ to the uniform distribution on $[\ab'] = \disjunion_i S_i$: only to something with small $\lp[2]$ norm. The reason for this boils down to our choice of $\ab_i$, and, more specifically looking at~\cref{def:phi:mapping:l2}, to the sad fact that
+\[
+	\frac{\q(i)}{1+\flr{\ab\q(i)}} \neq \frac{1}{\ab}
+\]
+but instead the LHS is some quantity which depends on $i$. The deeper reason for this being that $\ab\q(i)$ is not in general a positive integer  (why would it be?), as otherwise we would just set $\ab_i \eqdef \ab\q(i)$ instead, and end up with $\q(i)/\ab_i = 1/\ab$ for all $i$. \emph{But we can dream,} and this motivates the following definition of ``well-behaved'' distribution $\q$:
+\begin{definition}[Grained distribution]
+Given a parameter $\gamma>0$, we say that a probability distribution $\q\in\distribs{\ab}$ is \emph{$\gamma$-grained} if every probability is a positive multiple of $\gamma$, that is, if $\q(i)\in \gamma\N$ for every $i\in[\ab]$.
+\end{definition}
+Now, suppose our reference distribution $\q$ over $[\ab]$\footnote{As discussed above, we will later apply this to a reference distribution over $[\ab+1]$; but for ease of notation here we keep $\ab$ as the domain size parameter.} is $(1/\ab')$-grained, for some suitable integer $\ab'\geq \ab$ (we will take $\ab'=4\ab$ or so). Then, we can, for every $i\in[\ab]$, set
+\begin{equation}
+	\label{eq:l1:reduction:ki}
+	\ab_i \eqdef \ab'\q(i) \in\N
+\end{equation}
+and then define accordingly the disjoint sets $S_1,\dots,S_\ab$ and the mappings $\Phi^{(1)}_\q,\Psi^{(1)}_\q$ as in~\cref{ssec:l2:reduction}, with this different choice of $\ab_i$'s:
+\begin{equation}
+	\label{def:phi:mapping:l1:grained}
+	\Phi^{(1)}_\q(\p)(j) = \sum_{i=1}^\ab \frac{\p(i)}{\ab_i} \indic{ j\in S_i } = \frac{1}{\ab'}\sum_{i=1}^\ab \frac{\p(i)}{\q(i)} \indic{ j\in S_i }, \qquad j \in [\ab']
+\end{equation}
+(note that $\ab' = \sum_{i=1}^\ab \ab'\q(i) = \sum_{i=1}^\ab \ab_i$). We directly have the analogue of~\cref{lemma:l2:reduction:distances}, with the same proof: for any $\p_1,\p_2\in\distribs{\ab}$,
+\begin{equation}
+	\label{lemma:l1:reduction:distances}	
+		\totalvardist{\Phi^{(1)}_\q(\p_1)}{\Phi^{(1)}_\q(\p_2)} = \totalvardist{\p_1}{\p_2}\,.
+\end{equation}
+(The interested reader can also verify that the $\chi^2$ divergences to $\q$ are now exactly mapped to $\lp[2]$ distances, not just approximately as in~\cref{ex:l2:reduction:chisquare}).\exercise{Check it!}  
+However, we now have a much stronger version of~\cref{lemma:l1:reduction:uniform}: $\Phi_\q(\q)$ is not just ``nice,'' it is \emph{the} uniform distribution!
+\begin{lemma}[$\Phi_\q(\q)$ is uniform]
+	\label{lemma:l1:reduction:uniform}
+	We have $\Phi_\q(\q)=\uniform_{\ab'}$ (and, in particular, 
+	$	
+		\normtwo{\Phi_\q(\q)} = {1}/{\sqrt{\ab'}}
+	$).
+\end{lemma}
+\noindent This follows readily from~\cref{def:phi:mapping:l1:grained}, which implies that $\Phi^{(1)}_\q(\q)(j) = 1/\ab'$ for all $j\in[\ab']$. This completes the first step of our reduction; in the next two, we will see how to go from an arbitrary reference distribution $\q$ to one which satisfies our very strong assumptions~--~that is, one which is $(1/\ab')$-grained for some reasonable parameter $\ab'$.
+
+
+
+\paragraph{From not-too-badly behaved to well-behaved.} Let us assume we have a reference distribution $\q\in\distribs{\ab}$, and we want to ``convert'' it to a $(1/\ab')$-grained distribution. A very natural idea is to simply shave off the extra probability mass from each point, to make each probability be a multiple of $1/\ab'$; and then to somehow move all that remaining probability mass on a single new element, say $\ab+1$. That is, for every $i\in[\ab]$, we go from $\q(i)$ to
+\[
+	\frac{\flr{\ab'\q(i)}}{\ab'}
+\]
+and put probability $1-\sum_{i=1}^\ab {\flr{\ab'\q(i)}}/{\ab'}$ (which is also a multiple of $1/\ab'$)  on $\ab+1$. Rewriting the above $\frac{\flr{\ab'\q(i)}}{\ab'\q(i)}\cdot \q(i)$, this leads to defining \smash{$\Phi^{(2)}_\q\in\distribs{\ab+1}$} as
+\begin{equation}
+	\label{def:phi:mapping:l1:making:grained}
+	\Phi^{(2)}_\q(\p)(j) \eqdef 
+	\begin{cases}
+		\frac{\flr{\ab'\q(j)}}{\ab'\q(j)}\cdot \p(j) & j\in[\ab]\\
+		1-\sum_{i=1}^\ab \frac{\flr{\ab'\q(i)}}{\ab'\q(i)}\p(i) & j=\ab+1
+	\end{cases}
+\end{equation}
+for $\p\in\distribs{\ab}$. This \emph{almost} works: the issue is that some of the $\q(j)$'s could be arbitrarily small, and for those $\Phi^{(2)}_\q(\q)(j) = 0$: this violates the requirement that a grained distribution only takes positive values (no $0$), and also could lead to some other issues about distances not being well preserved: for instance, one could have some distributions $\p_1,\p_2$ such that $\totalvardist{\Phi^{(2)}_\q(\p_1)}{\Phi^{(2)}_\q(\p_2)}=0$, yet $\totalvardist{\p_1}{\p_2}=1$!\exercise{Can you see why?}
+
+This will not happen, fortunately, if our reference distribution $\q$ is not \emph{too} badly behaved: say, if it puts probability mass at least $1/(2\ab)$ on every $i\in[\ab]$. Then, as long as $\ab'\geq 4\ab$, we will have $\ab'\q(i)\geq 2$ for all $i$, and so
+\[
+	\min_{i\in[\ab]}\frac{\flr{\ab'\q(i)}}{\ab'\q(i)} \geq\frac{1}{2}\,.
+\]
+This will be enough to approximately preserve total variation distances: since then, for any two $\p_1,\p_2\in\distribs{\ab}$, we will have
+\begin{align}
+	\totalvardist{\Phi^{(2)}_\q(\p_1)}{\Phi^{(2)}_\q(\p_2)}
+	&= \frac{1}{2}\sum_{i=1}^{\ab+1} \abs{\Phi^{(2)}_\q(\p_1)(i)-\Phi^{(2)}_\q(\p_2)(i)} \notag\\
+	&\geq \frac{1}{2}\sum_{i=1}^{\ab} \abs{\Phi^{(2)}_\q(\p_1)(i)-\Phi^{(2)}_\q(\p_2)(i)} \notag\\
+	&= \frac{1}{2}\sum_{i=1}^{\ab} \frac{\flr{\ab'\q(i)}}{\ab'\q(i)}\abs{\p_1(i)-\p_2(i)} \tag{\cref{def:phi:mapping:l1:making:grained}}\\
+	&\geq \frac{1}{4}\sum_{i=1}^{\ab}\abs{\p_1(i)-\p_2(i)} \tag{good behavior}\\
+	&= \frac{1}{2}\totalvardist{\p_1}{\p_2}	\label{eq:phi:mapping:l1:making:grained:distances}
+\end{align}
+(Of course, as usual, $\totalvardist{\Phi^{(2)}_\q(\p_1)}{\Phi^{(2)}_\q(\p_2)}\leq \totalvardist{\p_1}{\p_2}$ by the data processing inequality (\cref{fact:dpi})). So, under this ``not-too-badly behaved'' assumption on the reference distribution $\q$ and for $\ab' \geq 4\ab$, our transformation $\Phi^{(2)}_\q$ from~\cref{def:phi:mapping:l1:making:grained} (1)~maps $\q$ to an $(1/\ab')$-grained distribution $\Phi^{(2)}_\q(\q)$ over $[\ab+1]$, and (2)~preserves total variation distance between distributions up to a factor $2$.
+
+To conclude, it only remains to point out that $\Psi^{(2)}_\q$ can be easily implemented as follows:
+\begin{description}
+	\item[$\Psi^{(2)}_\q$:] Given $i \in [\ab]$, return $i$ with probability $\frac{\flr{\ab'\q(j)}}{\ab'\q(j)}$ and $\ab+1$ otherwise.
+\end{description}
+The last step is thus to show how to go from a completely arbitrary reference distribution $\q$ to a ``not-too-badly behaved'' one. Fortunately, this last step will not be too hard: we are almost there!
+
+
+\paragraph{From arbitrary to not-too-badly behaved.} This last mapping is the simplest: recall that its goal is to ensure that the reference distribution $\q$ puts at least probability $1/(2\ab)$ on each element of the domain, while still roughly preserving the total variation distance between distributions. But we have seen this one already: this is just the ``mixture trick'' of~\cref{eq:trick:mixture}, where the mappings are actually independent of $\q$:
+\[
+	\Phi^{(3)}_\q(\p) = \frac{1}{2}\p+\frac{1}{2}\uniform_\ab
+\]
+and $\Psi^{(3)}_\q$ is just the randomized function which returns a uniformly random value with probability $1/2$:
+\begin{description}
+	\item[$\Psi^{(3)}_\q$:] Given $i \in [\ab]$, return $i$ with probability $\frac{1}{2}$ and a uniformly random element of $[\ab]$ otherwise.
+\end{description}
+We then have, as in~\cref{ssec:chisquare:identity}, that $\smash{\totalvardist{\Phi^{(3)}_\q(\p_1)}{\Phi^{(3)}_\q(\p_2)}}\geq \frac{1}{2}\totalvardist{\p_1}{\p_2}$ for all $\p_1,\p_2$, and that $\min_i \smash{\Phi^{(3)}_\q(\q)(i)} \geq 1/(2\ab)$.
+
+\paragraph{Putting it together.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
