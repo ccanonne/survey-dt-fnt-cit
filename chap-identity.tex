@@ -817,6 +817,7 @@ It is unclear whether one could avoid using the first (very convenient) ``stocha
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Random binary hashing} 
+	\label{ssec:random:hashing}
 Now we turn to a tester that is \emph{not} sample-optimal~--~but has other advantages, and whose analysis contains a couple insighful aspects. The main idea is that, while large domains are complicated, if there is one thing we know how to do optimally it is estimating the bias of a coin. That is, we know how to handle the case $\ab=2$:
 \begin{fact}[Bias of a coin]\exercise{Prove this!~\cref{ex:uniformity:bias:coin}.}
   \label{lemma:bias:coin}
@@ -1141,6 +1142,7 @@ This concludes the proof.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Empirical subset weighting} 
+	\label{ssec:empirical:subset}
 To conclude, we will look at a somewhat different type of algorithms, in that this one can inherently be seen as \emph{adaptive}: it works in two stages, where the second depends on what the outcome of the first stage was. As in the previous section, it also allows for some tradeoff, dividing the $\ns$ total samples into two sets of size $\nss$ and $\nst$.
 
 
@@ -1335,14 +1337,14 @@ In this section, we have covered and analyzed seven different algorithms for uni
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Identity testing}
   \label{sec:identity}
-\cnote{Discuss the instance-optimal setting as well, and the relation to unifor-
-mity testing.}
-\tbc
-\begin{itemize}
-\item chi-square tester
-\item testing via $\lp[2]$ (and why it fails, then the DK16 trick; then, relation to chi-square)
-\item $\lp[1]$ reduction (Goldreich)
-\end{itemize}
+%\cnote{Discuss the instance-optimal setting as well, and the relation to uniformity testing.}
+%\tbc
+%\begin{itemize}
+%\item chi-square tester
+%\item testing via $\lp[2]$ (and why it fails, then the DK16 trick; then, relation to chi-square)
+%\item $\lp[1]$ reduction (Goldreich)
+%\end{itemize}
+Having developed techniques, insights, and mathematical muscle memory for the task of uniformity testing, we now turn to its natural generalization, \emph{identity testing}, where we now seek to test whether the unknown distribution $\p$ is equal to some specific, fixed reference distribution $\q$~--~our ``model''~--~of which we have the full, explicit description. Fortunately, many of the ideas from the previous chapter can be extended or reused for this more general problem; as we will see in the last subsection, there even exists a way to reuse the exact same algorithms as for uniformity. But first, let us get reacquainted  with a familiar algorithm, the $\chi^2$ tester.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The return of $\chi^2$}
@@ -1768,22 +1770,22 @@ All three approaches have their pros and cons: the first might be more efficient
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}
-\tbc
-\citet{GoldreichR00} 
-\cite{Paninski08}
-\cite{ChanDVV14}
-\cite{AcharyaDK15}
-\cite{DiakonikolasGPP18}
-\cite{BlaisCG17}
-\cite{HuangM13}
-\cite{AcharyaCT19b,AcharyaCHST20,AminJM20}
+From the computer science perspective, distribution testing begun with the influential work of~\citet{GoldreichGR98}, who define it as a variant of the general paradigm of property testing.~\citet{GoldreichR00} then implicitly relied on uniformity testing (or, more specifically, uniformity testing with respect to $\lp[2]$ distance) to test whether the endpoints of short random walks of a graph were uniformly distributed. To do so, they introduced and analyzed the collision-based tester, although their analysis did not lead to the optimal sample complexity, but instead to a quartic dependence on $\dst$. A systematic study of distribution testing was then initiated in~\citet{BatuFRSW00}, focusing on closeness (two-sample) testing; identity testing was first considered in~\citet{BFFKRW:01}. These papers, and many which followed, introduced several important and versatile algorithmic ideas, such as the \emph{bucketing} technique,\footnote{Which we did not cover in this monograph; the interested reader is referred to, \eg{} Section~5.2 of~\citet{Canonne:15:Survey} for a short primer on bucketing.} and reductions between distribution testing questions. However, it is only with the work of~\citet{Paninski08} that the tight bound of $\bigTheta{\sqrt{\ab}/\dst^2}$ for uniformity testing was established through both an information-theoretic lower bound and a matching upper bound via the unique-elements tester we covered in~\cref{sec:uniformity:unique}.\footnote{With some caveats: the upper bound is restricted to the regime $\dst \gtrsim1/\ab^{1/4}$, and its original analysis had a flaw, discussed in p.~\pageref{note:paninski:flaw}.} Interestingly, the optimality of first uniformity tester proposed, the collision-based tester of~\citet{GoldreichR00}, was only established nearly two decades later, by~\citet{DiakonikolasGPP19}.
+
+The right dependence on the error probability $\errprob$ was shown to be $\sqrt{\log(1/\errprob)}$ (\cf~\cref{eq:optimal:dep:delta}), instead of the ``obvious'' logarithmic dependence, by~\citet{HuangM13} (for a restricted range of parameters) and~\citet{DiakonikolasGPP18} (for the general case). The latter established this result by analyzing the empirical-distance tester (\cref{sec:uniformity:empirical}), showing as a byproduct that it \emph{did}, contrary to the common belief, not only work, but in fact achieve the optimal sample complexity.
+
+The bipartite collision tester (\cref{sec:uniformity:bipartite}) was proposed by~\citet{DiakonikolasGKR19} in the context of uniformity testing in the so-called streaming setting (as it allows to trade the memory required to store a small set of samples for the size of the second set of samples, which arrive one by one as a ``stream''). The empirical-subset-weighing tester of~\cref{ssec:empirical:subset} can be found in~\citet{AcharyaCLST21}, where it was developed to establish a separation between adaptive and non-adaptive testing algorithms under some type of measurement constraints (where the algorithms only have partical access to the samples; a setting we will discuss at length in~\cref{chap:constrained}). 
+Finally, the binary hashing technique of~\cref{ssec:random:hashing} is due to~\citet{AcharyaCT19b}, and the general form of the domain compression lemma (\cref{theo:random:dct:hashing}) as well as some of its generalizations can be found in~\citet{AcharyaCT19b,AcharyaCHST20,AminJM20}.\medskip
 
 
-The case of uniformity (or, more broadly, identity testing) for \emph{continuous} densities has been considered by Ingster (see~\citet{Ingster97}, and references within), under smoothness assumptions on the unknown density. As mentioned in~\cref{chap:what}, such assumptions are necessary to obtain non-trivial bounds: as an example, for Lipschitz densities over $[0,1]$ (corresponding to the Sobolev space $W^{1,\infty})$, Ingster's results establish a tight sample complexity of $\bigTheta{1/\dst^{5/2}}$, attained by a $\chi^2$ test. He further showed that in the adaptive setting (as discussed on~p.\pageref{chap:what:adaptive}), the sample complexity scales as $\bigTheta{\log\log(1/(\dst(\p)\lor \dst))/(\dst(\p)\lor \dst)^{5/2}}$.
+The optimal bound for \emph{identity} testing was then established separately by~\citet{ChanDVV14} (where it is implicit, from their result on $\lp[2]$ testing),~\citep{AcharyaDK15}, which analyzes the~$\chi^2$-based tester of~\cref{ssec:chisquare:identity} (as a key routine to obtain a flurry of testing results, for various properties), and~\citet{ValiantV17}, which we will discuss in more detail in a moment.
+The $\lp[2]$-based reduction for identity testing covered in~\cref{ssec:l2:reduction} is due to~\citet{DiakonikolasK16}, where it is used as the main building block for a general testing framework. The identity-to-uniformity reduction detailed in~\cref{ssec:l2:reduction} was then obtained by~\citet{Goldreich16}. We slightly departed from the original presentation of these results, in order to provide a more unified view.
 
-\tbc
+Going back to~\citet{ValiantV17}, their work actually introduces and addresses a refinement of identity testing, which they term ``instance-optimal identity testing'' and which statisticians may be more familiar with under the name \emph{local} minimax testing. That is, they parameterize the sample complexity of the testing problem in terms of the distance parameter $\dst$ and a suitable functional of the reference distribution $\q$, instead of the domain size $\ab$. Namely, they provide upper and lower bounds (which match in many cases) of a quantity related to the $2/3$ ``norm'' $\norm{\q}_{2/3}$ of the reference distribution $\q$. Note that, when maximizing this quantity over all possible reference distributions $\q\in\distribs{\ab}$, we retrieve the usual $\sqrt{\ab}$ dependence; yet, this may be significantly smaller, for particular choices of $\q$, leading to better sample complexity for identity testing to $\q$ in those cases. For more on this, we refer the reader to~\citet{BlaisCG17} (where a discussion and alternative characterization as a function of $\q$ are provided) and~\citet{DiakonikolasK16}, as well as the excellent survey of~\citet{BW:17}.\medskip
 
-\cref{ex:nomallet} (and thus the failure of stochastic dominance for the bipartite collision tester) is due to Moritz Schauer, who provided a counterexample to stochastic dominance in this case~\citep{MathSE-schauer}.
+To conclude, the case of uniformity (or, more broadly, identity testing) for \emph{continuous} densities has been considered by Ingster (see~\citet{Ingster97}, and references within), under smoothness assumptions on the unknown density. As mentioned in~\cref{chap:what}, such assumptions are necessary to obtain non-trivial bounds: as an example, for Lipschitz densities over $[0,1]$ (corresponding to the Sobolev space $W^{1,\infty})$, Ingster's results establish a tight sample complexity of $\bigTheta{1/\dst^{5/2}}$, attained by a $\chi^2$ test. He further showed that in the adaptive setting (as discussed on~p.\pageref{chap:what:adaptive}), the sample complexity scales as $\bigTheta{\log\log(1/(\dst(\p)\lor \dst))/(\dst(\p)\lor \dst)^{5/2}}$.
+
+\paragraph{Acknowledgment.} \cref{ex:nomallet} (and thus the failure of stochastic dominance for the bipartite collision tester) is due to Moritz Schauer, who provided a counterexample to stochastic dominance in this case~\citep{MathSE-schauer}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1928,6 +1930,7 @@ concluding the proof.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \paragraph{Note: The variance analysis from~\citet{Paninski08}.}
+	\label{note:paninski:flaw}
 The proof of~\cref{theo:uniformity:unique:elements} presented in this survey departs from the original one from~\citet{Paninski08}. The argument analyzing the expectation gap (\cref{lemma:gap:z2}) is similar, although we tried to make it a little simpler and intuitive (which, admittedly, is very subjective). The main difference is in bounding the variance in the ``far'' case; indeed, while~\citep{Paninski08} relies for this on the Efron--Stein inequality, the argument given is flawed, and the claimed variance bound does not follow.
 
 Specifically, the proof of~\citet[Lemma~2]{Paninski08} claims the bound
