@@ -1,9 +1,13 @@
 \tbc
+\cnote{KL is in nats! Use $\ln$ everywhere.}
+\cnote{$\domain$ discrete here. Extends to continuous via R-N.}
+
 \todonote{Pinsker, $\chi^2$, etc.~\cref{fact:dpi} as a consequence of TV being an $f$-divergence.}
 \begin{lemma}
   \label{app:distances:chi2:tv}
+For every $\p,\q$ on $\domain$, 
   \[
-    \totalvardist{\p}{\q}^2 \leq \frac{1}{4}\chisquare{\p}{\q}
+    \totalvardist{\p}{\q}^2 \leq \frac{1}{4}\chisquare{\p}{\q}\,.
   \]
 \end{lemma}
 \begin{proof}
@@ -16,10 +20,43 @@
 \end{proof}
 
 \begin{lemma}[Pinsker's Inequality]
-  \label{lemma:pinsker}
+  \label{app:distances:pinsker}
+For every $\p,\q$ on $\domain$, 
+\[
+  \totalvardist{\p}{\q} \leq \sqrt{\frac{1}{2}\kldiv{\p}{\q}}\,.
+\]
+\end{lemma}
+This inequality is ``good enough'' for most situations; nonetheless, we state here a lesser known, but stronger result, for when it is not:
+\begin{lemma}[Bretagnolles--Huber Bound]
+  \label{app:distances:bh}
 For every $\p,\q$ on $\domain$, 
 \begin{equation}
-  \label{eq:pinsker}
-  \totalvardist{\p}{\q} \leq \sqrt{\frac{1}{2}\kldiv{\p}{\q}}\,.
+  \label{eq:bh}
+  \totalvardist{\p}{\q} \leq \sqrt{1-e^{-\kldiv{\p}{\q}}}\,.
+\end{equation}
+In particular, as $\sqrt{1-e^{-x}} \leq 1-\frac{1}{2}e^{-x}$ for $x\geq 0$, this implies
+\begin{equation}
+  \label{eq:tsybakov}
+  \totalvardist{\p}{\q} \leq 1-\frac{1}{2}e^{-\kldiv{\p}{\q}}\,.
 \end{equation}
 \end{lemma}
+We refer the reader to~\citet{Canonne:note:22} or~\citet[Section~2.4.1]{Tsybakov09} for a proof and discussion of this inequality, due to~\citet{BretagnolleH78}.
+
+\begin{lemma}
+  \label{lemma:kl:chi2}
+For every $\p,\q$ on $\domain$, 
+\[
+  \kldiv{\p}{\q} \leq \ln(1+\chisquare{\p}{\q}) \leq \chisquare{\p}{\q}
+\]
+\end{lemma}
+\begin{proof}
+  The second inequality follows from the standard convexity inequality $\ln(1+x) \leq x$ (for $x>-1$), so it suffices to prove the first. To do so, observe that
+  \begin{align*}
+      \kldiv{\p}{\q} 
+      &= \sum_{x\in\domain} \p(x)\ln\frac{\p(x)}{\q(x)} \\
+      &\leq \ln\sum_{x\in\domain}\frac{\p(x)^2}{\q(x)} \tag{Jensen's inequality}\\
+      &= \ln(1+\chisquare{\p}{\q})\,,
+  \end{align*}
+  where we used concavity of the logarithm.
+\end{proof}
+\noindent Note that~\cref{app:distances:pinsker,lemma:kl:chi2} together imply a weaker version of~\cref{app:distances:chi2:tv}, losing a factor 2.

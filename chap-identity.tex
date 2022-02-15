@@ -1132,7 +1132,7 @@ Perhaps more interesting is combining~\cref{theo:bipartite:collision-based,lemma
 The bipartite collision-based tester (\cref{algo:bipartite:collision-based}) combined with the $\lp[\infty]$ testing algorithm (\cref{algo:linfty}) form a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = \nss+\nst$ and time complexity $O(\ns)$, provided that $\nss\nst \geq 4800\ab/\dst^4$ and $\max(\nss,\nst)\leq \ab^{2/3}$.
 \end{corollary}
 \begin{proof}
-Without loss of generality, suppose that $\nst\leq\nss\leq \ab^{2/3}$. The overall algorithm runs~\cref{algo:linfty} on $S_1$, and records the output as $b_1\in\{0,1\}$; and in parallel runs~\cref{algo:bipartite:collision-based} on the multisets $S_1$ and $S_2$, and records the output as $b_2\in\{0,1\}$. The output of the algorithm is then $b_1b_2$, \ie the \textsf{AND} the two decisions: it declares ``uniform'' only if both sub-algorithms declared it.
+Without loss of generality, suppose that $\nst\leq\nss\leq \ab^{2/3}$. The overall algorithm runs~\cref{algo:linfty} on $S_1$, and records the output as $b_1\in\{0,1\}$; and in parallel runs~\cref{algo:bipartite:collision-based} on the multisets $S_1$ and $S_2$, and records the output as $b_2\in\{0,1\}$. The output of the algorithm is then $b_1b_2$, \ie the \textsf{AND} of the two decisions: it declares ``uniform'' only if both sub-algorithms declared it.
 \begin{itemize}
     \item In the uniform case, by a union bound both algorithms return $\accept$ with probability at least $1-(1/6+1/6)=2/3$, as desired.
     \item In the ``far'' case, we have two possibilities. If $\norminf{\p} > 10/\nsu$, then~\cref{algo:linfty} will return $b_1=\reject$ with probability at least $5/6$, and then regardless of the output of~\cref{algo:bipartite:collision-based} we have $b_1b_2=0$ and will return $\reject$. If $\norminf{\p} \leq 10/\nsu$, however, then we have $\nss\nst \geq 96\ab/\dst^4$ and $\min(\nss,\nst)\geq 480\ab\norminf{\p}/\dst^2$, and so~\cref{algo:bipartite:collision-based} will return $b_2=\reject$ with probability at least $5/6$. Either way, we return \reject with probability at least $5/6>2/3$.
@@ -1157,7 +1157,7 @@ where, as before, $\occur_j$ is the number of occurrences of $j$ among the $\nss
 \end{equation}
 which should be roughly (making a few not necessarily warranted approximations) $\expect{\p(S)}\approx \nss\normtwo{\p}^2$. Under the uniform distribution, this is exactly $(1-(1-1/\ab)^{\nss})\approx \nss/\ab$, where the approximation is valid for $\nss\ll \ab$.
 
-Great: we have a new estimator for (more or less) the $\lp[2]$ norm. Now, assuming things went well, as the end of this first stage we have a set $S$ such that $\p(S)$ is approximately either $\nss/\ab$ or $\nss\normtwo{\p}^2\geq \nss(1+\Omega(\dst^2))/\ab$ (we just argued that this is what happens \emph{in expectation}).\footnote{The tricky part, of course, will be to argue that $\p(S)$ does concentrate enough around its expectation for this to also happen with constant probability.} So, let's do a second stage! Take the next $\nst \eqdef \ns-\nss$ samples, and count the number of them which fall in $S$: this is allows you to estimate $\p(S)$  up to an additive $\nss\dst^2/\ab$, as long as
+Great: we have a new estimator for (more or less) the $\lp[2]$ norm. Now, assuming things went well, at the end of this first stage we have a set $S$ such that $\p(S)$ is approximately either $\nss/\ab$ or $\nss\normtwo{\p}^2\geq \nss(1+\Omega(\dst^2))/\ab$ (we just argued that this is what happens \emph{in expectation}).\footnote{The tricky part, of course, will be to argue that $\p(S)$ does concentrate enough around its expectation for this to also happen with constant probability.} So, let's do a second stage! Take the next $\nst \eqdef \ns-\nss$ samples, and count the number of them which fall in $S$: this is allows you to estimate $\p(S)$  up to an additive $\nss\dst^2/\ab$, as long as
 \[
       \nst \gg \frac{\ab}{\nss\dst^4}
 \]
@@ -1198,7 +1198,7 @@ If $\ns \leq \ab$, we have
     \Delta(\p) \geq \frac{\nss}{16\ab}\totalvardist{\p}{\uniform_\ab}^2\,.
 \]
 \end{lemma}
-We will here introduce (and use) another concept we have not seen yet, that of \emph{negative association} between random variables. This is a stronger notion than negative correlation, and is very useful when dealing with random variables which are dependent ``but in a way which helps us'' (to prove concentration):
+Here, we will introduce (and use) another concept we have not seen yet, that of \emph{negative association} between random variables. This is a stronger notion than negative correlation, and is very useful when dealing with random variables which are dependent ``but in a way which helps us'' (to prove concentration):
 \begin{definition}[Negative Association]
 The random variables $X_1,\dots, X_n$ are said to be \emph{negatively associated} if, for all disjoint subsets $I,J\subseteq [\ns]$ and functions $f\colon \R^{|I|} \to \R$, $g\colon \R^{|J|} \to \R$, we have
 \[
