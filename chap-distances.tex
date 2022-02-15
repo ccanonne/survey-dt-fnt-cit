@@ -1,0 +1,25 @@
+\tbc
+\todonote{Pinsker, $\chi^2$, etc.~\cref{fact:dpi} as a consequence of TV being an $f$-divergence.}
+\begin{lemma}
+  \label{app:distances:chi2:tv}
+  \[
+    \totalvardist{\p}{\q}^2 \leq \frac{1}{4}\chisquare{\p}{\q}
+  \]
+\end{lemma}
+\begin{proof}
+  By Cauchy--Schwarz, 
+  \begin{align*}
+      \totalvardist{\p}{\q} &= \frac{1}{2}\sum_{x\in\domain} \abs{\p(x)-\q(x)} \\
+      &\leq \frac{1}{2}\sqrt{\sum_{x\in\domain} \frac{(\p(x)-\q(x))^2}{\q(x)}}\sqrt{\sum_{x\in\domain} \q(x)} \\
+      &= \frac{1}{2}\sqrt{\chisquare{\p}{\q}}\,.
+  \end{align*}
+\end{proof}
+
+\begin{lemma}[Pinsker's Inequality]
+  \label{lemma:pinsker}
+For every $\p,\q$ on $\domain$, 
+\begin{equation}
+  \label{eq:pinsker}
+  \totalvardist{\p}{\q} \leq \sqrt{\frac{1}{2}\kldiv{\p}{\q}}\,.
+\end{equation}
+\end{lemma}
