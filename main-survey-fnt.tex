@@ -11,8 +11,10 @@
 \usepackage{imakeidx}
 \usepackage[utf8]{inputenc}
 
-\def\withcolors{1}
-\def\withnotes{1}
+\usepackage{draftwatermark}
+
+\def\withcolors{0}
+\def\withnotes{0}
 \usepackage{ccanonne}
 
 \usetikzlibrary{shadows}
@@ -51,7 +53,11 @@
 \setlength{\marginparwidth}{18mm}
 \newcommand{\exercise}[1]{\marginnote{\textbf{E:} #1}}
 
+\ifnum\withnotes=1
 \newcommand{\tbc}{\noindent\hl{\sc{}to be continued}\xspace}
+\else
+\newcommand{\tbc}{}
+\fi
 
 
 \newcommand{\nss}{\textcolor{red}{\ns_1}}
