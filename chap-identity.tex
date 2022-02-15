@@ -1629,7 +1629,7 @@ Since $\ab'\normtwo{\Phi_\q(\q)} \leq \sqrt{2\ab'}$ by~\cref{lemma:l2:reduction:
 To conclude this subsection, it is worth highlighting the connection between this $\lp[2]$ reduction and the $\chi^2$-based tester from~\cref{theo:z}. Indeed, while we focused on the fact that the tranformation $\Phi_\q$ preserved the total variation distance between distributions (\cref{lemma:l2:reduction:distances}), one can also see it as \emph{converting $\chi^2$ divergences (to $\q$) to $\lp[2]$ distances}: $\chisquare{\p}{\q}\approx \ab\normtwo{\Phi_\q(\p)-\Phi_\q(\q)}^2$.\exercise{See~\cref{ex:l2:reduction:chisquare}.} Thus, in this sense,~\cref{algo:chisquare:identity} can be seen as an ``unrolled'' version of~\cref{algo:l2:reduction:identity}, where the mapping $\Phi_\q$ is explicitly expanded into~\cref{algo:l2:identity}, converting $\lp[2]$ testing of $\Phi_\q(\p),\Phi_\q(\q)$ into $\chi^2$ testing of $\p,\q$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Reduction to uniformity testing: $\lp[1]$ distance}
+\subsection{Reduction to uniformity testing}
 	\label{ssec:l1:reduction}
 So far, we have seen in~\cref{ssec:chisquare:identity} a transformation which brought the reference distribution $\q$ (and, actually, \emph{all} distributions) a little closer to uniform, while preserving the total variation distances up to a factor $2$ (\cref{eq:trick:mixture}); and, in~\cref{ssec:l2:reduction}, a different transformation which brought down the $\lp[2]$ norm of the reference $\q$ to ``near-uniform levels'' while exactly preserving the total variation distances. In this section, we will describe a third mapping, which transforms the reference $\q$ to the \emph{actual} uniform distribution (on a slightly larger domain), while \emph{nearly} preserving total variation distances.
 
@@ -1762,10 +1762,85 @@ To close this subsection, let us discuss some aspects of this reduction. The fir
 
 The second is its cost. The above argument transforms the identity testing question with parameters $(\ab,\dst)$ to uniformity testing with parameters $(4\ab, \dst/4)$. Since the cost of the latter scales as $\sqrt{\ab}/\dst^2$, the ``blowup'' in sample complexity between uniformity and identity testing is $\sqrt{4}/(1/4)^2 = 32$. This might seem a lot! Yet, we did not make here any attempt at optimizing the parameters: one can check (see~\cref{ex:l1:reduction:parameters}) that choosing better parameters reduces this blowup to ``only'' a factor~$\approx 12.2$.
 
-\subsection{Discussion}
-This concludes this section on identity testing: to summarize, we saw 3 different approaches. The first, in~\cref{ssec:chisquare:identity}, defines and analyzes directly a $\chi^2$-type test statistic, which generalizes the one we had in the case of uniformity testing (\cref{ssec:uniformity:chisquare}). The second , in~\cref{ssec:l2:reduction}, takes a different route, by first obtaining a simple ``$\lp[2]$ tester'' (which implies, by the usual $\lp[2]/\lp[1]$ relation, a total variation one) which works well whenever the distribution $\q$ has small $\lp[2]$ norm; and then providing a reduction to this case, via a randomized transformation of both the input distribution $\q$ and the samples (from the unknown $\p$). The third, which we just covered in~\cref{ssec:l1:reduction}, goes even further, and \emph{only} provides a reduction via a sequence of such ranodmized transformations: showing that one can leverage any uniformity testing algorithm as a blackbox to solve the more general identity testing problem.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bonus: bucketing}
+	\label{ssec:bucketing}
+	We would be remiss to end this section without at least mentioning a simple, yet powerful technique which, too, \emph{almost} reduces identity to uniformity testing. This technique, \emph{bucketing}\index{bucketing}, was one of the first proposed; and while it does not quite lead to the optimal sample complexity, it \emph{almost} gets us there. We hereafter provide only an outline of the main ideas and argument; the reader is encouraged to fill in the details.
 
-All three approaches have their pros and cons: the first might be more efficient in practice, while the second can generalize to other problems than identity testing (namely, any testing problem where bringing down the $\lp[2]$ norm of some probability distribution helps). The third, besides being intellectually satisfying, naturally extends to other settings such as the ``constrained measurements'' ones discussed in~\cref{chap:constrained}. Of course, more broadly, we may be tempted to say that the more techniques at our disposal, the better; and that three is greater than one.
+Given our reference distribution $\q\in\distribs{\ab}$ and a parameter $\dst\in(0,1]$, the starting point is to partition the domain into a logarithmic number of ``buckets'' $B_1\dots,B_L\subseteq[\ab]$ such that $\q$ is roughly constant (up to a multiplicative factor) on each $B_j$:
+\begin{equation}
+	\label{eq:bucketing}
+		B_j \eqdef \setOfSuchThat{ i \in [\ab] }{ \frac{1}{2^{j}} < \q(i) \leq \frac{1}{2^{j-1}} }, \qquad j\in[L]
+\end{equation}
+where $L\eqdef \log\frac{2\ab}{\dst}$. We also define the ``leftover bucket'' 
+\[
+B_0 \eqdef \setOfSuchThat{ i \in [\ab] }{ \q(i) \leq \frac{1}{2^{L}} }
+\]
+ which by our choice of $L$ only contains elements with probability at most $\dst/(2\ab)$ under $\q$, and so $\q(B_0) \leq \dst/2$. Thus, this leftover bucket will not contribute too much to the distance as long as $\p(B_0)\leq 3\dst/4$ as well, which can be checked separately with $O(1/\dst)$ samples from $\p$ (\cf~\cref{lemma:bias:coin:test}). We can therfore effectively ignore it in the rest of the analysis.
+ 
+ One nice property of this bucketing is that, for every $j\in[L]$, we have
+ \begin{equation}
+ \label{eq:bucketing:bucketsize}
+ 	\frac{|B_j|}{2^{j}}  \leq \q(B_j) = \sum_{i\in B_j} \q(i) \leq \frac{|B_j|}{2^{j-1}}\,.
+ \end{equation}
+ and $|B_j| < 2^j$.
+ In particular, denoting by $\q_j$ the conditional distribution of $\q$ on $B_j$, it is a simple matter to check that
+\begin{equation}
+ \label{eq:bucketing:l2norm}
+ 		\normtwo{\q_j}^2 = \sum_{i\in B_j} \frac{\q(i)^2}{\q(B_j)^2} \leq \frac{4}{|B_j|^2}\,.
+\end{equation}
+ so, great! Each of the conditional distributions $\q_j$ has very small $\lp[2]$ norm, and we should be able to use the $\lp[2]$ testing algorithm of~\cref{theo:l2:identity:robust}.
+ 
+Moreover, for any $\p\in\distribs{\ab}$, we have
+ \begin{align*}
+ 	2\totalvardist{\p}{\q} 
+ 	&= \sum_{j=0}^{L} \sum_{i\in B_j} \abs{\p(i)-\q(j)} \\
+ 	&\leq \sum_{j=0}^{L} \sum_{i\in B_j} \q(B_j)\Paren{ \abs{\frac{\p(i)}{\q(B_j)} - \frac{\p(i)}{\p(B_j)}}+\abs{\frac{\p(i)}{\p(B_j)} - \frac{\q(i)}{\q(B_j)}} }\\
+ 	&= \sum_{j=0}^{L} \sum_{i\in B_j} \p(i)\abs{\frac{\q(B_j)}{\p(B_j)} - 1}+\sum_{j=0}^{L} \q(B_j) \sum_{i\in B_j}\abs{\p_j(i)-\q_j(i)} \\
+ 	&= \sum_{j=0}^{L} \abs{\p(B_j) - \q(B_j)} + 2\sum_{j=0}^{L} \q(B_j) \totalvardist{\p_j}{\q_j} \,,
+ \end{align*}
+ where $\p_j$ is as before the conditional distribution of $\p$ on $B_j$. Letting $\bar{\Phi}_\q(\p),\bar{\Phi}_\q(\q)$ denote the ``flattened'' distributions on $[L]$ induced by $\p,\q$, what this does is relating the total variation distance between $\p$ and $\q$ to the weighted distance between conditionals and distance between ``flattenings:''
+ \begin{equation}
+ 	\totalvardist{\p}{\q}  \leq \totalvardist{\bar{\Phi}_\q(\p)}{\bar{\Phi}_\q(\q)} +\sum_{j=0}^{L} \q(B_j) \totalvardist{\p_j}{\q_j}\,.
+ \end{equation}
+ What does it tell us? Define $H(\q) \eqdef \setOfSuchThat{j \in[L] }{ \q(B_j) \geq \dst/(4L)}$. On the one hand, if $\p=\q$ then $\totalvardist{\bar{\Phi}_\q(\p)}{\bar{\Phi}_\q(\q)}=0$, and $\totalvardist{\p_j}{\q_j}=0$ for all $j\in[L]$. On the other hand, if $\totalvardist{\p}{\q}>\dst$ then
+ \begin{equation}
+ 	\frac{\dst}{4}  \leq \totalvardist{\bar{\Phi}_\q(\p)}{\bar{\Phi}_\q(\q)} +\sum_{j\in H(\q)}\q(B_j) \totalvardist{\p_j}{\q_j}\,.
+ \end{equation}
+ where we used that $\q(B_{0}) \leq \dst/2$ and $\sum_{j\notin H(\q)}\q(B_j) < L\cdot \dst/(4L) = \dst/4$. So if $\p$ is $\dst$-far from $\q$, then one of the two terms of the RHS must be at least $\dst/8$; even more, in the latter case this implies that at least one of the $|H(\q)|$ terms of the sum\exercise{Can you see why?} $\totalvardist{\p_j}{\q_j}$ must be at least $\dst_j \eqdef \dst/(8L\q(B_j))$! If $\p=\q$, however, all $|H(\q)|+1$ terms are $0$.
+ 
+\noindent So this leads to the following natural testing idea, which we will refer to as the ``bucketing-based tester'':
+ \begin{itemize}
+ 	\item test $\totalvardist{\bar{\Phi}_\q(\p)}{\bar{\Phi}_\q(\q)} = 0$ vs. $\totalvardist{\bar{\Phi}_\q(\p)}{\bar{\Phi}_\q(\q)}>\dst/8$: Now, this is itself another identity testing task, so it seems like we are back to square one! But not quite: since the domain of the distributions is only logarithmic, we can afford to do this with the baseline approach (\cref{lemma:learning:baseline}) by \emph{learning} the distribution $\bar{\Phi}_\q(\p)$. This only costs us $O(L/\dst^2) = O(\log(\ab/\dst)/\dst^2))$ samples.
+ 	\item test, for every $j\in H(\q)$, $\totalvardist{\p_j}{\q_j} = 0$ vs. $\totalvardist{\p_j}{\q_j}>\dst_j$: another identity testing task, but now where the reference $\q_j$ has small $\lp[2]$ norm (by~\cref{eq:bucketing:l2norm}). of course, to do this, we need to get enough samples from $\p_j$, \ie enough samples from $\p$ must fall in each $B_j$. What is ``enough''? Since $\normtwo{\q_j}\asymp 1/\sqrt{B_j}$, using~\cref{theo:l2:identity:robust} as in the proof of~\cref{theo:l2:reduction} we obtain that
+ 	\[
+ 			\max\Paren{\frac{|B_j|\normtwo{\q_j}}{\dst_j^2}, \frac{1}{\dst_j}} \asymp \frac{\sqrt{|B_j|}}{\dst_j^2} \asymp \frac{|B_j|^{5/2}L^2}{\dst^22^{2j}}
+ 	\]
+ 	samples (up to constants) are enough (where we relied on~\cref{eq:bucketing:bucketsize}). Moreover, since we restrict ourselves to $j\in H(\q)$, if $\p=\q$ we will get on expectation at least
+ 	\[
+ 		\ns\q(B_j) \geq \frac{\ns|B_j|}{2^j}\;
+ 	\]
+ 	and, since we restrict ourselves to $j\in H(\q)$ where $\ns\q(B_j)\geq \ns/(4L)$, when $\p=\q$ the actual number of samples observed in $B_j$ will be at least half of this with overwhelming probability\exercise{Check it!} by a Chernoff bound. If we do not get that many samples for some $j$, then we immediately reject: this is sufficient evidence that $\p\neq \q$. So, based on the above, all we need for this to work is to have
+ 	\[
+ 		\frac{\ns|B_j|}{2^j} \gg \frac{|B_j|^{5/2}L^2}{\dst^22^{2j}}\,,
+ 	\]
+ 	that is,
+ 	\[
+ 		\ns \gg \frac{|B_j|^{3/2}L^2}{\dst^22^j}\,.
+ 	\]
+ 	Recalling first that $|B_j|<2^j$ and then that $|B_j|\leq \ab$ for all $j\in[L]$, the RHS is at most $\sqrt{\ab}L^2/\dst^2 = \tildeO{\sqrt{\ab}/\dst^2}$, as desired.
+ \end{itemize}
+Some final bookkeeping: we lose an extra factor $\log L = \log\log(\ab/\dst)$ for a union bound over all $L+1$ tests performed, by actually running each of them with error probability $\errprob \eqdef 1/(3(L+1))$. Overall, modulo to the missing details ``left to the reader,''\exercise{That's you!} we established the following:
+\begin{theorem}
+  \label{theo:bucketing}
+The bucketing-based tester is testing algorithm for identity with sample complexity $\ns(\ab,\dst,1/3) = \tilde{O}(\sqrt{\ab}/\dst^2)$.
+\end{theorem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discussion}
+This concludes this section on identity testing: to summarize, we saw 4 different approaches. The first, in~\cref{ssec:chisquare:identity}, defines and analyzes directly a $\chi^2$-type test statistic, which generalizes the one we had in the case of uniformity testing (\cref{ssec:uniformity:chisquare}). The second , in~\cref{ssec:l2:reduction}, takes a different route, by first obtaining a simple ``$\lp[2]$ tester'' (which implies, by the usual $\lp[2]/\lp[1]$ relation, a total variation one) which works well whenever the distribution $\q$ has small $\lp[2]$ norm; and then providing a reduction to this case, via a randomized transformation of both the input distribution $\q$ and the samples (from the unknown $\p$). The third, which we covered in~\cref{ssec:l1:reduction}, goes even further, and \emph{only} provides a reduction via a sequence of such ranodmized transformations: showing that one can leverage any uniformity testing algorithm as a blackbox to solve the more general identity testing problem. As for the fourth, it relies on partitioning the domain into a small number of buckets, on each of which the reference distribution is not uniform~--~but close enough.
+
+All four approaches have their pros and cons: the first might be more efficient in practice, while the second can generalize to other problems than identity testing (namely, any testing problem where bringing down the $\lp[2]$ norm of some probability distribution helps). The third, besides being intellectually satisfying, naturally extends to other settings such as the ``constrained measurements'' ones discussed in~\cref{chap:constrained}. Finally, the fourth, albeit not optimal, not only introduces a very versatile technique, bucketing, but is often ``good enough'' to get nearly optimal results. Of course, more broadly, we may be tempted to say that the more techniques at our disposal, the better; and that four is greater than one.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

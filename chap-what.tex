@@ -122,6 +122,7 @@ Importantly, this logarithmic dependence is not always the right one: as we will
 \paragraph{The learning baseline.}
 Before setting out to design specific algorithms for various testing tasks and analyze their performance, it is good to have some sort of baseline to compare the result to. The most natural one is the \emph{testing-by-learning} approach, which can essentially be summarized as follows: the sample complexity of testing $\property= \bigcup_{\ab=1}^\infty \property_\ab$ under $\class= \bigcup_{\ab=1}^\infty \class_\ab$ is at most the sample complexity of, given $\ab$, \emph{learning} an arbitrary distribution from $\property_\ab\cup\class_\ab$. More specifically, we have the following:
 \begin{lemma}[Testing by Learning]
+	\label{lemma:learning:baseline}
   Fix any $\property= \bigcup_{\ab=1}^\infty \property_\ab$ and $\class= \bigcup_{\ab=1}^\infty \class_\ab$, and let $\ns_{\mathcal{L}}(\ab,\dst,\errprob)$ denote the sample complexity of learning an arbitrary probability distribution from $\property_\ab\cup\class_\ab\subseteq \distribs{\ab}$ to total variation $\dst$ with error probability at most $\errprob$. Then, the sample complexity $\ns$ of testing \property under $\class$ satisfies
   \[
       \ns(\ab,\dst,\errprob) \leq \ns_{\mathcal{L}}(\ab,\tfrac{\dst}{2},\errprob)\,.
