@@ -12,10 +12,9 @@
 \usepackage[utf8]{inputenc}
 
 %\usepackage{draftwatermark}
-%\SetWatermarkLightness{0.95}
 
-\def\withcolors{0}
-\def\withnotes{0}
+\def\withcolors{1}
+\def\withnotes{1}
 \usepackage{ccanonne}
 
 \usetikzlibrary{shadows}
@@ -65,6 +64,7 @@
 \newcommand{\nst}{\textcolor{red}{\ns_2}}
 \newcommand{\nsu}{\textcolor{red}{\ns_3}}
 \newcommand{\occur}{\textcolor{red}{N}}
+\newcommand{\freq}{\textcolor{purple}{F}}
 
 
 %% Subsections in the ToC (set to 1 for sections only)
@@ -189,10 +189,7 @@ measurements). Talk about adaptive schemes?}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Information-theoretic lower bounds}
   \label{chap:lowerbounds}
-\section{Proving hardness by reductions}
-\section{Indistinguishability via moment-matching}
-\section{Ingster's method}
-\section{Application: distributed inference}
+\input{chap-lowerbounds}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -247,6 +244,7 @@ measurements). Talk about adaptive schemes?}
 \chapter{Poissonization}
   \label{app:poissonization}
 \tbc
+Include the transformation from Lemma 4.3.3 of Paul Valiant's thesis?
 
 %BACKMATTER SEE DOCUMENTATION
 \backmatter  % references, restarts sample
