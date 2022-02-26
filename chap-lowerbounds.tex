@@ -1,0 +1,118 @@
+\cnote{Add the DK16 framework?}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Ingster's method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Indistinguishability via moment-matching}
+
+We will here describe a general, out-of-the-box theorem which applies to a broad class of distribution properties: namely, the class of \emph{symmetric properties}, which are those which do not depend on the individual labels of the domain elements.
+\begin{definition}
+	A property $\property=\cup_{\ab=1}^\infty \property_\ab$ of distributions is said to be \emph{symmetric} if it is closed under permutations of the domain: for every $\ab$ and every permutation $\sigma\colon\domain_\ab\to \domain_\ab$, if $\p\in\property_\ab$ then $\p\circ\sigma\in\property_\ab$.
+\end{definition}
+A by now familiar example of symmetric property is uniformity, $\property_\ab =\{\uniformOn{\ab}\}$, since the uniform distribution is invariant by relabeling: $\uniformOn{\ab}(\sigma(i))=\uniformOn{\ab}(i)$ for every $i\in\domain_\ab$ and every permutation $\sigma$ of $\domain_\ab$. Other notable examples include the property of ``all distributions of support size at most $s$,'' that of ``distributions of (Shannon) entropy at least $h$,'' but, for instance, \emph{not} the property of ``distributions with a non-increasing pmf'' (since it depends on the ordering of the domain).
+
+The definition of symmetric properties can be extended to multiple distributions over the same domain: for instance, taking $\domain_\ab=[\ab]\times[\ab]$, a property $\property_\ab$ of product distributions is symmetric if $\p_1\otimes \p_2\in \property_\ab$ implies $\p_1\circ\sigma\otimes \p_2\circ\sigma\in \property_\ab$ for all permutations $\sigma$. This is the case, \eg of the property corresponding to {closeness testing}, $\setOfSuchThat{\p_1\otimes\p_2}{\p_1=\p_2}$, mentioned in~\cref{chap:what}.
+
+Symmetric properties are nice in the sense that, when considering them, one can completely forget about the individual values of the $\ns$ samples taken, and focus instead on the empirical histogram. That is, a sufficient statistic for symmetric properties is the \emph{fingerprint} of the samples, which is just the tuple
+\[
+	\freq\eqdef (\freq_{0},\freq_{1},\freq_{2},\dots,\freq_{\ns}) \in \N^{\ns+1}
+\]
+where $\freq{j} = \sum_{i=1}^\ab \indic{\occur_{i}=j}$ is the number of elements of the domain which appear exactly $j$ times among the $\ns$ samples. In particular, we always have $\sum_{j=0}^\ns \freq_j = \ns$.\exercise{Check that you can express several (FOCUS ON A COUPLE) \tbc of the algorithms in~\cref{sec:uniformity} as a function of $\freq$ only.}\medskip
+
+The main result discussed in this section is the ``Wishful Thinking Theorem'' of~\citet{Valiant:11}, which applies to testing symmetric properties of distributions. Intuitively, this theorem ensures that ``if the low-degree moments ($\lp[p]$ norms) of two distributions match, then these distributions (up to relabeling) are hard to distinguish.'' To see why this is the case, and justify the name of the theorem, observe that since we focus on symmetric properties all which matters is the fingerprint $\freq$ introduced about; that is, the number of $j$-collisions, for every $j\geq 0$.
+
+Now, given a distribution $\p$, the number of $j$-collisions in $\ns$ samples has expectation 
+\[
+	\binom{\ns}{j}\norm{\p}_j^j \asymp \ns^j\norm{\p}_j^j
+\]
+and variance, wishfully ignoring all dependencies, maybe something like $\ns^j\norm{\p}_j^j$ as well (roughly what it would be if $j$-wise collisions were Binomial with parameters $\binom{\ns}{j}$ and $\norm{\p}_j^j$~--~again, wishful thinking). So, given two probability distributions $\p^\yes,\p^\no$, if the squared gap between the expected numbers of $j$-wise collisions was much smaller than the maximum of the two variances
+\[
+		(\ns^j\norm{\p^\yes}_j^j - \ns^j\norm{\p^\no}_j^j )^2 \ll
+		\max(\ns^j\norm{\p^\yes}_j^j, \ns^j\norm{\p^\no}_j^j)
+\]
+for all $j\geq 1$; or, equivalently, 
+\[
+	\frac{|\ns^j\norm{\p^\yes}_j^j - \ns^j\norm{\p^\no}_j^j|}{\sqrt{\max(\ns^j\norm{\p^\yes}_j^j, \ns^j\norm{\p^\no}_j^j)}} \ll 1
+\] 
+for all $j\geq 1$, then we could \emph{hope} that the two distributions are indistinguishable from their fingerprints on $\ns$ samples. Well, the reasoning above is flawed in a few ways, but can be made rigorous with enough work; and, luckily, someone else took care of this already:
+\begin{theorem}[Wishful Thinking Theorem {\citep[Theorem 4.10]{Valiant:11}}]\label{theo:valiant:wishful}
+  Fix any \emph{symmetric} property $\property$. Given a positive integer $\ns$, a distance parameter $\dst\in(0,1]$, and two distributions $\p^\yes,\p^\no\in\distribs{\ab}$, suppose the following conditions hold:
+  \begin{enumerate}
+    \item $\norminf{\p^\yes},\norminf{\p^\no} \leq \frac{1}{500\ns}$;
+    \item letting $m^\yes$, $m^\no$ be the $\ns$-based moments of $\p^\yes,\p^\no$ (defined below),
+      \[
+         \sum_{j=2}^\infty \frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}} < \frac{1}{24},
+      \]
+      where $m^{\yes}(j) \eqdef \ns^j\norm{\p^\yes}_j^j$, $m^{\no}(j) \eqdef \ns^j\norm{\p^\no}_j^j$ for $j\geq 0$,
+     \item $\p^\yes\in\property_\ab$ and $\totalvardist{\p^\no}{\property_\ab}>\dst$.
+  \end{enumerate}
+  Then every testing algorithm for $\property_\ab$ must have sample complexity $\ns(\ab,\dst, 1/3) > \ns$.
+\end{theorem}
+\noindent (Side remark: the term $j=1$ does not appear in the sum, since $\ns\norm{\p}_1=\ns$ for every distribution $\p$, and so this term always cancels out.)\medskip
+%\noindent (We observe that we only reproduced here one of the three sufficient conditions given in the original, more general theorem; as this will be the only one we need.)
+
+To see the strength of this theorem , let us use it to prove the $\bigOmega{\sqrt{\ab}/\dst^2}$ lower bound for uniformity testing. Our distribution $\p^\yes$ will, of course, have to be the uniform distribution $\uniform_\ab$ itself; as for $\p^{\no}$, let us take it to be any of the instances of ``Paninski construction'' (\cref{eq:paninski:construction}), so that
+\[
+	\p^{\no}(2i) = \frac{1+3\dst}{\ab}, \qquad \p^{\no}(2i-1) = \frac{1-3\dst}{\ab}, \qquad 1\leq i\leq \ab/2
+\]
+(where we again assume without loss of generality that $\ab$ is even, and $\dst\in(0,1/3]$). We then have 
+$\totalvardist{\p^\no}{\property_\ab}=\totalvardist{\p^\no}{\uniform_\ab}= \frac{3}{2}\dst > \dst$; so let's check the two conditions of the theorem hold. 
+
+The first condition, 
+$\norminf{\p^\yes},\norminf{\p^\no} \leq \frac{1}{500\ns}$
+will be satisfied as long as $\ns \leq \frac{\ab}{1000}$, since $\norminf{\p^\yes}\leq \norminf{\p^\no} \leq 2/\ab$. This is a limitation which will limit the range of applicability of the lower bound, but we can live with it (and will get back to it later).
+
+Turning to the second condition, we need to compute these $\ns$-based moments. Luckily, it is a simple matter to check that, for every $j\geq 2$,
+\begin{equation}
+	m^{\yes}(j) = \frac{\ns^j}{\ab^{j-1}}
+\end{equation}
+while
+\begin{equation}
+	m^{\no}(j) = \ns^j \sum_{i=1}^\ab \p^{\no}(i)^j = \ns^j\Paren{ \frac{\ab}{2} \Paren{\frac{1+3\dst}{\ab}}^j + \frac{\ab}{2} \Paren{\frac{1-3\dst}{\ab}}^j }
+	\leq \frac{2^j\ns^j}{\ab^{j-1}}
+\end{equation}
+Moreover, for the special case of $j=2$, the expression is a little nicer, and becomes
+\begin{equation}
+	m^{\no}(2) = \ns^2\Paren{ \frac{\ab}{2} \Paren{\frac{1+3\dst}{\ab}}^2 + \frac{\ab}{2} \Paren{\frac{1-3\dst}{\ab}}^2 }
+	= (1+9\dst^2)\frac{\ns^2}{\ab}\,.
+\end{equation}
+Why do we handle separately the second $\ns$-based moment? Without wanting to spoil the surprise, it's because we expect the term $j=2$ of the series $\sum_{j=2}^\infty \frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}}$ to dominate (as the second moment $\normtwo{\p}^2$ of the distribution is ``what gives it away'' in uniformity testing, as we saw now and again in~\cref{sec:uniformity}), so we want to make sure we handle that term as tightly as possible.
+
+With the above expressions at our disposal, we can proceed: first, this maximum in the denominator seems annoying and will prevent us from easily computing the series, so let's get rid of it:
+\begin{align*}
+\sum_{j=2}^\infty \frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}}
+&\leq
+\sum_{j=2}^\infty \abs{m^{\yes}(j)-m^{\no}(j)} \\
+&\leq \frac{9\dst^2\ns^2}{\ab} + \sum_{j=3}^\infty \frac{(2^j-1)\ns^j}{\ab^{j-1}} \\
+&\leq \frac{9\dst^2\ns^2}{\ab} + 2\ns\sum_{j=2}^\infty \frac{2^j\ns^j}{\ab^{j}} \\
+&= \frac{9\dst^2\ns^2}{\ab} + \frac{8\ns^3}{\ab^2}\cdot \frac{1}{1-2\ns/\ab} \\
+&\leq \frac{9\dst^2\ns^2}{\ab} + \frac{9\ns^3}{\ab^2}
+\end{align*}
+where we used the assumption that $\ns\leq \ab/1000$ to guarantee convergence of the geometric series, and bound its sum. Now, even ignoring the second term, we see that the RHS will only be less that $1/24$ (as required by the second condition of the theorem) if $\ns \ll \sqrt{\ab}/\dst$, so the best lower bound we can hope for is $\bigOmega{\sqrt{\ab}/\dst}$. But we wanted $\bigOmega{\sqrt{\ab}/\dst^2}$!\smallskip
+
+\noindent Oops.\smallskip
+
+\noindent What went wrong? We were a little too eager to get rid of ``this maximum in the denominator.'' It \emph{is} annoying, and it \emph{is} a good idea to get rid of it in order to be left with a geometric series, but \emph{not} in that first term we handle separately. There, we need it\dots{} So let's try again.
+\begin{align*}
+\sum_{j=2}^\infty \frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}}
+&\leq
+\frac{9\dst^2\ns^2}{\ab\sqrt{1+4\ns^2/\ab}}+\sum_{j=3}^\infty \abs{m^{\yes}(j)-m^{\no}(j)} \\
+&\leq \frac{9\dst^2\ns}{2\sqrt{\ab}} + \frac{9\ns^3}{\ab^2}\,.
+\end{align*}
+This looks better! For the RHS to be less than $1/24$, it suffices to have both, say, ${9\dst^2\ns}/{2\sqrt{\ab}} \leq 1/48$ and ${9\ns^3}/{\ab^2} \leq 1/48$, that is, $\ns \ll \max\Paren{\sqrt{\ab}/\dst^2, \ab^{2/3}}$. Finally, since $\ab^{2/3} \leq \sqrt{\ab}/\dst^2$ when $\dst \geq 1/\ab^{1/12}$, after invoking~\cref{theo:valiant:wishful} we get the following:
+\begin{theorem}
+  \label{theo:uniformity:lb:valiant}
+Every testing algorithm for uniformity must have sample complexity $\ns(\ab,\dst,1/3) = \Omega(\sqrt{\ab}/\dst^2)$, provided that $\dst \geq 1/\ab^{1/12}$.
+\end{theorem}
+The key aspect of this lower bound was how \emph{painless} it was to obtain it. The main idea was to use the same Paninski construction as before, check a couple conditions, compute a geometric series after handling separately the first (dominating) term, and then conclude by~\cref{theo:valiant:wishful}. 
+
+To conclude, let's mention that the restriction on $\dst$ in~\cref{theo:uniformity:lb:valiant} can be relaxed a little to $\dst\geq 1/\ab^{1/8}$, by being a little more careful about bounding the $\ns$-based moments (especially for $j=3$)~\exercise{Try it!}. However, it can only get us so far, as the first condition of the theorem, $\norminf{\p^\yes} \leq \frac{1}{500\ns}$, by itself imposes $\ns \lesssim \ab$, leading to $\dst\gtrsim 1/\ab^{1/4}$.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Valiant--Valiant'17}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Proving hardness by reductions}
+CDGR'16?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Application: distributed inference}
