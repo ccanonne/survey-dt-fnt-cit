@@ -41,7 +41,7 @@ for all $j\geq 1$, then we could \emph{hope} that the two distributions are indi
     \item $\norminf{\p^\yes},\norminf{\p^\no} \leq \frac{1}{500\ns}$;
     \item letting $m^\yes$, $m^\no$ be the $\ns$-based moments of $\p^\yes,\p^\no$ (defined below),
       \[
-         \sum_{j=2}^\infty \frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}} < \frac{1}{24},
+         \sum_{j=2}^\infty \frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\flr{j/2}!\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}} < \frac{1}{24},
       \]
       where $m^{\yes}(j) \eqdef \ns^j\norm{\p^\yes}_j^j$, $m^{\no}(j) \eqdef \ns^j\norm{\p^\no}_j^j$ for $j\geq 0$,
      \item $\p^\yes\in\property_\ab$ and $\totalvardist{\p^\no}{\property_\ab}>\dst$.
@@ -64,21 +64,25 @@ will be satisfied as long as $\ns \leq \frac{\ab}{1000}$, since $\norminf{\p^\ye
 
 Turning to the second condition, we need to compute these $\ns$-based moments. Luckily, it is a simple matter to check that, for every $j\geq 2$,
 \begin{equation}
+	\label{eq:moments:yes}
 	m^{\yes}(j) = \frac{\ns^j}{\ab^{j-1}}
 \end{equation}
 while
+\begin{align}
+	m^{\no}(j) 
+	&= \ns^j \sum_{i=1}^\ab \p^{\no}(i)^j 
+	= \ns^j\Paren{ \frac{\ab}{2} \Paren{\frac{1+3\dst}{\ab}}^j + \frac{\ab}{2} \Paren{\frac{1-3\dst}{\ab}}^j } \notag\\
+	&= \frac{\ns^j}{\ab^{j-1}}\Paren{ \frac{(1+3\dst)^j + (1-3\dst)^j}{2} }
+	\leq \frac{2^j\ns^j}{\ab^{j-1}} \label{eq:moments:no}
+\end{align}
+For instance, for the special case of $j=2$, the expression is a little nicer, and becomes
 \begin{equation}
-	m^{\no}(j) = \ns^j \sum_{i=1}^\ab \p^{\no}(i)^j = \ns^j\Paren{ \frac{\ab}{2} \Paren{\frac{1+3\dst}{\ab}}^j + \frac{\ab}{2} \Paren{\frac{1-3\dst}{\ab}}^j }
-	\leq \frac{2^j\ns^j}{\ab^{j-1}}
-\end{equation}
-Moreover, for the special case of $j=2$, the expression is a little nicer, and becomes
-\begin{equation}
-	m^{\no}(2) = \ns^2\Paren{ \frac{\ab}{2} \Paren{\frac{1+3\dst}{\ab}}^2 + \frac{\ab}{2} \Paren{\frac{1-3\dst}{\ab}}^2 }
+	m^{\no}(2)
 	= (1+9\dst^2)\frac{\ns^2}{\ab}\,.
 \end{equation}
-Why do we handle separately the second $\ns$-based moment? Without wanting to spoil the surprise, it's because we expect the term $j=2$ of the series $\sum_{j=2}^\infty \frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}}$ to dominate (as the second moment $\normtwo{\p}^2$ of the distribution is ``what gives it away'' in uniformity testing, as we saw now and again in~\cref{sec:uniformity}), so we want to make sure we handle that term as tightly as possible.
+Without wanting to spoil the surprise, we ``should'' expect the term $j=2$ of the series $\sum_{j=2}^\infty \frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\flr{j/2}!\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}}$ to dominate (as the second moment $\normtwo{\p}^2$ of the distribution is ``what gives it away'' in uniformity testing, as we saw now and again in~\cref{sec:uniformity}), so we will want to make sure we handle that term as tightly as possible.
 
-With the above expressions at our disposal, we can proceed: first, this maximum in the denominator seems annoying and will prevent us from easily computing the series, so let's get rid of it:
+\paragraph{First attempt.} With the above expressions at our disposal, we can proceed: first, since the series decays quite fast already (at least geometrically) as $\ns/\ab \ll 1$, the factorial in the denominator does not seem really crucial and it seems reasonable to ignore it to get a sense of what is going on. Moreover this maximum in the denominator seems annoying and will prevent us from easily computing the series, so let's get rid of it as well:
 \begin{align*}
 \sum_{j=2}^\infty \frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}}
 &\leq
@@ -92,7 +96,9 @@ where we used the assumption that $\ns\leq \ab/1000$ to guarantee convergence of
 
 \noindent Oops.\smallskip
 
-\noindent What went wrong? We were a little too eager to get rid of ``this maximum in the denominator.'' It \emph{is} annoying, and it \emph{is} a good idea to get rid of it in order to be left with a geometric series, but \emph{not} in that first term we handle separately. There, we need it\dots{} So let's try again.
+\noindent What went wrong? We were a little too eager to get rid of ``this maximum in the denominator.'' It \emph{is} annoying, and it \emph{is} a good idea to get rid of it in order to be left with a geometric series, but \emph{not} in that first term we handled separately. There, we need it\dots{} So let's try again.
+
+\paragraph{Second attempt.} 
 \begin{align*}
 \sum_{j=2}^\infty \frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}}
 &\leq
@@ -100,13 +106,49 @@ where we used the assumption that $\ns\leq \ab/1000$ to guarantee convergence of
 &\leq \frac{9\dst^2\ns}{2\sqrt{\ab}} + \frac{9\ns^3}{\ab^2}\,.
 \end{align*}
 This looks better! For the RHS to be less than $1/24$, it suffices to have both, say, ${9\dst^2\ns}/{2\sqrt{\ab}} \leq 1/48$ and ${9\ns^3}/{\ab^2} \leq 1/48$, that is, $\ns \ll \max\Paren{\sqrt{\ab}/\dst^2, \ab^{2/3}}$. Finally, since $\ab^{2/3} \leq \sqrt{\ab}/\dst^2$ when $\dst \geq 1/\ab^{1/12}$, after invoking~\cref{theo:valiant:wishful} we get the following:
-\begin{theorem}
-  \label{theo:uniformity:lb:valiant}
+\begin{proposition}
+  \label{prop:uniformity:lb:valiant}
 Every testing algorithm for uniformity must have sample complexity $\ns(\ab,\dst,1/3) = \Omega(\sqrt{\ab}/\dst^2)$, provided that $\dst \geq 1/\ab^{1/12}$.
-\end{theorem}
-The key aspect of this lower bound was how \emph{painless} it was to obtain it. The main idea was to use the same Paninski construction as before, check a couple conditions, compute a geometric series after handling separately the first (dominating) term, and then conclude by~\cref{theo:valiant:wishful}. 
+\end{proposition}
+Not bad! But can we do better? The restriction on $\dst$ is not quite the best we could hope for: the first condition of the theorem by itself, $\norminf{\p^\yes} \leq \frac{1}{500\ns}$, only imposes $\ns \lesssim \ab$, leading to $\dst\gtrsim 1/\ab^{1/4}$. It looks like we lost something, even in our second attempt -- was it necessary?
 
-To conclude, let's mention that the restriction on $\dst$ in~\cref{theo:uniformity:lb:valiant} can be relaxed a little to $\dst\geq 1/\ab^{1/8}$, by being a little more careful about bounding the $\ns$-based moments (especially for $j=3$)~\exercise{Try it!}. However, it can only get us so far, as the first condition of the theorem, $\norminf{\p^\yes} \leq \frac{1}{500\ns}$, by itself imposes $\ns \lesssim \ab$, leading to $\dst\gtrsim 1/\ab^{1/4}$.
+\paragraph{Third attempt.} The answer is no: as it turns out, we were again a little too eager to get rid of that seemingly inconsequential $\flr{j/2}!$ in the denominator. For our third (and last) attempt, let us be more careful:
+\begin{align*}
+\sum_{j=2}^\infty &\frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\flr{j/2}!\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}} \\
+&\leq
+\sum_{j=2}^\infty \frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\flr{j/2}!\sqrt{m^{\yes}(j)}}\\
+&= \sum_{j=2}^\infty \frac{\ns^{j/2}}{\flr{j/2}!\ab^{{j/2}-1}}\Paren{ \frac{(1+3\dst)^j + (1-3\dst)^j}{2} - 1 } \\
+&= \frac{1}{2\sqrt{\ab}}\sum_{j=2}^\infty \frac{\alpha^j+\beta^j-2\gamma^j}{\flr{j/2}!}
+\end{align*}
+where $\alpha \eqdef \frac{(1+3\dst)\ns^{1/2}}{\ab^{1/2}}$, $\beta \eqdef \frac{(1-3\dst)\ns^{1/2}}{\ab^{1/2}}$, $\gamma \eqdef \frac{\ns^{1/2}}{\ab^{1/2}}$, and we used~\cref{eq:moments:yes,eq:moments:no} for the first equality. We can then use the identity
+\[
+	\sum_{j=2}^\infty \frac{x^j}{\flr{j/2}!}
+	= \sum_{\ell=1}^\infty \frac{x^{2\ell}+x^{2\ell+1}}{\ell!}
+	= e^{x^2} + x e^{x^2} - x - 1, \qquad x\in\R
+\]
+and the values of $\alpha,\beta,\gamma$ to get, after some cancellations,
+\begin{align*}
+\sum_{j=2}^\infty &\frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\flr{j/2}!\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}} \\
+&\leq \frac{1}{2\sqrt{\ab}}( e^{(1+3\dst)^2\gamma^2}+e^{(1-3\dst)^2\gamma^2}-2e^{\gamma^2}
+\\
+&\qquad+ (1+3\dst)\gamma e^{(1+3\dst)^2\gamma^2}+(1-3\dst)\gamma e^{(1-3\dst)^2\gamma^2}-2\gamma e^{\gamma^2} )
+\end{align*}
+Sure, this is quite ugly; but a Taylor expansion at $0$ (since $\gamma = \sqrt{\ns/\ab} \ll 1$) tells us that the RHS
+is
+\[
+	18\dst^2 \gamma^2 + o(\gamma^2) = \frac{18\dst^2\ns}{\ab} + \littleO{\frac{\ns}{\ab}}
+\]
+and so 
+\begin{equation}
+	\sum_{j=2}^\infty \frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\flr{j/2}!\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}}
+	\lesssim \frac{1}{\sqrt{\ab}} \cdot \dst^2\frac{\ns}{\ab} = \frac{\dst^2\ns}{\sqrt{\ab}}
+\end{equation}
+This in turn will be less than $1/24$ for $\ns \ll \sqrt{\ab}/\dst^2$. Success! Recalling finally the condition $\ns \ll \ab$ (for the first condition of the Wishful Thinking theorem to hold), by invoking~\cref{theo:valiant:wishful} we get the result we wanted:
+\begin{theorem}
+  \label{prop:uniformity:lb:valiant}
+Every testing algorithm for uniformity must have sample complexity $\ns(\ab,\dst,1/3) = \Omega(\sqrt{\ab}/\dst^2)$, provided that $\dst \geq 1/\ab^{1/4}$.
+\end{theorem}
+The key aspect of this lower bound was how \emph{painless} it was to obtain it. The main idea was to use the same Paninski construction as before, check a couple conditions, compute a converging series, and then conclude by~\cref{theo:valiant:wishful}. (Sure, it might have felt a \emph{little} longer than this, but this is mostly due to the author's choice of going through three consecutive attempts, instead of skipping directly to the last one.)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
