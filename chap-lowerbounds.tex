@@ -118,12 +118,12 @@ so we should be fine; and indeed, one can check that
 \begin{align*}
 \frac{(1+3\dst)^2\gamma^2}{1-(1+3\dst)\gamma}+\frac{(1-3\dst)^2\gamma^2}{1-(1-3\dst)\gamma}-\frac{2\gamma^2}{1-\gamma} 
 &= \frac{18\dst^2\gamma^2}{(1-\gamma)(1-(1+3\dst)\gamma)(1-(1-3\dst)\gamma)} \\
-&\leq 144 \dst^2\gamma^2
+&\leq 144 \dst^2\gamma^2\,.
 \end{align*}
-and so 
+From this, we get
 \begin{equation}
 	\sum_{j=2}^\infty \frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}}
-	\leq \frac{1}{2\sqrt{\ab}} \cdot 144\dst^2\frac{\ns}{\ab} = \frac{72\dst^2\ns}{\sqrt{\ab}}
+	\leq \frac{1}{2\sqrt{\ab}} \cdot 144\dst^2\frac{\ns}{\ab} = \frac{72\dst^2\ns}{\sqrt{\ab}}\,.
 \end{equation}
 This in turn will be less than $1/24$ for $\ns \leq \sqrt{\ab}/(1728\dst^2)$. Success! Recalling finally the condition $\ns \ll \ab/$ (for the first condition of the Wishful Thinking theorem to hold) which imposes $\dst \gg 1/\ab^{1/4}$, by invoking~\cref{theo:valiant:wishful} we get the result we wanted:
 \begin{theorem}
