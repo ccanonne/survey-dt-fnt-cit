@@ -133,7 +133,113 @@ The key aspect of this lower bound was how \emph{painless} it was to obtain it. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Valiant--Valiant'17}
+\section{Indistinguishability on an instance-by-instance basis}
+We will now discuss and illustrate the use of a very convenient (albeit intimidating) result due to~\citet{ValiantV17}, which allows one to establish lower bounds tailored to any reference distribution $\q$.
+\begin{theorem}
+        \label{theo:vv:lb}
+    Given a distribution $\q$ over $[\ab]$, and associated values $\alpha_i$ such that $\alpha_i \in [0,1]$ for all $i\in[\ab]$, define the set of distributions $\class=\{\p_z\}_{z\in\bool^\ab}$ by setting, for every $z\in\bool^\ab$,
+\begin{equation}
+	\label{eq:vv:def:hardcase}
+    		\p_z(i) \eqdef \frac{(1+z_i\alpha_i)\q(i)}{\sum_{j=1}^\ab (1+z_j\alpha_j)\q(j) }, \qquad i\in[\ab]
+\end{equation}
+ \ie $\p_z(i) \propto (1+z_i\alpha_i)\q(i)$. 
+Then there exists an absolute constant $c>0$ such that any algorithm which, given $\ns$ \iid samples from an arbitrary distribution $\p$, distinguishes with success probability at least $2/3$ between (i)~$\p=\q$ and (ii)~$\p\in\class$, must satisfy
+\begin{equation}
+	\label{eq:vv:lb:samples}
+		\ns \geq \frac{c}{\sqrt{\sum_i \alpha_i^4\q(i)^2}}\,.
+\end{equation}
+Further, if $\max_{i} \alpha_i\q(i) \leq \frac{1}{2}\sum_{i=1}^\ab \alpha_i\q(i)$, then
+\begin{equation}
+	\label{eq:vv:proba:far}
+	\bP{Z}{\totalvardist{\p_Z}{\q} > \frac{1}{4}\sum_{i=1}^\ab \alpha_i\q(i) } \geq \frac{1}{2}\,,
+\end{equation}
+where $Z$ is uniformly random on $\bool^\ab$.
+\end{theorem}
+This is a bit of a mouthful, so let's break~\cref{theo:vv:lb} down before seeing a few corollaries and applications. First, given a reference distribution $\q$, and a choice of ``element-wise perturbations'' values $\alpha_1,\dots,\alpha_\ab$,~\cref{eq:vv:def:hardcase} says we should define a ``hard instance'' by setting $\p(i) = (1\pm \alpha_i)\q(i)$, choosing the sign independently and uniformly at random for every $i$, and then normalizing the resulting $\p$ to make it a true probability distribution. After doing this,~\cref{eq:vv:lb:samples} states that distinguishing $\q$ from a hard instance $\p$ chosen randomly this way requires
+$
+\Omega(1/\sqrt{\sum_i \alpha_i^4\q(i)^2})
+$ samples. Finally,~\cref{eq:vv:proba:far} tells us that (until some mild condition on the $\alpha_i$'s), most of those hard instances are actually \emph{far} from $\q$; in particular, we will typically want to choose the $\alpha_i$'s so that the guaranteed distance
+$
+\frac{1}{4}\sum_{i=1}^\ab \alpha_i\q(i)
+$ is equal to our parameter $\dst$.\medskip
+
+But \emph{how} should we choose these values $\alpha_1,\dots,\alpha_\ab$? In view of what we just discussed, it seems natural to set $\alpha_i \eqdef 4\dst$ for all $i$, ensuring that $\frac{1}{4}\sum_{i=1}^\ab \alpha_i\q(i) = \dst$. This also immediately satisfies $\max_{i} \alpha_i\q(i) \leq \frac{1}{2}\sum_{i=1}^\ab \alpha_i\q(i)$, as long as $\norminf{\q}\leq 1/2$: a rather mild condition. As for~\cref{eq:vv:lb:samples}, plugging in this choice of $\alpha_i$'s shows that it becomes
+\[
+		\ns \gtrsim \frac{1}{\dst^2\normtwo{\q}}
+\]
+which seems\dots good? For instance, when $\q$ is the uniform distribution, then $\normtwo{\q}=1/\sqrt{\ab}$, and we get an $\Omega(\sqrt{\ab}/\dst^2)$ lower bound! Specifically, we (almost) proved:
+\begin{theorem}
+  \label{prop:uniformity:lb:vv}
+Every testing algorithm for identity with reference $\q$ must have sample complexity $\ns(\ab,\dst,1/3) = \Omega(1/(\dst^2\normtwo{\q}))$, provided that $\norminf{\q}\leq 1/2$.
+
+In particular, every testing algorithm for uniformity must have sample complexity $\ns(\ab,\dst,1/3) = \Omega(\sqrt{\ab}/\dst^2)$.
+\end{theorem}
+\begin{proof}
+The above discussion, combined with~\cref{theo:vv:lb}, \emph{almost} establishes the result we want, up to some annoying detail: the success probability is not exactly what we needed, due to the fact that~\cref{theo:vv:lb} only guarantees a random distribution $\p_z$ is $\dst$-far from $\q$ with probability $1/2$. Namely, assume we have a testing algorithm $\Algo$ for identity with reference $\q$ with sample complexity $\ns=\ns(\ab,\dst,1/3)$. We can use it to distinguish between $\p=\q$ and a (uniformly randomly chosen) $\p$ from $\class$ (as defined with our choice $\alpha_i = 4\dst$), giving that
+(1)~if the distribution is $\q$, then we say so with probability at least $2/3$ (good);
+(2)~if the distribution is $\dst$-far from $\q$, then we say $\p\in\class$ with probability at least $2/3$ (good);
+\emph{but} if (3)~if the distribution is in $\class$ but \emph{not} $\dst$-far from $\q$, then we cannot say anything about being right or wrong (bad). So when $\p$ is chosen at random from $\class$, we can only guarantee we are correct with probability at least $2/3\cdot (1/2) = 1/3$\dots not $2/3$, which would be necessary to get the sample complexity lower bound from~\cref{theo:vv:lb} (\cref{eq:vv:lb:samples}) to apply.
+
+Fortunately, there is a fix. Define $\Algo'$ as follows: given ``enough'' samples (but still $O(\ns)$), it runs $\Algo$ on disjoint subsets of $\ns$ samples and takes a majority vote, to amplify its success probability from $2/3$ to $3/4$ (as described in~\cref{lemma:error:proba:amplification}). Looking at the output, it then does the following:
+\begin{itemize}
+	\item if the output is $1$ ($\p\neq \q$), then it outputs $1$;
+	\item if the output is $0$ ($\p=\q$), then it outputs $0$ with probability $17/24$, and $1$ with probability $7/24$.
+\end{itemize}
+Why did we do this? If $\p=\q$, then the probability that $\Algo'$ correctly outputs $0$ is now at least
+$
+\frac{3}{4}\cdot \frac{17}{24} > \frac{1}{2}
+$ (worse than before). But if $\p\in\class$, it will (correctly) output $1$ with probability at least
+\[
+	\frac{3}{4}\cdot \frac{1}{2}+\frac{1}{2}\cdot \frac{7}{24} > \frac{1}{2}
+\]
+(better than before). Since both probabilities are constants greater than $1/2$, we can again use the same amplification trick (\cref{lemma:error:proba:amplification}) on $\Algo'$ to get $\Algo''$, which is correct in distinguishing $\p=\q$ from $\p\in\class$ with probability at least $2/3$ in both cases. Moreover, since all these amplications only required to blow up the sample complexity by a constant factor, $\Algo''$ still uses $\ns' = O(\ns)$ samples, and applying~\cref{theo:vv:lb} on $\Algo''$ leads to
+\[
+	\ns' = \Omega(1/(\dst^2\normtwo{\q}))
+\]
+which implies $\ns = \Omega(1/(\dst^2\normtwo{\q}))$.
+\end{proof}
+
+
+
+Corollary where all $\alpha_i$'s are the same: $\Omega(1/(\dst^2\normtwo{\q}))$.
+Application:
+\begin{itemize}
+	\item uniformity: $\alpha_i=\dst$ for all $i$. Gives optimal bound, since $\normtwo{\q}=1/\sqrt{\ab}$.
+	\item Binomial: same. Gives optimal bound, since $\normtwo{\q}\asymp 1/\ab^{1/4}$.
+\end{itemize}
+Now, an example where the corollary is not tight:
+
+Consider $\q$ on $[\ab]$ such that
+\[
+	\q(i) = \frac{1}{\Lambda(\ab) \sqrt{i}}
+\]
+where
+\[
+	\Lambda(\ab) \eqdef \sum_{i=1}^\ab \frac{1}{\sqrt{i}} \operatorname*{\sim}_{\ab\to\infty} 2\sqrt{\ab}
+\]
+It is not hard to check that
+\[
+	\normtwo{\q} = \frac{\sqrt{H_\ab}}{\Lambda(\ab)} \operatorname*{\sim}_{\ab\to\infty} \frac{\ln \ab}{2\sqrt{\ab}}
+\]
+so the corollary gives a lower bound of $\bigOmega{\frac{\sqrt{\ab}}{\dst^2\sqrt{\log \ab}}}$. But now, let us apply the theorem itself, with
+\[
+	\alpha_i \eqdef 
+	\begin{cases}
+		4\dst &\text{if } i \geq \frac{\ab}{2}\\
+		0 &\text{ otherwise}
+	\end{cases}
+\]
+(we perturb only the tail!) 
+Then, setting $L\eqdef \clg{\frac{\ab}{2}}$,
+\[
+	\sum_{i=1}^\ab \alpha_i^4 \q(i)^2 = \frac{256\dst^4}{\Lambda(\ab)^2}\sum_{i=L}^\ab \frac{1}{i} \asymp \frac{\dst^4}{\ab}
+\]
+which gives a lower bound of $\bigOmega{\frac{\sqrt{\ab}}{\dst^2}}$. 
+since $\sum_{i=L}^\ab \frac{1}{i}\asymp 1$. Moreover, we do have the distance we want, as
+\[
+	\sum_{i=1}^\ab \alpha_i\q(i) = 	\frac{4\dst}{\Lambda(\ab)} \sum_{i=L}^\ab \frac{1}{\sqrt{i}} \asymp \dst
+\]
+while $\max_i \alpha_i\q(i) = 4\dst \q(L) \ll \dst$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Proving hardness by reductions}
 CDGR'16?
