@@ -205,23 +205,28 @@ This raises the question: is~\cref{theo:uniformity:lb:vv} always optimal? Or, to
 
 It is not just for show. Consider the following ``Zipf'' distribution $\q$ on $[\ab]$, where $\q(i) \propto 1/\sqrt{i}$:
 \begin{equation}
-	\q(i) = \frac{1}{H_{\ab}^{(1/2)} \sqrt{i}}, \qquad i \in [\ab]\,,
+	\q(i) = \frac{1}{H_{\ab,1/2} \sqrt{i}}, \qquad i \in [\ab]\,,
 \end{equation}
 where
 \[
-	H_{\ab}^{(1/2)} \eqdef \sum_{i=1}^\ab \frac{1}{\sqrt{i}} \operatorname*{\sim}_{\ab\to\infty} 2\sqrt{\ab}
+	H_{\ab,1/2} \eqdef \sum_{i=1}^\ab \frac{1}{\sqrt{i}} \operatorname*{\sim}_{\ab\to\infty} 2\sqrt{\ab}
 \]
 is the generalized Harmonic number of order $1/2$ (and $H_\ab$ will be the usual Harmonic number). A direct computation then shows that
 \[
-	\normtwo{\q} = \frac{\sqrt{H_\ab}}{H_{\ab}^{(1/2)}} \operatorname*{\sim}_{\ab\to\infty} \frac{\sqrt{\ln \ab}}{2\sqrt{\ab}}\,,
+	\normtwo{\q} = \frac{\sqrt{H_\ab}}{H_{\ab,1/2}} \operatorname*{\sim}_{\ab\to\infty} \frac{\sqrt{\ln \ab}}{2\sqrt{\ab}}\,,
 \]
 and so~\cref{theo:uniformity:lb:vv} gives a lower bound of $\bigOmega{\frac{\sqrt{\ab}}{\dst^2\sqrt{\log \ab}}}$ samples. This does not look too bad, especially since we know from~\cref{chap:identity} that an \emph{upper} bound of  $\bigO{{\sqrt{\ab}}/{\dst^2}}$ samples holds. But that leaves a gap of $\sqrt{\log \ab}$ between the two, which could go either way.
 
-But let us look at this $\q$, and what a typical ``local perturbation'' $\p\in\class$ looks like when we perturb each element by $1\pm\dst$:
+However, let us look at this $\q$, and what a typical ``local perturbation'' $\p\in\class$ looks like when we perturb each element by $1\pm\dst$:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[H]
 	\includegraphics[width=1.0\textwidth]{figures/fig-lowerbound-zipf-pq}
+	\caption{\label{fig:vv17:lb:zipf}Our reference $\q$ (Zipf distribution), along with a randomly chosen perturbation $\p$, here depicted for $\ab=200$, $\dst=1/10$.}
 \end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\bgroup
+\color{gray}
  now, let us apply the theorem itself, with
 \[
 	\alpha_i \eqdef 
@@ -241,6 +246,7 @@ since $\sum_{i=L}^\ab \frac{1}{i}\asymp 1$. Moreover, we do have the distance we
 	\sum_{i=1}^\ab \alpha_i\q(i) = 	\frac{4\dst}{\Lambda(\ab)} \sum_{i=L}^\ab \frac{1}{\sqrt{i}} \asymp \dst
 \]
 while $\max_i \alpha_i\q(i) = 4\dst \q(L) \ll \dst$.
+\egroup
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Proving hardness by reductions}
 CDGR'16?
