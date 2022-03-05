@@ -169,7 +169,7 @@ But \emph{how} should we choose these values $\alpha_1,\dots,\alpha_\ab$? In vie
 \]
 which seems\dots good? For instance, when $\q$ is the uniform distribution, then $\normtwo{\q}=1/\sqrt{\ab}$, and we get an $\Omega(\sqrt{\ab}/\dst^2)$ lower bound! Specifically, we (almost) proved:
 \begin{theorem}
-  \label{prop:uniformity:lb:vv}
+  \label{theo:uniformity:lb:vv}
 Every testing algorithm for identity with reference $\q$ must have sample complexity $\ns(\ab,\dst,1/3) = \Omega(1/(\dst^2\normtwo{\q}))$, provided that $\norminf{\q}\leq 1/2$.
 
 In particular, every testing algorithm for uniformity must have sample complexity $\ns(\ab,\dst,1/3) = \Omega(\sqrt{\ab}/\dst^2)$.
@@ -198,30 +198,31 @@ $ (worse than before). But if $\p\in\class$, it will (correctly) output $1$ with
 \]
 which implies $\ns = \Omega(1/(\dst^2\normtwo{\q}))$.
 \end{proof}
+\exercise{Apply this to the Binomial distribution, to get $\Omega(\ab^{1/4}/\dst^2)$.}
+This corollary is very handy, and provides a non-trivial lower bound as a function of some easily interpretable function of the reference $\q$. One can even generalize it to distributions over $\N$ instead of $[\ab]$ (infinite discrete domains), keeping the same statement and proof!
 
+This raises the question: is~\cref{theo:uniformity:lb:vv} always optimal? Or, to put things more bluntly: is allowing for different $\alpha_i$'s in~\cref{theo:vv:lb} useful, or is it just for show, and unnecessarily complicated?
 
-
-Corollary where all $\alpha_i$'s are the same: $\Omega(1/(\dst^2\normtwo{\q}))$.
-Application:
-\begin{itemize}
-	\item uniformity: $\alpha_i=\dst$ for all $i$. Gives optimal bound, since $\normtwo{\q}=1/\sqrt{\ab}$.
-	\item Binomial: same. Gives optimal bound, since $\normtwo{\q}\asymp 1/\ab^{1/4}$.
-\end{itemize}
-Now, an example where the corollary is not tight:
-
-Consider $\q$ on $[\ab]$ such that
-\[
-	\q(i) = \frac{1}{\Lambda(\ab) \sqrt{i}}
-\]
+It is not just for show. Consider the following ``Zipf'' distribution $\q$ on $[\ab]$, where $\q(i) \propto 1/\sqrt{i}$:
+\begin{equation}
+	\q(i) = \frac{1}{H_{\ab}^{(1/2)} \sqrt{i}}, \qquad i \in [\ab]\,,
+\end{equation}
 where
 \[
-	\Lambda(\ab) \eqdef \sum_{i=1}^\ab \frac{1}{\sqrt{i}} \operatorname*{\sim}_{\ab\to\infty} 2\sqrt{\ab}
+	H_{\ab}^{(1/2)} \eqdef \sum_{i=1}^\ab \frac{1}{\sqrt{i}} \operatorname*{\sim}_{\ab\to\infty} 2\sqrt{\ab}
 \]
-It is not hard to check that
+is the generalized Harmonic number of order $1/2$ (and $H_\ab$ will be the usual Harmonic number). A direct computation then shows that
 \[
-	\normtwo{\q} = \frac{\sqrt{H_\ab}}{\Lambda(\ab)} \operatorname*{\sim}_{\ab\to\infty} \frac{\ln \ab}{2\sqrt{\ab}}
+	\normtwo{\q} = \frac{\sqrt{H_\ab}}{H_{\ab}^{(1/2)}} \operatorname*{\sim}_{\ab\to\infty} \frac{\sqrt{\ln \ab}}{2\sqrt{\ab}}\,,
 \]
-so the corollary gives a lower bound of $\bigOmega{\frac{\sqrt{\ab}}{\dst^2\sqrt{\log \ab}}}$. But now, let us apply the theorem itself, with
+and so~\cref{theo:uniformity:lb:vv} gives a lower bound of $\bigOmega{\frac{\sqrt{\ab}}{\dst^2\sqrt{\log \ab}}}$ samples. This does not look too bad, especially since we know from~\cref{chap:identity} that an \emph{upper} bound of  $\bigO{{\sqrt{\ab}}/{\dst^2}}$ samples holds. But that leaves a gap of $\sqrt{\log \ab}$ between the two, which could go either way.
+
+But let us look at this $\q$, and what a typical ``local perturbation'' $\p\in\class$ looks like when we perturb each element by $1\pm\dst$:
+\begin{figure}[H]
+	\includegraphics[width=1.0\textwidth]{figures/fig-lowerbound-zipf-pq}
+\end{figure}
+
+ now, let us apply the theorem itself, with
 \[
 	\alpha_i \eqdef 
 	\begin{cases}
