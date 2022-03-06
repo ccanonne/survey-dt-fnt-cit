@@ -224,6 +224,29 @@ However, let us look at this $\q$, and what a typical ``local perturbation'' $\p
 	\caption{\label{fig:vv17:lb:zipf}Our reference $\q$ (Zipf distribution), along with a randomly chosen perturbation $\p$, here depicted for $\ab=200$, $\dst=1/10$.}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+While the second half (``tail'') of the distribution looks somewhat uniform (all probabilities between $\ab/2$ and $\ab$ are within a factor $\sqrt{2}$), the first half is clearly not, with the first few elements having much higher probability. Perturbing those heavy elements by the same relative amount as the rest, ``intuitively,'' is not a good idea, as it is easier to detect and can give away a lot more information. Instead, we will see what happens when we only perturb this somewhat-uniform tail of $\q$: define our $\alpha_i$'s by
+\[
+	\alpha_i \eqdef 
+	\begin{cases}
+		16\dst &\text{if } i \geq \frac{\ab}{2}\\
+		0 &\text{ otherwise}
+	\end{cases}
+\]
+In view of applying~\cref{theo:vv:lb}, we first check that the distance of our hard instances $\p_z$ to $\q$ will be at least $\dst$:
+$
+\max_{i} \alpha_i\q(i) = 16\dst\q(\ab/2) \ll \dst
+$, and
+\[
+	\frac{1}{4}\sum_{i=1}^\ab \alpha_i\q(i) = 	\frac{4\dst}{H_{\ab,1/2}} \sum_{i=\frac{\ab}{2}}^\ab \frac{1}{\sqrt{i}} = 4\dst\Paren{1-\frac{H_{\frac{\ab}{2},1/2}}{H_{\ab,1/2}}} \geq 4\Paren{1-\frac{1}{\sqrt{2}}}\dst > \dst\,,
+\]
+so by~\cref{eq:vv:proba:far} the distance is fine. Turning to the sample complexity lower bound this will lead to, we compute
+\[
+	\sum_{i=1}^\ab \alpha_i^4 \q(i)^2 = \frac{(16\dst)^4}{H_{\frac{\ab}{2},1/2}^2}\sum_{i=\frac{\ab}{2}}^\ab \frac{1}{i} 
+	= \frac{(16\dst)^4}{H_{\frac{\ab}{2},1/2}^2} \Paren{ H_{\ab} - H_{\frac{\ab}{2}} }
+	\asymp \frac{\dst^4}{\ab}
+\] 
+since $H_{\ab} - H_{\ab/2} = \ln 2 + o(1)$. By~\cref{eq:vv:lb:samples}, this means we get a (tight) lower bound of $\Omega(\sqrt{\ab}/\dst^2)$ samples! All we needed to do was to restrict our perturbation to the ``somewhat-uniform'' part of the reference distribution; crucially, this required the ability to choose different $\alpha_i$'s for different $i$, as allowed by~\cref{theo:vv:lb}.
+
 
 \bgroup
 \color{gray}
