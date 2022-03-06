@@ -245,31 +245,34 @@ so by~\cref{eq:vv:proba:far} the distance is fine. Turning to the sample complex
 	= \frac{(16\dst)^4}{H_{\frac{\ab}{2},1/2}^2} \Paren{ H_{\ab} - H_{\frac{\ab}{2}} }
 	\asymp \frac{\dst^4}{\ab}
 \] 
-since $H_{\ab} - H_{\ab/2} = \ln 2 + o(1)$. By~\cref{eq:vv:lb:samples}, this means we get a (tight) lower bound of $\Omega(\sqrt{\ab}/\dst^2)$ samples! All we needed to do was to restrict our perturbation to the ``somewhat-uniform'' part of the reference distribution; crucially, this required the ability to choose different $\alpha_i$'s for different $i$, as allowed by~\cref{theo:vv:lb}.
+since $H_{\ab} - H_{\ab/2} = \ln 2 + o(1)$. By~\cref{eq:vv:lb:samples}, this means we get a (tight) lower bound of $\Omega(\sqrt{\ab}/\dst^2)$ samples! All we needed to do was to restrict our perturbation to the ``near-uniform'' part of the reference distribution; crucially, this required the ability to choose different $\alpha_i$'s for different $i$, as allowed by~\cref{theo:vv:lb}.\medskip
+
+To conclude this section, we will derive another corollary to~\cref{theo:vv:lb}, which provides the ``best'' perturbation possible for any given reference $\q$; that is, an optimal choice for the $\alpha_i$'s as a function of $\q$. Based on our previous example, we know that $\alpha_i$ somehow has to \emph{adapt} to $\q(i)$, to differentiate between the heavy elements and the ``near-uniform'' part of the distribution $\q$.
+
+Now, on the one hand we want to establish as large a lower bound as possible, and so~\cref{eq:vv:lb:samples} says we should maximize
+$
+\sum_{i=1}^\ab \alpha_i^4\q(i)^2
+$. On the other hand, for our lower bound to be meaningful, we also need our hard instances to be at distance $\dst$ from $\q$, and for that~\cref{eq:vv:proba:far} imposes the condition
+$
+\sum_{i=1}^\ab \alpha_i\q(i) \asymp \dst
+$. Since
+\begin{equation}
+	\sum_{i=1}^\ab \alpha_i^4\q(i)^2 \leq \max_i \alpha_i^3\q(i) \cdot \sum_{i=1}^\ab \alpha_i\q(i)
+\end{equation}
+combining the two conditions leads us to try and maximize $\max_i \alpha_i^3\q(i)$, and the condition for equality in H\"older's inequality further suggests we should have $\alpha_i^3\q(i)$ constant; that is,
+\begin{equation}
+	\label{eq:vv:lb:intuition}
+	\alpha_i \propto 1/\q(i)^{1/3}\,.
+\end{equation}
+We may not be able to do this exactly, as the theorem also requires that $\alpha_i \leq 1$, so we will have to cap our $\alpha_i$'s;  but this motivates the following idea. Without loss of generality, assume that $\q$ is non-increasing: $\q(1)\geq \q(2)\geq \dots\geq \q(\ab)$ (we can, since we know $\q$, and can permute the domain if we want) and $\dst\in(0,1/8]$; and assume, \emph{with} some loss of generality, that $\q(1)=\norminf{\q} \leq 1/2$. First, define $\alpha\geq 0$ as a value such that
+\begin{equation}
+	\label{eq:vv:lb:choice:alpha}
+	\frac{1}{4}\sum_{i=2}^\ab \Paren{1\land \frac{\alpha}{\q(i)^{1/3}}}\q(i) = \dst
+\end{equation}
+where we start the summation at $i=2$ to (later) handle the annoying condition from~\cref{theo:vv:lb} on $\max_i \alpha_i\q(i)$, which will be $\alpha_1\q(1)$. To see why such a choice of $\alpha$ always exists, note that 
+the LHS of~\cref{eq:vv:lb:choice:alpha} is continuous and non-decreasing in $\alpha$, equal to $0$ for $\alpha=0$, and goes to $\frac{1}{4}\sum_{i=2}^\ab \q(i) = \frac{1}{4}(1-\norminf{\q}) \geq \frac{1}{8}$ for $\alpha\to\infty$.
 
 
-\bgroup
-\color{gray}
- now, let us apply the theorem itself, with
-\[
-	\alpha_i \eqdef 
-	\begin{cases}
-		4\dst &\text{if } i \geq \frac{\ab}{2}\\
-		0 &\text{ otherwise}
-	\end{cases}
-\]
-(we perturb only the tail!) 
-Then, setting $L\eqdef \clg{\frac{\ab}{2}}$,
-\[
-	\sum_{i=1}^\ab \alpha_i^4 \q(i)^2 = \frac{256\dst^4}{\Lambda(\ab)^2}\sum_{i=L}^\ab \frac{1}{i} \asymp \frac{\dst^4}{\ab}
-\]
-which gives a lower bound of $\bigOmega{\frac{\sqrt{\ab}}{\dst^2}}$. 
-since $\sum_{i=L}^\ab \frac{1}{i}\asymp 1$. Moreover, we do have the distance we want, as
-\[
-	\sum_{i=1}^\ab \alpha_i\q(i) = 	\frac{4\dst}{\Lambda(\ab)} \sum_{i=L}^\ab \frac{1}{\sqrt{i}} \asymp \dst
-\]
-while $\max_i \alpha_i\q(i) = 4\dst \q(L) \ll \dst$.
-\egroup
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Proving hardness by reductions}
 CDGR'16?
