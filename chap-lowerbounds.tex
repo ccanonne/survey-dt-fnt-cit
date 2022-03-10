@@ -333,7 +333,6 @@ But we have already shown (in a few different ways by now) that \emph{uniformity
 Here's how. Imagine we had an ``efficient'' reduction from uniformity testing to monotonicity testing: given samples from an arbitrary distribution $\p\in\distribs{\ab}$, we can obtain samples from a distribution $\Phi(\p)\in\distribs{\ab'}$ such that (i)~$\Phi(\p)\in\property^{\searrow}_{\ab'}$ whenever $\p=\uniform_\ab$, and $\totalvardist{\Phi(\p)}{\property^{\searrow}_{\ab'}} > \dst'$ whenever $\totalvardist{\p}{\uniform_\ab} > \dst$. We allow the domain to change a little, from $\ab$ to some (not much larger) $\ab'$; and similarly for the distance parameter, originally $\dst$, which can become some other (not much smaller) value $\dst'$. See~\cref{fig:reduction:monotonicity} for a depiction.
 
 \begin{figure}[htbp]\centering
-
 \tikzset {_3eubqr20l/.code = {\pgfsetadditionalshadetransform{ \pgftransformshift{\pgfpoint{0 bp } { 0 bp }  }  \pgftransformrotate{0 }  \pgftransformscale{2.64 }  }}}
 \pgfdeclarehorizontalshading{_y5uoy9rpz}{150bp}{rgb(0bp)=(0.99,0.97,0.93);
 rgb(54.285714285714285bp)=(0.99,0.97,0.93);
@@ -379,7 +378,17 @@ rgb(100bp)=(0.98,0.95,0.95)}
 \end{tikzpicture}
 \caption{Illustration of what a reduction from uniformity testing to monotonicity testing is. The uniform distribution is mapped to some monotone distribution, while distributions far from uniform are mapped to distributions far from monotone. (Things that are neither uniform nor far from it can be mapped to anything.)\label{fig:reduction:monotonicity}}
 \end{figure}
+\noindent Then, any algorithm $\Tester$ for testing $\property^{\searrow}$ (with parameters $\ab',\dst'$) can be used to test uniformity (with parameters $\ab,\dst$): convert the samples from $\p\in\distribs{\ab}$ to samples from $\Phi(\p)\in\distribs{\ab'}$, run $\Tester$ on them, and output what this tester returns. Which is great\dots except that we know that $\Omega(\sqrt{\ab}/\dst^2)$ samples are required for the latter task; so the sample complexity $\ns$ of $\Tester$ must satisfy $\ns(\ab',\dst',1/3) = \Omega(\sqrt{\ab}/\dst^2)$. We get a lower bound! Whose meaningfulness, of course, depends a lot on how $\ab'$ and $\dst'$ are related to $\ab$ and $\dst$.\smallskip
 
+Let us look at an example, to make things more concrete. Consider the following (randomized) mapping $\Psi\colon[\ab]\to[2\ab]$: 
+\begin{description}
+	\item[$\Psi$:] Given $i \in [\ab]$, return $i$ with probability $\frac{1}{2}$ and $\ab+i$ otherwise.
+\end{description}
+Applying this to samples from a probability distribution $\p\in\distribs{\ab}$ corresponds to the mapping $\Phi\colon\distribs{\ab}\to\distribs{2\ab}$ (so, $\ab'\eqdef2\ab$) such that
+\begin{equation}
+	\Phi(\p)(i) = \frac{1}{2}\p(i\bmod\ab)
+\end{equation}
+which ``duplicates the domain and puts two contiguous copies of $\p$ next to each other.'' Why is it a good thing to consider? For a start, if we apply this to the uniform distribution $\uniform_\ab$, we end up with $\Phi(\uniform_\ab) = \uniform_{2\ab}$, the uniform distribution on our new domain, which is definitely in $\property^{\searrow}_{2\ab}$ (the uniform distribution may not be the most interesting monotone distribution, but it is a monotone distribution nonetheless).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Application: distributed inference}
