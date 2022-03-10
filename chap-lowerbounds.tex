@@ -4,7 +4,7 @@
 \section{Ingster's method}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Indistinguishability via moment-matching}
-
+\label{ssec:momentmatching}
 We will here describe a general, out-of-the-box theorem which applies to a broad class of distribution properties: namely, the class of \emph{symmetric properties}, which are those which do not depend on the individual labels of the domain elements.
 \begin{definition}
 	A property $\property=\cup_{\ab=1}^\infty \property_\ab$ of distributions is said to be \emph{symmetric} if it is closed under permutations of the domain: for every $\ab$ and every permutation $\sigma\colon\domain_\ab\to \domain_\ab$, if $\p\in\property_\ab$ then $\p\circ\sigma\in\property_\ab$.
@@ -313,12 +313,73 @@ Observe that~\cref{eq:vv:lb:choice:alpha:2} also implies $\sum_{i=L+1}^\ab \q(i)
   \label{theo:2/3:lb:vv}
 Given a probability distribution $\q\in\distribs{\ab}$, let $\tilde{\q}^{-\!\max}_{-4\dst}$ denote the vector obtained by seeing $\q$ as a vector in $[0,1]^\ab$, and removing (i)~its largest entry, and (ii)~its smallest entries, stopping just before the total removed exceeds $4\dst$. Then every testing algorithm for identity with reference $\q$ must have sample complexity $\ns(\ab,\dst,1/3) = \Omega(\lVert\tilde{\q}^{-\!\max}_{-4\dst}\rVert_{2/3}/\dst^2)$, provided that $\norminf{\q}\leq 1/2$ and $\dst\in(0,1/8]$.
 \end{theorem}
-\noindent One can check that this does retrieve the $\Omega(\sqrt{\ab}/\dst^2)$ testing lower bound both when (1)~$\q$ is the uniform distribution, (2)~$\q$ is the Zipf  distribution we saw in our earlier example.\exercise{Check it!\cref{???}}
+\noindent One can check that this does retrieve the $\Omega(\sqrt{\ab}/\dst^2)$ testing lower bound both when (1)~$\q$ is the uniform distribution, (2)~$\q$ is the Zipf  distribution we saw in our earlier example\medskip.\exercise{Check it!\cref{???}}
 
 %%%% Comment on uses beyond identity testing! E.g., LB for other problems.
 
+Finally, it is worth mentioning that~\cref{theo:vv:lb} is not restricted to identity testing (although this is the application we detailed in this section). One can use it to establish indistinguishability results for other questions, focusing on the sample complexity lower bound it provides (\cref{eq:vv:lb:samples}) and possibly ignoring the distance part (\cref{eq:vv:proba:far}). For instance, it can be used to establish sample complexity lower bounds for testing in other norms than total variation distance, or to obtain lower bounds on estimating some parameter of interest.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Proving hardness by reductions}
-CDGR'16?
+In this section, we will shift focus a little, and discuss how to \emph{leverage work (other) people did} in order to establish new sample complexity lower bounds. To illustrate the idea, consider the property $\property^{\searrow}=\cup_{\ab=1}^\infty \property^{\searrow}_\ab$ of \emph{monotone} (non-increasing) distributions,
+\ie
+\begin{equation}
+\property^{\searrow}_\ab \eqdef \setOfSuchThat{ \p\in\distribs{\ab} }{ \p(1)\geq \p(2) \geq \dots \geq \p(\ab) }
+\end{equation}
+Say we want to test this property $\property^{\searrow}$: that is, given samples from a distribution over $\{1,2,\dots,\ab\}$, we want to test whether its pmf is non-increasing; more specifically, say we want to show it is not easy. We could try to use techniques from the previous subsections (though probably not directly those from~\cref{ssec:momentmatching}, as $\property^{\searrow}$ is most definitely not a symmetric property) to establish a sample complexity lower bound: this will require quite a bit of thinking and at least of few non-trivial computations.
+
+But we have already shown (in a few different ways by now) that \emph{uniformity} testing had sample complexity $\Omega(\sqrt{\ab}/\dst^2)$. Can we somehow show that testing monotonicity is \emph{at least as hard}, and get the same lower bound without working much more? Enters the concept of \emph{reduction}, quite central to (theoretical) computer science. We already saw it in~\cref{ssec:l1:reduction}, when we used it to show how to use any uniformity testing algorithm for the more general problem of identity testing: that is, we described a reduction from uniformity to identity testing to get an algorithm (upper bound) for the latter, using an algorithm for the former. But every coin has two sides, and a reduction can be used to show lower bounds too!
+
+Here's how. Imagine we had an ``efficient'' reduction from uniformity testing to monotonicity testing: given samples from an arbitrary distribution $\p\in\distribs{\ab}$, we can obtain samples from a distribution $\Phi(\p)\in\distribs{\ab'}$ such that (i)~$\Phi(\p)\in\property^{\searrow}_{\ab'}$ whenever $\p=\uniform_\ab$, and $\totalvardist{\Phi(\p)}{\property^{\searrow}_{\ab'}} > \dst'$ whenever $\totalvardist{\p}{\uniform_\ab} > \dst$. We allow the domain to change a little, from $\ab$ to some (not much larger) $\ab'$; and similarly for the distance parameter, originally $\dst$, which can become some other (not much smaller) value $\dst'$. See~\cref{fig:reduction:monotonicity} for a depiction.
+
+\begin{figure}[htbp]\centering
+
+\tikzset {_3eubqr20l/.code = {\pgfsetadditionalshadetransform{ \pgftransformshift{\pgfpoint{0 bp } { 0 bp }  }  \pgftransformrotate{0 }  \pgftransformscale{2.64 }  }}}
+\pgfdeclarehorizontalshading{_y5uoy9rpz}{150bp}{rgb(0bp)=(0.99,0.97,0.93);
+rgb(54.285714285714285bp)=(0.99,0.97,0.93);
+rgb(61.96428571428571bp)=(0.98,0.95,0.95);
+rgb(100bp)=(0.98,0.95,0.95)}
+\tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
+
+\begin{tikzpicture}[x=0.75pt,y=0.75pt,yscale=-1.3,xscale=1.3]
+%uncomment if require: \path (0,300); %set diagram left start at 0, and has height of 300
+
+%Shape: Polygon Curved [id:ds24835565753561872] 
+\draw  [xshift=-100pt,draw opacity=0.05,scale=0.85,yshift=20pt,xshift=-20pt][shading=_y5uoy9rpz,_3eubqr20l] (228.87,88.88) .. controls (266.87,64.88) and (266.87,111.88) .. (282.87,123.88) .. controls (298.87,135.88) and (360.87,96.88) .. (335.87,141.88) .. controls (310.87,186.88) and (389.87,249.88) .. (305.87,226.88) .. controls (221.87,203.88) and (251.87,247.88) .. (208.87,236.88) .. controls (165.87,225.88) and (201.87,193.88) .. (183.87,172.88) .. controls (165.87,151.88) and (157.87,118.88) .. (191.87,123.88) .. controls (225.87,128.88) and (190.87,112.88) .. (228.87,88.88) -- cycle ;
+%Shape: Circle [id:dp2977666721327956] 
+\draw  [draw opacity=0,scale=0.45,xshift=-91pt,yshift=153pt][fill={rgb, 255:red, 253; green, 170; blue, 30 }, fill opacity=0.7 ][general shadow={fill={rgb, 255:red, 245; green, 166; blue, 35 },shadow xshift=0pt,shadow yshift=0pt, opacity=0 }] (242,165.5) .. controls (248,147) and (253,132) .. (271.5,132) .. controls (290,132) and (305,147) .. (308,165.5) .. controls (310,184) and (290,199) .. (271.5,199) .. controls (253,199) and (238,184) .. (242,165.5) -- cycle ;
+%Shape: Circle [id:dp2977666721327956] 
+\draw  [draw opacity=0.05,scale=0.25,xshift=0pt,yshift=375pt][fill={rgb, 255:red, 253; green, 170; blue, 30 }, fill opacity=0.99 ][general shadow={fill={rgb, 255:red, 245; green, 166; blue, 35 },shadow xshift=0pt,shadow yshift=0pt, opacity=0 }] (242,165.5) .. controls (248,147) and (253,132) .. (271.5,132) .. controls (290,132) and (305,147) .. (308,165.5) .. controls (310,184) and (290,199) .. (271.5,199) .. controls (253,199) and (238,184) .. (242,165.5) -- cycle ;
+%Shape: Ellipse [id:dp5805520465941827] 
+\node at (50,120) (nodedistribs) {$\distribs{\ab}$};
+\node at (90,145) (nodefar) {};
+\node at (60,175) (nodeeps) {\scriptsize$\dst$};
+\node at (70,168) (nodepropertyunif) {$\uniform_{\ab}$};
+\node at (65,168) (nodepropertyunifstartarrow) {};
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%Shape: Polygon Curved [id:ds24835565753561872] 
+\draw  [draw opacity=0.05][shading=_y5uoy9rpz,_3eubqr20l] (228.87,88.88) .. controls (266.87,64.88) and (266.87,111.88) .. (282.87,123.88) .. controls (298.87,135.88) and (360.87,96.88) .. (335.87,141.88) .. controls (310.87,186.88) and (389.87,249.88) .. (305.87,226.88) .. controls (221.87,203.88) and (251.87,247.88) .. (208.87,236.88) .. controls (165.87,225.88) and (201.87,193.88) .. (183.87,172.88) .. controls (165.87,151.88) and (157.87,118.88) .. (191.87,123.88) .. controls (225.87,128.88) and (190.87,112.88) .. (228.87,88.88) -- cycle ;
+%Shape: Circle [id:dp2977666721327956] 
+\draw  [draw opacity=0][fill={rgb, 255:red, 253; green, 170; blue, 30 }  ,fill opacity=0.70 ][general shadow={fill={rgb, 255:red, 245; green, 166; blue, 35 },shadow xshift=0pt,shadow yshift=0pt, opacity=0 }] (242,165.5) .. controls (248,147) and (253,132) .. (271.5,132) .. controls (290,132) and (305,147) .. (308,165.5) .. controls (310,184) and (290,199) .. (271.5,199) .. controls (253,199) and (238,184) .. (242,165.5) -- cycle ;
+%Shape: Circle [id:dp2977666721327956] 
+\draw  [draw opacity=0.05, scale=0.8,xshift=51pt,yshift=31pt][fill={rgb, 255:red, 253; green, 170; blue, 30 }  ,fill opacity=0.99 ][general shadow={fill={rgb, 255:red, 245; green, 166; blue, 35 },shadow xshift=0pt,shadow yshift=0pt, opacity=0 }] (242,165.5) .. controls (248,147) and (253,132) .. (271.5,132) .. controls (290,132) and (305,147) .. (308,165.5) .. controls (310,184) and (290,199) .. (271.5,199) .. controls (253,199) and (238,184) .. (242,165.5) -- cycle ;
+%Shape: Ellipse [id:dp5805520465941827] 
+\node at (240,120) (nodedistribsprime) {$\distribs{\ab'}$};
+\node at (220,170) (nodefarprime) {};
+\node at (245,175) (nodeepsprime) {\scriptsize$\dst'$};
+\node at (275,165) (nodeproperty) {$\property^{\searrow}_{\ab'}$};
+
+
+
+\draw [dotted,->] (nodefar) to  [out=-25,in=225] (nodefarprime);
+\draw [dotted,->] (nodepropertyunifstartarrow) to [out=45,in=100] (nodeproperty);
+\end{tikzpicture}
+\caption{Illustration of what a reduction from uniformity testing to monotonicity testing is. The uniform distribution is mapped to some monotone distribution, while distributions far from uniform are mapped to distributions far from monotone. (Things that are neither uniform nor far from it can be mapped to anything.)\label{fig:reduction:monotonicity}}
+\end{figure}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Application: distributed inference}
