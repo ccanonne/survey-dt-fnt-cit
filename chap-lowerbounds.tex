@@ -423,17 +423,47 @@ In other terms, an agnostic learning algorithm works even in the unrealizable se
 \begin{theorem}[Hardness by Reduction]\label{theo:hardness:subclass}
   Fix any property $\property$, and suppose there exists $\property'\subseteq \property$ such that the following holds.
   \begin{enumerate}
-    \item\label{theo:hardness:subclass:item1} agnostic learning of $\property$ (with a given ``agnostic constant'' $C\geq 1$) has sample complexity at most $\ns_{\mathcal{L}}(\ab,\dst,\delta)$;
-    \item testing $\property'$ has sample complexity at least $\ns_{\mathcal{T}}(\ab,\dst,\errprob)$;
-    \item there exist a range of parameters $\ab,\dst,\errprob$ for which learning $\property$ is easier than testing $\property'$: 
+    \item\label{theo:hardness:subclass:item1} Agnostic learning of $\property$ (with a given ``agnostic constant'' $C\geq 1$) has sample complexity at most $\ns_{\mathcal{L}}(\ab,\dst,\delta)$;
+    \item\label{theo:hardness:subclass:item2} Testing $\property'$ has sample complexity at least $\ns_{\mathcal{T}}(\ab,\dst,\errprob)$;
+    \item\label{theo:hardness:subclass:item3} There exists a range of parameters $\ab,\dst,\errprob$ for which learning $\property$ is easier than testing $\property'$: 
     	\[
-    		\ns_{\mathcal{L}}(\ab,\dst/3,\errprob/2) \leq \frac{1}{2}\ns_{\mathcal{T}}(\ab,\dst/(3C),\errprob/2)
+    		\ns_{\mathcal{L}}(\ab,C\dst,\errprob) \leq \frac{1}{2}\ns_{\mathcal{T}}(\ab,3C\dst,2\errprob)
     	\]
   \end{enumerate}
-  Then every testing algorithm for $\property$ must have sample complexity at least $\ns_{\mathcal{T}}(\ab,\dst,\errprob)$.
+  Then, for $\ab,\dst,\errprob$ in that range of parameters, every testing algorithm for $\property$ must have sample complexity at least $\frac{1}{2}\ns_{\mathcal{T}}(\ab,3C\dst,2\errprob)$.
 \end{theorem}
 \begin{proof}
-The idea of the proof is quite simple: suppose we have a testing algorithm $\Algo$ for $\property$ with sample complexity $\ns(\ab,\dst,\errprob)$, and let $\Learner$ be the agnostic learning algorithm for $\property$ with sample complexity $\ns_{\mathcal{L}}(\ab,\dst,\errprob)$ promised by~\cref{theo:hardness:subclass:item1}. (Note that we only care about sample complexity, and do not make any assumption on computational efficiency.)
+The idea of the proof is quite simple: suppose we have a testing algorithm $\Algo$ for $\property$ with sample complexity $\ns_\Algo(\ab,\dst,\errprob)$, and let $\Learner$ be the agnostic learning algorithm for $\property$ with sample complexity $\ns_{\mathcal{L}}(\ab,\dst,\errprob)$ promised by~\cref{theo:hardness:subclass:item1}. Then we can combine both to obtain a testing algorithm for $\property'$: but since $\property'$ is hard to test, this testing algorithm cannot be \emph{too} sample-efficient (it must take at least $\ns_{\mathcal{T}}$ samples), giving us a lower bound $\ns_\Algo+\ns_\Learner \geq \ns_{\mathcal{T}}$. (Note that we only care about sample complexity, and do not make any assumption on computational efficiency.)
+
+\noindent In more detail, consider the following testing algorithm $\Algo'$ for $\property'$: on input $\ab,\dst,\errprob$,
+\begin{itemize}
+	\item Run $\Algo$ with parameters $\ab,\dst/(3C),\errprob/2$; let $b\in\{\reject,\accept\}$ be the result.
+	\item Run $\Learner$ with parameters $\ab,\dst/3,\errprob/2$; let $\hat{\p}$ be the output.
+	\item Check whether $\totalvardist{\hat{\p}}{\property'} \leq \dst/3$; let $b'\in\{\reject,\accept\}$ indicate the result (this is purely computational and requires no samples from $\p$).
+	\item Return $b\land b'$ (\ie \accept if, and only if, both $b$ and $b'$ were \accept).
+\end{itemize}
+Since both $\Algo$ and $\Learner$ were run with error probability $\errprob/2$, by a union bound they are simultaneously correct with probability at least $1-\errprob$. Assume hereafter this event holds.
+\begin{itemize}
+\item If $\p\in\property'$, then \textit{a fortiori} $\p\in\property$, and $\Algo$ returns $b=\accept$. Moreover, $\totalvardist{\p}{\hat{\p}} \leq C\cdot 0 + \dst/3 = \dst/3$, so $b'=\accept$ as well, and overall $\Algo'$ returns \accept.
+\item Let us now argue the ``soundness.'' Suppose that $\Tester'$ returns $\accept$: this means that $b=\accept$, and so since $\Algo$ is a testing algorithm for $\property$ we must have $\totalvardist{\p}{\property} \leq \dst/(3C)$. But then, since $\Learner$ is an agnostic learner for $\property$, we get $\totalvardist{\p}{\hat{\p}} \leq C\cdot \totalvardist{\p}{\property} + \dst/3 \leq 2\dst/3$. And finally, since the last check was successful as well ($b'=\accept$), we have that $\totalvardist{\hat{\p}}{\property'} \leq \dst/3$. By the triangle inequality, it follows that
+\[
+	\totalvardist{\p}{\property'} \leq \totalvardist{\p}{\hat{\p}}+\totalvardist{\hat{\p}}{\property'} \leq \dst\,.
+\]
+By contrapositive, if $\totalvardist{\p}{\property'} > \dst$ then it must be the case that $\Tester'$ returns $\reject$.
+\end{itemize}
+So $\Tester'$ is a \textit{bona fide} testing algorithm for $\property'$, and its sample complexity is
+\[
+	\ns'(\ab,\dst,\errprob) = \ns_\Algo(\ab,\dst/(3C),\errprob/2) + \ns_{\mathcal{L}}(\ab,\dst/3,\errprob/2)
+\]
+or, reparameterizing, 
+\[
+	\ns'(\ab,3C\dst,2\errprob) = \ns_\Algo(\ab,\dst,\errprob) + \ns_{\mathcal{L}}(\ab,C\dst,\errprob)\,.
+\]
+But since we know by~\cref{theo:hardness:subclass:item2} that $\property'$ is hard to test, we must then have
+\[
+	\ns_\Algo(\ab,\dst,\errprob) + \ns_{\mathcal{L}}(\ab,C\dst,\errprob) \geq \ns_{\mathcal{T}}(\ab,3C\dst,2\errprob)
+\]
+which by~\cref{theo:hardness:subclass:item3} implies $\ns_\Algo(\ab,\dst,\errprob) \geq \ns_{\mathcal{T}}(\ab,3C\dst,2\errprob)$, and proves the theorem.
 \end{proof}
 
 With this theorem in hand, proving a sample complexity lower bound for a given property $\property$ boils down to scouring the literature to check if (1)~$\property$ is easy to learn, and (2)~something (anything!) inside $\property$ is known to be hard to test. Note that the result may not always be an \emph{optimal} lower bound; but it often gets quite close to it, and is a simple and valuable starting point.\smallskip
@@ -442,8 +472,12 @@ To conclude, let us see a direct application of this theorem to the property $\p
 
 % Exercise VV17 for Binomial + this -> LB for PBDs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Application: distributed inference}
+%%\section{Application: distributed inference}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Historical notes}
+\tbc
+\citet{BlaisCG17} for another type of reductions (via communication complexity)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
