@@ -17,7 +17,7 @@ Symmetric properties are nice in the sense that, when considering them, one can 
 \[
 	\freq\eqdef (\freq_{0},\freq_{1},\freq_{2},\dots,\freq_{\ns}) \in \N^{\ns+1}
 \]
-where $\freq{j} = \sum_{i=1}^\ab \indic{\occur_{i}=j}$ is the number of elements of the domain which appear exactly $j$ times among the $\ns$ samples. In particular, we always have $\sum_{j=0}^\ns \freq_j = \ns$.\exercise{Check that you can express several (FOCUS ON A COUPLE) \tbc of the algorithms in~\cref{sec:uniformity} as a function of $\freq$ only.}\medskip
+where $\freq_{j} = \sum_{i=1}^\ab \indic{\occur_{i}=j}$ is the number of elements of the domain which appear exactly $j$ times among the $\ns$ samples. In particular, we always have $\sum_{j=0}^\ns \freq_j = \ns$.\exercise{Check that you can express several (FOCUS ON A COUPLE) \tbc of the algorithms in~\cref{sec:uniformity} as a function of $\freq$ only.}\medskip
 
 The main result discussed in this section is the ``Wishful Thinking Theorem'' of~\citet{Valiant:11}, which applies to testing symmetric properties of distributions. Intuitively, this theorem ensures that ``if the low-degree moments ($\lp[p]$ norms) of two distributions match, then these distributions (up to relabeling) are hard to distinguish.'' To see why this is the case, and justify the name of the theorem, observe that since we focus on symmetric properties all which matters is the fingerprint $\freq$ introduced about; that is, the number of $j$-collisions, for every $j\geq 0$.
 
@@ -46,7 +46,7 @@ for all $j\geq 1$, then we could \emph{hope} that the two distributions are indi
       where $m^{\yes}(j) \eqdef \ns^j\norm{\p^\yes}_j^j$, $m^{\no}(j) \eqdef \ns^j\norm{\p^\no}_j^j$ for $j\geq 0$,
      \item $\p^\yes\in\property_\ab$ and $\totalvardist{\p^\no}{\property_\ab}>\dst$.
   \end{enumerate}
-  Then every testing algorithm for $\property_\ab$ must have sample complexity $\ns(\ab,\dst, 1/3) > \ns$.
+  Then every testing algorithm for $\property$ must have sample complexity $\ns(\ab,\dst, 1/3) > \ns$.
 \end{theorem}
 \noindent (Side remark: the term $j=1$ does not appear in the sum, since $\ns\norm{\p}_1=\ns$ for every distribution $\p$, and so this term always cancels out.)\medskip
 %\noindent (We observe that we only reproduced here one of the three sufficient conditions given in the original, more general theorem; as this will be the only one we need.)
@@ -134,6 +134,7 @@ The key aspect of this lower bound was how \emph{painless} it was to obtain it. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Indistinguishability on an instance-by-instance basis}
+	\label{ssec:vv:instancebyinstance}
 We will now discuss and illustrate the use of a very convenient (albeit intimidating) result due to~\citet{ValiantV17}, which allows one to establish lower bounds tailored to any reference distribution $\q$.
 \begin{theorem}
         \label{theo:vv:lb}
@@ -321,6 +322,7 @@ Finally, it is worth mentioning that~\cref{theo:vv:lb} is not restricted to iden
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Proving hardness by reductions}
+	\label{ssec:lb:reductions}
 In this section, we will shift focus a little, and discuss how to \emph{leverage work (other) people did} in order to establish new sample complexity lower bounds. To illustrate the idea, consider the property $\property^{\searrow}=\cup_{\ab=1}^\infty \property^{\searrow}_\ab$ of \emph{monotone} (non-increasing) distributions,
 \ie
 \begin{equation}
@@ -398,6 +400,7 @@ which ``duplicates the domain and puts two contiguous copies of $\p$ next to eac
 \end{figure}
 By the above discussion, the lower bound on uniformity testing directly implies that monotonicity testing with parameters $2\ab$ and $\dst/2$ must have sample complexity $\Omega(\sqrt{\ab}/\dst^2)$. Since constant factors are just constant factors, this leads to the following:
 \begin{theorem}
+	\label{theo:lb:testing:monotonicity}
 Every testing algorithm for $\property^{\searrow}$ (monotonicity) must have sample complexity $\ns(\ab,\dst,1/3) = \Omega(\sqrt{\ab}/\dst^2)$.
 \end{theorem}
 \noindent(As a side note, this is known to be tight, as least for $\dst \gg \sqrt{\log\ab}/\ab^{1/4}$.) Crucially, reductions comes with another advantage: if we were to introduce another parameter (focusing on the dependence on $\errprob$, for instance), or work with constrained measurements as in~\cref{chap:constrained}, then as long as our reduction goes through in the setting considered, we only need to derive the uniformity testing lower bound in that setting to immediately get the corresponding lower bound for monotonicity testing as well. As said earlier, reductions are great to avoid unnecessary work!
@@ -416,8 +419,26 @@ As we will see momentarily, this is indeed the case, albeit for a very specific 
 	\]
 with probability at least $1-\delta$, where $C\geq 1$ is an absolute constant.
 \end{definition}
-In other terms, an agnostic learning algorithm works even in the unrealizable setting (when $\p\notin\class_\ab$), and its output is ``nearly as good'' as the best candidate from $\class_\ab$ would be.
+In other terms, an agnostic learning algorithm works even in the unrealizable setting (when $\p\notin\class_\ab$), and its output is ``nearly as good'' as the best candidate from $\class_\ab$ would be. The main result of this section is the following theorem, which roughly states that ``if a property is easy to learn, then it is as hard to test as its hardest sub-property:''
+\begin{theorem}[Hardness by Reduction]\label{theo:hardness:subclass}
+  Fix any property $\property$, and suppose there exists $\property'\subseteq \property$ such that the following holds.
+  \begin{enumerate}
+    \item\label{theo:hardness:subclass:item1} agnostic learning of $\property$ (with a given ``agnostic constant'' $C\geq 1$) has sample complexity at most $\ns_{\mathcal{L}}(\ab,\dst,\delta)$;
+    \item testing $\property'$ has sample complexity at least $\ns_{\mathcal{T}}(\ab,\dst,\errprob)$;
+    \item there exist a range of parameters $\ab,\dst,\errprob$ for which learning $\property$ is easier than testing $\property'$: 
+    	\[
+    		\ns_{\mathcal{L}}(\ab,\dst/3,\errprob/2) \leq \frac{1}{2}\ns_{\mathcal{T}}(\ab,\dst/(3C),\errprob/2)
+    	\]
+  \end{enumerate}
+  Then every testing algorithm for $\property$ must have sample complexity at least $\ns_{\mathcal{T}}(\ab,\dst,\errprob)$.
+\end{theorem}
+\begin{proof}
+The idea of the proof is quite simple: suppose we have a testing algorithm $\Algo$ for $\property$ with sample complexity $\ns(\ab,\dst,\errprob)$, and let $\Learner$ be the agnostic learning algorithm for $\property$ with sample complexity $\ns_{\mathcal{L}}(\ab,\dst,\errprob)$ promised by~\cref{theo:hardness:subclass:item1}. (Note that we only care about sample complexity, and do not make any assumption on computational efficiency.)
+\end{proof}
 
+With this theorem in hand, proving a sample complexity lower bound for a given property $\property$ boils down to scouring the literature to check if (1)~$\property$ is easy to learn, and (2)~something (anything!) inside $\property$ is known to be hard to test. Note that the result may not always be an \emph{optimal} lower bound; but it often gets quite close to it, and is a simple and valuable starting point.\smallskip
+
+To conclude, let us see a direct application of this theorem to the property $\property^{\searrow}$. We can use the fact that monotone distributions can be agnostically learned with $O(\log(1+\dst\ab)/\dst^3)$ samples~\citep{Birge87,DDS:12} along with our uniformity testing lower bound (taking $\property'_\ab \eqdef \{\uniform_\ab\}$). This lets us derive the same $\Omega(\sqrt{\ab}/\dst^2)$ sample complexity lower bound for testing $\property^{\searrow}$ as in~\cref{theo:lb:testing:monotonicity}, with the additional (small) restriction $\dst \gg (\log\ab)/\sqrt{\ab}$. Here again, we relied on the uniformity testing lower bound: it is worth pointing out that we can (and sometimes must) use other ``hard-to-test'' sub-properties than uniformity! We will see such an example in~\cref{ex:testing:pbd}, where you will be asked to prove a lower bound on testing ``Poisson Binomial Distributions.''
 
 % Exercise VV17 for Binomial + this -> LB for PBDs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -457,3 +478,6 @@ Now, fix any monotone distribution $\q\in\property^{\searrow}_{2\ab}$. We have t
 This shows that $\totalvardist{\Phi(\p)}{\q} > \dst/2$. For the ``necessary'' part, consider $\p$ such that $\p(1)=1$.
 \end{proof}
 \fi  %%%%%%%%%%% End of hidden answer
+\begin{question}\label{ex:testing:pbd}
+  A \emph{Poisson Binomial Distribution} (PBD) with parameters $\ab$ and $\vec{p}=(p_1,\dots,p_\ab)$ is the distribution of the sum of $\ab$ independent Bernoulli random variables $X_1,\dots,X_\ab$, where $X_i \sim \bernoulli{p_i}$. (This is a generalization of Binomial distributions, which correspond to $p_1=\dots=p_\ab$.) Let $\property^{\rm{}pbd}_{\ab}$ denote the class of all PBDs with parameter $\ab$. Using the facts that (1)~$\property^{\rm{}pbd}_{\ab}$ can be agnostically learned with $O(\log^2(1/\dst)/\dst^2)$ samples (independent of $\ab$)~\citep{DDS:PBD:15}, and (2)~the ``standard'' Binomial distribution $\binomial{\ab}{1/2}$ is a PBD, show that testing $\property^{\rm{}pbd}_{\ab}$ has sample complexity $\Omega(\ab^{1/4}/\dst^2)$ (as long as $\dst \geq 1/2^{O(\ab^{1/8})}$). \textit{(Hint: combine the results of~\cref{ssec:vv:instancebyinstance,ssec:lb:reductions}.)}
+\end{question}
