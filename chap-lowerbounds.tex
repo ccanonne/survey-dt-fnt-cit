@@ -1,7 +1,26 @@
-\cnote{Add the DK16 framework?}
+\cnote{Discuss briefly the difference with \emph{learning} (Assouad)}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Ingster's method}
+
+\tbc
+By~\cref{lemma:pearsonneyman}, to distinguish with probability at least $1-\errprob$ between our two distributions $\p_0$ and $\p_1$ from $\ns$ samples, we must have
+\begin{equation}
+	1- 2\errprob \leq \totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}
+\end{equation}
+To obtain a lower bound on $\ns$, we need to somehow relate this quantity to $\totalvardist{\p_0}{\p_1}$, which we know is $\dst$. A first natural attempt is to use the fact that total variation distance is subadditive: $\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}} \leq \ns \cdot \totalvardist{\p_0}{\p_1}$, which gives
+\begin{equation}
+	1- 2\errprob \leq \ns\dst
+\end{equation}
+leading to a sample complexity lower bound of $\Omega(1/\dst)$. This is, quite frankly, underwhelming. The issue here is that ``total variation distance does not tensorize,'' \ie that metric does not play nice when you take products of probability distributions. Alright, so maybe we can use a different metric (or ``distance'') between distributions which \emph{does} tensorize, as a proxy?
+
+Two choices come to mind: the first, Hellinger distance, or rather its square, and Kullback--Leibler divergence. Both are related to TV distance (\cref{},app:distances:hellinger,app:distances:pinsker})
+
+\tbc
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{DK16}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Indistinguishability via moment-matching}
 \label{ssec:momentmatching}
