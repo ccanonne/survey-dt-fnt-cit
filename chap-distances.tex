@@ -2,7 +2,33 @@
 \cnote{KL is in nats! Use $\ln$ everywhere.}
 \cnote{$\domain$ discrete here. Extends to continuous via R-N.}
 
-\todonote{Pinsker, $\chi^2$, etc.~\cref{fact:dpi} as a consequence of TV being an $f$-divergence.}
+\todonote{\cref{fact:dpi} as a consequence of TV being an $f$-divergence. Subaddidivity of KL and squared Hellinger.}
+
+\begin{lemma}
+  \label{app:distances:hellinger}
+For every $\p,\q$ on $\domain$, 
+  \[
+    \hellinger{\p}{\q}^2 \leq \totalvardist{\p}{\q} \leq \sqrt{2}\hellinger{\p}{\q}\,.
+  \]
+\end{lemma}
+\begin{proof}
+  Let us first prove the left side. Using $a-b=(\sqrt{a}-\sqrt{b})(\sqrt{a}+\sqrt{b})$,
+  \begin{align*}
+      \hellinger{\p}{\q}^2
+      &= \frac{1}{2}\sum_{x\in\domain} \Paren{\sqrt{\p(x)}-\sqrt{\q(x)}}^2 \\
+      &\leq \frac{1}{2}\sum_{x\in\domain} \abs{\sqrt{\p(x)}-\sqrt{\q(x)}}\Paren{\sqrt{\p(x)}+\sqrt{\q(x)}} \\
+      &= \frac{1}{2}\sum_{x\in\domain} \abs{\p(x)-\q(x)} = \totalvardist{\p}{\q}\,.
+  \end{align*}
+ For the right side, we have, by Cauchy--Schwarz and then using the identity $2(a+b) = (\sqrt{a}+\sqrt{b})^2+(\sqrt{a}-\sqrt{b})^2$,
+   \begin{align*}
+      \totalvardist{\p}{\q} &= \frac{1}{2}\sum_{x\in\domain} \abs{\sqrt{\p(x)}-\sqrt{\q(x)}}\Paren{\sqrt{\p(x)}+\sqrt{\q(x)}}  \\
+      &\leq \frac{1}{2}\sqrt{\sum_{x\in\domain} \Paren{\sqrt{\p(x)}-\sqrt{\q(x)}}^2}\sqrt{\sum_{x\in\domain} \Paren{\sqrt{\p(x)}+\sqrt{\q(x)}}^2} \\
+      &= \frac{1}{\sqrt{2}}\hellinger{\p}{\q}\sqrt{\sum_{x\in\domain} \Paren{2(\p(x)+\q(x))-\Paren{\sqrt{\p(x)}-\sqrt{\q(x)}}^2 }}\\
+      &= \hellinger{\p}{\q}\sqrt{2-\hellinger{\p}{\q}^2 }\,,
+  \end{align*}
+  which implies the (slightly weaker) inequality we wanted to show.
+\end{proof}
+
 \begin{lemma}
   \label{app:distances:chi2:tv}
 For every $\p,\q$ on $\domain$, 
