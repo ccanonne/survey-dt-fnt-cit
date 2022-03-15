@@ -14,6 +14,7 @@ and then, sets out to show that it is impossible to distinguish two randomly cho
 
 Suppose now we came up with such a prior, and also that we chose $\zeta_\accept,\zeta_\reject$ such that every $\p_\accept, \p_\reject$ are at distance exactly $\dst$. By~\cref{lemma:pearsonneyman}, to distinguish with probability at least $1-\errprob$ between two such distributions $\p_0$ and $\p_1$ from $\ns$ samples, we must have
 \begin{equation}
+	\label{eq:naive:distinguish}
 	1- 2\errprob \leq \totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}
 \end{equation}
 To obtain a lower bound on $\ns$, we need to somehow relate this quantity to $\totalvardist{\p_0}{\p_1}$, which we know is $\dst$. A first natural attempt is to use the fact that total variation distance is subadditive: $\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}} \leq \ns \cdot \totalvardist{\p_0}{\p_1}$, which gives
@@ -33,11 +34,18 @@ and
 respectively. If it so happens that $\hellinger{\p_0}{\p_1}\asymp \dst$ or $\kldiv{\p_0}{\p_1}\asymp \dst^2$ (both stronger statements than our assumption $\totalvardist{\p_0}{\p_1}=\dst$, but both reasonable, and easy to check when coming up with $\p_0,\p_1$), then we get a sample complexity lower bound of $\Omega(1/\dst^2)$. Which is much better, but still rather underwhelming: there is no dependence on $\ab$!
 
 Why? We did not really take advantage of our ``priors,'' really, we just fixed two $\p_\accept,\p_\reject$ and completely ignored whatever ``the \emph{random} choice of a \yes- and \no-instance'' could bring. Instead of analyzing $\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}$ for fixed $\p_0,\p_1$, we \emph{could} instead bound
-\[
+\begin{equation}
+	\label{eq:mixture:distances}
 	\bE{\zeta_\reject,\zeta_\accept}{\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}}\,,
-\]
+\end{equation}
 which conceivably could lead to some improvement. That will not be enough, though: if $\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}\asymp \ns\dst^2$ for every random choice of $\p_0,\p_1$~--~or even most of them~--~then taking this extra expectation will not buy us anything.\exercise{See ???} That is unfortunate, but we can do better!
 \tbc
+\begin{equation}
+	\label{eq:lecam}
+	1-2\errprob \leq \totalvardist{\bE{\zeta_\reject}{\p_\reject^{\otimes\ns}}}{\bE{\zeta_\accept}{\p_\accept^{\otimes\ns}}}\,,
+\end{equation}
+and the right-hand side can end up being \emph{much} smaller than the RHS of~\cref{eq:naive:distinguish}, or even than the expected distance from~\cref{eq:mixture:distances}.\footnote{It is worth pointing out that we always have \smash{$\totalvardist{\bE{\zeta_\reject}{\p_\reject^{\otimes\ns}}}{\bE{\zeta_\accept}{\p_\accept^{\otimes\ns}}} \leq \bE{\zeta_\reject,\zeta_\accept}{\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}}$}, by joint convexity of total variation distance (which is a consequence of it being an $f$-divergence). The key is that, if we play our cards right when defining $\zeta_0,\zeta_1$, we will have
+$\totalvardist{\bE{\zeta_\reject}{\p_\reject^{\otimes\ns}}}{\bE{\zeta_\accept}{\p_\accept^{\otimes\ns}}} \ll \bE{\zeta_\reject,\zeta_\accept}{\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}}$.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{DK16}
