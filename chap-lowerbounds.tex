@@ -38,15 +38,84 @@ Why? We did not really take advantage of our ``priors,'' really, we just fixed t
 	\label{eq:mixture:distances}
 	\bE{\zeta_\reject,\zeta_\accept}{\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}}\,,
 \end{equation}
-which conceivably could lead to some improvement. That will not be enough, though: if $\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}\asymp \ns\dst^2$ for every random choice of $\p_0,\p_1$~--~or even most of them~--~then taking this extra expectation will not buy us anything.\exercise{See ???} That is unfortunate, but we can do better!
-\tbc
+which conceivably could lead to some improvement. That will not be enough, though: if $\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}\asymp \ns\dst^2$ for every random choice of $\p_0,\p_1$~--~or even most of them~--~then taking this extra expectation will not buy us anything.\exercise{See ???} That is unfortunate, but we can do better! We can put the expectation \emph{inside} the total variation distance.
+
+This follows from the following (simple) observation: if we have an algorithm $\Algo$ which correctly outputs \accept with probability at least $1-\errprob$ upon seeing $\ns$ samples from \emph{any} distribution $\p$~--~that is, when given one sample from $\p^{\otimes\ns}$, then that algorithm must also be correct when given a sample from any mixture $\mu = \bE{\zeta}{\p^{\otimes\ns}}=\sum_{\p}\zeta(\p)\p^{\otimes\ns}$ of those $\p^{\otimes\ns}$'s:
+\begin{align*}
+	\bP{x\sim\mu}{\Algo(x)=\accept}
+	&= \bE{x\sim\mu}{\indic{\Algo(x)=\accept}}
+	= \bE{\p\sim\zeta}{\bE{x\sim\p^{\otimes\ns}}{\indic{\Algo(x)=\accept}}}\\
+	&= \bE{\p\sim\zeta}{\bP{x\sim\p^{\otimes\ns}}{\Algo(x)=\accept}}\\
+	&\geq \bE{\p\sim\zeta}{1-\errprob} = 1-\errprob\;;
+\end{align*}
+and, similarly, for mixtures of $\no$-instances and probability to output $\reject$. It is worth enphasizing that here, the mixture is over $\ns$-fold distributions $\p^{\otimes\ns}$, \emph{not} over the distributions themselves: that is, we first pick $\p$ according to our prior $\zeta$, then take all $\ns$ samples from the same $\p$~--~this is very different from taking $\ns$ samples from the mixture $\bE{\zeta}{\p}$, which would mean we pick a new $\p$ for each sample! That is,
+\begin{equation}
+	\bE{\p\sim\zeta}{\p^{\otimes\ns}} \neq \bE{\p\sim\zeta}{\p}^{\otimes\ns}
+\end{equation}
+in general,\exercise{See~\cref{???} for an example.} and the argument above corresponds to the quantity on the left. 
 \begin{equation}
 	\label{eq:lecam}
 	1-2\errprob \leq \totalvardist{\bE{\zeta_\reject}{\p_\reject^{\otimes\ns}}}{\bE{\zeta_\accept}{\p_\accept^{\otimes\ns}}}\,,
 \end{equation}
-and the right-hand side can end up being \emph{much} smaller than the RHS of~\cref{eq:naive:distinguish}, or even than the expected distance from~\cref{eq:mixture:distances}.\footnote{It is worth pointing out that we always have \smash{$\totalvardist{\bE{\zeta_\reject}{\p_\reject^{\otimes\ns}}}{\bE{\zeta_\accept}{\p_\accept^{\otimes\ns}}} \leq \bE{\zeta_\reject,\zeta_\accept}{\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}}$}, by joint convexity of total variation distance (which is a consequence of it being an $f$-divergence). The key is that, if we play our cards right when defining $\zeta_0,\zeta_1$, we will have
+and the right-hand side can end up being \emph{much} smaller than the RHS of~\cref{eq:naive:distinguish}, or even than the expected distance from~\cref{eq:mixture:distances}.\footnote{It is worth pointing out that we always have \smash{$\totalvardist{\bE{\zeta_\reject}{\p_\reject^{\otimes\ns}}}{\bE{\zeta_\accept}{\p_\accept^{\otimes\ns}}} \leq \bE{\zeta_\reject,\zeta_\accept}{\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}}$}, by joint convexity of total variation distance (which is a consequence of it being an $f$-divergence). The key is that, if we play our cards right when defining $\zeta_0,\zeta_1$, we will actually have
 $\totalvardist{\bE{\zeta_\reject}{\p_\reject^{\otimes\ns}}}{\bE{\zeta_\accept}{\p_\accept^{\otimes\ns}}} \ll \bE{\zeta_\reject,\zeta_\accept}{\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}}$.}
 
+\cref{eq:lecam} (and what leads to it) is often referred to as \emph{Le Cam's two-point method}. Once we are there, however, we are left with the task of bounding this total variation distance between two mixtures, which seems anything but easy. In some cases, still, we \emph{can} proceed further: an important example is when one of the two mixtures (say, $\zeta_\accept$) is actually concentrated on a single distribution $\p_\accept$ (as we will see soon, this is the same for uniformity testing, for instance, where $\property_\ab$ is a singleton). 
+
+Let us further assume our family of $\no$-instances are parameterized as $\{\p_\theta\}_{\theta\in\Theta}$, and rewrite our mixture of $\no$-instances $\zeta_1$ as a probability distribution $\pi$ over $\Theta$. Picking a \no-instance $\p_\reject$ from $\zeta_1$ becomes equivalent to picking $\theta\sim\pi$, and returning $\pi_\theta$. Then, with this extra assumption and this rewriting,~\cref{eq:lecam} becomes
+\begin{equation}
+	\label{eq:lecam:simpler}
+	1-2\errprob \leq \totalvardist{\bE{\theta\sim\pi}{\p_\theta^{\otimes\ns}}}{\p_\accept^{\otimes\ns}}
+	\leq \frac{1}{2}\sqrt{\chisquare{\bE{\theta\sim\pi}{\p_\theta^{\otimes\ns}}}{\p_\accept^{\otimes\ns}}}\,,
+\end{equation}
+where we invoked the relation between total variation distance and chi-squared divergence (\cref{app:distances:chi2:tv}) for the second inequality. At this point, the reason for using this inequality might appear quite mysterious: why $\chi^2$ instead of, say, KL divergence, or Hellinger distance, or basically \emph{anything else}? The reason lies in the following lemma, which shows how to bound the chi-squared divergence between a mixture and a single, honest-to-goodness product distribution:
+\begin{lemma}[Ingster's method]
+	\label{lem:ingster}
+Consider a random variable $\theta$ such that, for each realization
+$\theta=\vartheta$, $\p_\vartheta^{(\ns)}=\p_{1,\vartheta} \otimes \dots \otimes \p_{\ns,\vartheta}$ is a product distribution. Further, let
+$\p^{(\ns)} = \p_1 \otimes \dots \otimes \p_\ns$ be a fixed product
+distribution. Then,
+\[
+\chisquare{\bE{\theta}{\p_\theta^{(\ns)}} }{ \p^{(\ns)} } = \bE{\theta,\theta'}{\prod_{j=1}^\ns (1+{H_j(\theta,\theta')})} - 1,
+\]
+where $\theta'$ is an independent copy of $\theta$, and
+\begin{align*}
+H_{j}(\vartheta,\vartheta') &\eqdef \bE{x\sim\p_j}{\frac{(\p_{j,\vartheta}(x)-\p_j(x))(\p_{j,\vartheta'}(x)-\p_j(x))}{\p_j(x)^2}}%\\&= \sum_{x\in\domain_j} \frac{(\q_{j,\vartheta}(x)-\p_j(x))(\q_{j,\vartheta'}(x)-\p_j(x))}{\p_j(x)}.
+\end{align*}
+is the ``chi-square inner product'' of $\p_{j,\vartheta}$ and $\p_{j,\vartheta'}$ with respect to $\p_j$.\footnote{To explain the name, observe that
+\[
+\bE{x\sim\p}{\frac{(\q(x)-\p(x))(\q'(x)-\p(x))}{\p(x)^2}}=\sum_{x\in\domain} \frac{(\q(x)-\p(x))(\q'(x)-\p(x))}{\p(x)}\,,
+\] and when $\q=\q'$ this is equal to $\chisquare{\q}{\p}$.}
+\end{lemma}
+This statement is still slightly too general for our purposes, as in our case all marginals of any fixed $\p_\vartheta^{(\ns)}$ (and those of $\p^{(\ns)}$) are the same, since we take $\ns$ \iid samples. Applying~\cref{lem:ingster} to~\cref{eq:lecam:simpler} (after squaring it to get rid of the square root) leads to
+\begin{equation}
+	\label{eq:lecam:simplest}
+	4(1-2\errprob) \leq \bE{\theta,\theta'\sim\pi}{(1+{H(\theta,\theta')})^\ns} - 1\,,
+\end{equation}
+where 
+\begin{align}
+H(\vartheta,\vartheta') &\eqdef \bE{x\sim\p_\accept}{\frac{(\p_{\vartheta}(x)-\p_\accept(x))(\p_{\vartheta'}(x)-\p_\accept(x))}{\p_\accept(x)^2}}
+\end{align}
+At this point, the reader is probably quietly wondering why, exactly, this is an improvement over what we had before, and where this is going. Before going through an application which, hopefully, will answer both of these questions and establish a lower bound for our running example of uniformity testing, let us try to give a heuristic argument.
+
+Suppose that we pick our prior over \no-instance well, so that $\bE{\theta}{\p_{\vartheta}}=\p_1$: that is, the average of our \no-instances is the \yes-instance $\p_1$, which sounds like a reasonable thing to go for. If we expand the RHS of~\cref{eq:lecam:simplest}, we get
+\begin{align*}
+\bE{\theta,\theta'}{(1+{H(\theta,\theta')})^\ns} - 1 
+&=\bE{\theta,\theta'}{1+\ns H(\theta,\theta') + \dots } - 1 \\
+&= \ns \bE{\theta,\theta'}{H(\theta,\theta')} + \textrm{(high-order terms)}
+\end{align*}
+Recalling the definition of $H(\theta,\theta')$ and by independence of $\theta,\theta'$, we can then rewrite this first-order term as
+\begin{align*}
+\ns \bE{\theta,\theta'}{H(\theta,\theta')}
+&= \ns \bE{\theta,\theta'}{\bE{x\sim\p_\accept}{\frac{(\p_{\vartheta}(x)-\p_\accept(x))(\p_{\vartheta'}(x)-\p_\accept(x))}{\p_\accept(x)^2}}}\\
+&=\ns \bE{x\sim\p_\accept}{\frac{(\bE{\theta}{\p_{\vartheta}(x)}-\p_\accept(x))(\bE{\theta'}{\p_{\vartheta'}(x)}-\p_\accept(x))}{\p_\accept(x)^2}}
+= 0
+\end{align*}
+the last equality since $\bE{\theta}{\p_{\vartheta}(x)}=\bE{\theta'}{\p_{\vartheta'}(x)}=\p_\accept(x)$ (we chose our prior well!). This means that the first-order term (at least) of that expansion cancels out entirely: which is good news, as the more cancellations we get the more likely the overall thing will be small, and the better the upper bound we can hope for.
+\tbc
+
+
+\cnote{Exercice: BH instead of Pinsker then KL $\leq \chi^2$, see what we get instead of~\cref{eq:lecam:simplest}.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{DK16}
 
