@@ -875,7 +875,7 @@ $|\p(S)-|S|/\ab| \geq \dst/\sqrt{2\ab}$ with constant probability (over the choi
 \]
 samples by~\cref{lemma:bias:coin}. Of course, there is a catch: we will only detect it when there \emph{is} some bias to detect, \ie when the random set $S$ we choose is ``good;'' which we only proved happens with probability at least $1/48$. But a constant probability to distinguish between uniform and far from uniform is enough: repeating independently the test several times will let us amplify the success probability to $2/3$.
 \begin{theorem}
-The binary hashing tester (\cref{{algo:binary:hashing:amplified}}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = O(\ab/\dst^2)$ and time complexity $O(\ns)$.
+The binary hashing tester (\cref{algo:binary:hashing:amplified}) is a testing algorithm for uniformity with sample complexity $\ns(\ab,\dst,1/3) = O(\ab/\dst^2)$ and time complexity $O(\ns)$.
 \end{theorem}
 \begin{proof}
 Set $\tau \gets \frac{\dst}{2\sqrt{2\ab}}$, as in~\cref{algo:binary:hashing}, and for $\p\in\distribs{\ab}$ let $\alpha_S(\p)\eqdef \p(S)$ denote the bias of the resulting coin; note that this is a random variable, over the choice of $S\subseteq[\ab]$, and that $\bEEC{Z_5}{S} = \alpha_S(\p)$. We will use~\cref{lemma:bias:coin} to get, for $\ns = O(1/\tau^2)$, a probability at least $99/100$ to correctly estimate the bias up to an additive $\tau$.

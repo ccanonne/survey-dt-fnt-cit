@@ -1,7 +1,9 @@
 \cnote{Discuss briefly the difference with \emph{learning} (Assouad)}
 
+In this chapter, we will cover several techniques and ``ready-to-use'' theorems allowing us to easily (or, rather, not too painfully) establish sample complexity lower bounds. As a guiding example, we will show that many of the uniformity testing algorithms we saw~\cref{sec:uniformity} are sample-optimal, by establishing (in several ways) an $\Omega(\sqrt{\ab}/\dst^2)$ sample complexity lower bound for uniformity testing.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Ingster's method}
+\section{Indistinguishability, Le Cam, and Ingster's method}
 
 To establish a lower bound on the sample complexity of testing a given property $\property = \bigcup_{\ab=1}^\infty \property_\ab$, we want to come up (for a given $\ab$) with a a ``simple'' family of (pairs of) distributions such that, when chosing such a pair $(\p_\accept, \p_\reject)$ at random, (i)~$\p_\accept$ has the property, but $\p_\reject$ is far from it, so a tester \emph{should} distinguish between the two; but (ii)~unless $\ns$ is large enough, so no algorithm taking $\ns$ samples can actually distinguish between the two. The ``simple'' here is somewhat fuzzy, but can be rephrased as ``a family simple enough to make proving (ii) as painless as possible.''
 
@@ -38,7 +40,7 @@ Why? We did not really take advantage of our ``priors,'' really, we just fixed t
 	\label{eq:mixture:distances}
 	\bE{\zeta_\reject,\zeta_\accept}{\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}}\,,
 \end{equation}
-which conceivably could lead to some improvement. That will not be enough, though: if $\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}\asymp \ns\dst^2$ for every random choice of $\p_0,\p_1$~--~or even most of them~--~then taking this extra expectation will not buy us anything.\exercise{See ???} That is unfortunate, but we can do better! We can put the expectation \emph{inside} the total variation distance.
+which conceivably could lead to some improvement. That will not be enough, though: if $\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}\asymp \ns\dst^2$ for every random choice of $\p_0,\p_1$~--~or even most of them~--~then taking this extra expectation will not buy us anything. That is unfortunate, but we can do better! We can put the expectation \emph{inside} the total variation distance.
 
 This follows from the following (simple) observation: if we have an algorithm $\Algo$ which correctly outputs \accept with probability at least $1-\errprob$ upon seeing $\ns$ samples from \emph{any} distribution $\p$~--~that is, when given one sample from $\p^{\otimes\ns}$, then that algorithm must also be correct when given a sample from any mixture $\mu = \bE{\zeta}{\p^{\otimes\ns}}=\sum_{\p}\zeta(\p)\p^{\otimes\ns}$ of those $\p^{\otimes\ns}$'s:
 \begin{align*}
@@ -52,7 +54,7 @@ and, similarly, for mixtures of $\no$-instances and probability to output $\reje
 \begin{equation}
 	\bE{\p\sim\zeta}{\p^{\otimes\ns}} \neq \bE{\p\sim\zeta}{\p}^{\otimes\ns}
 \end{equation}
-in general,\exercise{See~\cref{???} for an example.} and the argument above corresponds to the quantity on the left. 
+in general, and the argument above corresponds to the quantity on the left. That is, we get
 \begin{equation}
 	\label{eq:lecam}
 	1-2\errprob \leq \totalvardist{\bE{\zeta_\reject}{\p_\reject^{\otimes\ns}}}{\bE{\zeta_\accept}{\p_\accept^{\otimes\ns}}}\,,
@@ -68,7 +70,7 @@ Let us further assume our family of $\no$-instances are parameterized as $\{\p_\
 	1-2\errprob \leq \totalvardist{\bE{\theta\sim\pi}{\p_\theta^{\otimes\ns}}}{\p_\accept^{\otimes\ns}}
 	\leq \frac{1}{2}\sqrt{\chisquare{\bE{\theta\sim\pi}{\p_\theta^{\otimes\ns}}}{\p_\accept^{\otimes\ns}}}\,,
 \end{equation}
-where we invoked the relation between total variation distance and chi-squared divergence (\cref{app:distances:chi2:tv}) for the second inequality. At this point, the reason for using this inequality might appear quite mysterious: why $\chi^2$ instead of, say, KL divergence, or Hellinger distance, or basically \emph{anything else}? The reason lies in the following lemma, which shows how to bound the chi-squared divergence between a mixture and a single, honest-to-goodness product distribution:
+where we invoked the relation between total variation distance and chi-square divergence (\cref{app:distances:chi2:tv}) for the second inequality. At this point, the reason for using this inequality might appear quite mysterious: why $\chi^2$ instead of, say, KL divergence, or Hellinger distance, or basically \emph{anything else}? The reason lies in the following lemma, which shows how to bound the chi-square divergence between a mixture and a single, honest-to-goodness product distribution:
 \begin{lemma}[Ingster's method]
 	\label{lem:ingster}
 Consider a random variable $\theta$ such that, for each realization
@@ -94,7 +96,8 @@ This statement is still slightly too general for our purposes, as in our case al
 \end{equation}
 where 
 \begin{align}
-H(\vartheta,\vartheta') &\eqdef \bE{x\sim\p_\accept}{\frac{(\p_{\vartheta}(x)-\p_\accept(x))(\p_{\vartheta'}(x)-\p_\accept(x))}{\p_\accept(x)^2}}
+	\label{eq:lecam:simplest:chi:ip}
+H(\theta,\theta') &\eqdef \bE{x\sim\p_\accept}{\frac{(\p_{\theta}(x)-\p_\accept(x))(\p_{\theta'}(x)-\p_\accept(x))}{\p_\accept(x)^2}}
 \end{align}
 At this point, the reader is probably quietly wondering why, exactly, this is an improvement over what we had before, and where this is going. Before going through an application which, hopefully, will answer both of these questions and establish a lower bound for our running example of uniformity testing, let us try to give a heuristic argument.
 
@@ -111,11 +114,81 @@ Recalling the definition of $H(\theta,\theta')$ and by independence of $\theta,\
 &=\ns \bE{x\sim\p_\accept}{\frac{(\bE{\theta}{\p_{\vartheta}(x)}-\p_\accept(x))(\bE{\theta'}{\p_{\vartheta'}(x)}-\p_\accept(x))}{\p_\accept(x)^2}}
 = 0
 \end{align*}
-the last equality since $\bE{\theta}{\p_{\vartheta}(x)}=\bE{\theta'}{\p_{\vartheta'}(x)}=\p_\accept(x)$ (we chose our prior well!). This means that the first-order term (at least) of that expansion cancels out entirely: which is good news, as the more cancellations we get the more likely the overall thing will be small, and the better the upper bound we can hope for.
-\tbc
+the last equality since $\bE{\theta}{\p_{\vartheta}(x)}=\bE{\theta'}{\p_{\vartheta'}(x)}=\p_\accept(x)$ (we chose our prior well!). This means that the first-order term (at least) of that expansion cancels out entirely: which is good news, as the more cancellations we get the more likely the overall thing will be small, and the better the upper bound we can hope for. That being said, it is worth illustrating this with an example.
 
 
-\cnote{Exercice: BH instead of Pinsker then KL $\leq \chi^2$, see what we get instead of~\cref{eq:lecam:simplest}.}
+\paragraph{Uniformity testing lower bound.} Let us get back to our running example, uniformity testing. We saw  in~\cref{chap:identity} (in various ways) that the sample complexity of uniformity testing over a known domain of size $\ab$ is $\bigO{\sqrt{\ab}/\dst^2}$. Can we show that this is optimal (up to constant factors)?
+
+To do so, we need to come up with a prior over \yes-instances, and one over \no-instances. The former is immediate: since there is literally only one \yes-instance, \emph{the} uniform distribution $\uniform_\ab$, our prior $\zeta_\accept$ will just be concentrated on $\uniform_\ab$. For the latter, recalling what the ``hard cases'' for our uniformity testing algorithms were in~\cref{sec:uniformity}, a good starting point would be to look at probability distributions ``nearly uniform'' locally, but still far overall: something where each probability is something like $(1\pm\dst)/\ab$. 
+
+We also want as many of those distributions as possible in the support of $\zeta_\reject$, as otherwise the testing problem would be too easy: if we only have $N$ \no-instances, then a testing algorithm could do $N$ pairwise tests of the form \emph{``is it this specific $\p$, or $\uniform_\ab$?}: since each $\p$ is $\dst$-far from $\uniform_\ab$, each test would cost $O(\log(1/\errprob)/\dst^2)$. By a union bound, doing this with error probability $\errprob \eqdef 1/(3N)$ would suffice for the whole algorithm to succeed, and so the sample complexity overall would be $O((\log N)/\dst^2)$. To have any chance of proving our $\sqrt{\ab}$ lower bound, we thus need $N$ to be \emph{exponential} in $\ab$.
+
+Finally, we need each \no-instance to be a \emph{bona fide} probability distribution, so it should sum to one: the simplest way to achieve this is to pair elements of the domain together (assuming, without loss of generality, that $\ab$ is even) to perturb them jointly: if one element of a pair has probability $(1+\dst)/\ab$, the other gets $(1-\dst)/\ab$. Keeping all this in mind, we define $2^{\ab/2}$ distributions, each parameterized by some $\theta\in\Theta \eqdef \bool^{\ab/2}$, as follows:
+\begin{equation}
+	\label{eq:paninski:construction}
+	\p_\theta(i) = 
+		\frac{1+(-1)^i\theta_{\clg{i/2}} \cdot 3\dst}{\ab}, \qquad i\in[\ab]
+\end{equation}
+that is, where $\theta_i\in\bool$ determines whether the perturbation for elements $2i-1,2i$ is $1\pm3\dst$ (``up-down'') or  $1\mp3\dst$ (``down-up''). For every fixed $\theta\in\bool^{\ab/2}$, it is easy to check that the corresponding $\p_\theta$ satisfies
+\begin{equation}
+	\label{eq:paninski:construction:distance}
+	\totalvardist{\p_\theta}{\uniform_\ab} = \frac{3}{2}\dst > \dst
+\end{equation}
+since each element of the domain contributes exactly $3\dst$ to the $\lp[1]$ distance; and that we have $N\eqdef 2^{\ab/2}$ such \no-instances (so, indeed, exponentially many in $\ab$). To define our prior $\zeta_\reject$, since we do not have any reason to do anything more complicated we will simply take the uniform distribution over all these $2^{\ab/2}$ \no-instances; equivalently, in terms of parameter $\theta$ we will define our prior $\pi$ as the uniform distribution over $\Theta=\bool^{\ab/2}$, so the $\ab/2$ values $\theta_i$ are \iid Rademacher random variables.
+
+
+One can then check that
+$
+	\bE{\theta}{\p_{\theta}} = \uniform_\ab
+$, fitting our previous discussion. In view of bounding the RHS of~\cref{eq:lecam:simplest}, we need to first get a hold on the quantity $H(\theta,\theta')$ defined in~\cref{eq:lecam:simplest:chi:ip}. Plugging in our definition of $\p_\theta$ from~\cref{eq:paninski:construction} and recalling that $\p_\accept$ is simply $\uniform_\ab$, we get
+\begin{align}
+	\label{eq:lecam:simplest:chi:ip:paninski}
+H(\theta,\theta') = \frac{1}{\ab}\sum_{i=1}^\ab (\ab\p_\theta(i)-1)(\ab\p_{\theta'}(i)-1)
+= \frac{18\dst^2}{\ab} \sum_{i=1}^{\ab/2} \theta^{\vphantom{'}}_i\theta'_i\,.
+\end{align}
+This is going well: using $1+u \leq e^u$ and the fact that the $\theta^{\vphantom{'}}_i\theta'_i$'s are \iid Rademacher random variables, we can write
+\begin{align}
+\bE{\theta,\theta'}{(1+{H(\theta,\theta')})^\ns} - 1
+&\leq \bE{\theta,\theta'}{e^{\ns H(\theta,\theta')}} - 1 \notag\\
+&= \bE{\theta,\theta'}{e^{\frac{18\dst^2\ns}{\ab} \sum_{i=1}^{\ab/2} \theta^{\vphantom{'}}_i\theta'_i}} - 1 \notag\\
+&= \prod_{i=1}^{\ab/2} \bE{\theta,\theta'}{e^{\frac{18\dst^2\ns}{\ab} \theta^{\vphantom{'}}_i\theta'_i}} - 1 \notag\\
+%&\leq \prod_{i=1}^{\ab/2} e^{\frac{18^2\dst^2\ns^2}{2\ab^2}} - 1 \\
+%&= e^{\frac{81\dst^2\ns^2}{\ab}} - 1
+&\leq e^{\frac{81\dst^4\ns^2}{\ab}} - 1 \label{eq:bound:ingster:mgf:uniformity}
+\end{align}
+where the second inequality follows from Hoeffding's Lemma.\footnote{Since the random variable $\theta^{\vphantom{'}}_i\theta'_i$ is uniform on $\bool$, we could have computed that expectation exactly; but this would have involved some $\cosh$ which we would have to upper bound later on anyway.}
+
+Combining this with~\cref{eq:lecam:simplest} and massaging the inequality, we get that $\ns$ must satisfy
+\begin{equation}
+\label{eq:uniformity:lb:ingster:inequality}
+	4(1-2\errprob) \leq e^{\frac{81\dst^4\ns^2}{\ab}} - 1
+\end{equation}
+\ie $\dst^4\ns^2/\ab \gtrsim 1$ (for $\errprob \leq 1/2$). We proved our lower bound! 
+\begin{theorem}
+  \label{theo:uniformity:lb:ingster}
+Every testing algorithm for uniformity must have sample complexity $\ns(\ab,\dst,1/3) = \Omega(\sqrt{\ab}/\dst^2)$.
+\end{theorem}
+
+
+\paragraph{What about $\errprob$?} To conclude this chapter, it is worth pointing out that the above approach will \emph{not} let us directly obtain any meaningful dependence on the error probability $\errprob$. This is painfully apparent from~\cref{eq:uniformity:lb:ingster:inequality}, as the LHS remains $\Theta(1)$ regardless of how small $\errprob$ becomes. At a higher level, this comes from our use of~\cref{app:distances:chi2:tv} in~\cref{eq:lecam:simpler}, which by directly bounding the TV distance (always in $[0,1]$!) by the chi-square divergence, destroys any hope to have a lower bound on the latter which grows as $\errprob$ vanishes. Using Pinsker's inequality (\cref{app:distances:pinsker}) and then bounding KL by chi-square would lead to the same issue; does this mean there is no hope in getting the dependence on $\errprob$ in our lower bound?
+
+Not quite. Instead of~\cref{app:distances:chi2:tv}, one could use the stronger bound given by~\cref{app:distances:bh} to relate total variation distance and Kullback--Leibler divergence, and combine this with the refined upper bound between KL and $\chi^2$ divergences given in~\cref{lemma:kl:chi2} to obtain
+\begin{equation}
+	\label{eq:lecam:simpler:but:with:delta}
+	\frac{1}{4\errprob}
+	\leq 1+\chisquare{\bE{\theta\sim\pi}{\p_\theta^{\otimes\ns}}}{\p_\accept^{\otimes\ns}}\,.
+\end{equation}
+(See~\cref{exo:deriving:dep:delta:lb} for the details.) As an example, combining this with the upper bound 
+\[
+\chisquare{\bE{\theta}{\p_\theta^{\otimes\ns}}}{\uniform_\ab^{\otimes\ns}}
+\leq e^{\frac{81\dst^4\ns^2}{\ab}} - 1
+\]
+derived in~\cref{eq:bound:ingster:mgf:uniformity} for uniformity testing, this readily gives the (improved, and optimal) lower bound, essentially for free.
+\begin{theorem}
+  \label{theo:uniformity:lb:ingster:with:delta}
+Every testing algorithm for uniformity must have sample complexity $\ns(\ab,\dst,\errprob) = \Omega(\sqrt{\ab\log(1/\errprob)}/\dst^2)$.
+\end{theorem}
+\noindent We did not even have to start everything from scratch. Not too bad!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{DK16}
 
@@ -134,7 +207,7 @@ Symmetric properties are nice in the sense that, when considering them, one can 
 \[
 	\freq\eqdef (\freq_{0},\freq_{1},\freq_{2},\dots,\freq_{\ns}) \in \N^{\ns+1}
 \]
-where $\freq_{j} = \sum_{i=1}^\ab \indic{\occur_{i}=j}$ is the number of elements of the domain which appear exactly $j$ times among the $\ns$ samples. In particular, we always have $\sum_{j=0}^\ns \freq_j = \ns$.\exercise{Check that you can express several (FOCUS ON A COUPLE) \tbc of the algorithms in~\cref{sec:uniformity} as a function of $\freq$ only.}\medskip
+where $\freq_{j} = \sum_{i=1}^\ab \indic{\occur_{i}=j}$ is the number of elements of the domain which appear exactly $j$ times among the $\ns$ samples. In particular, we always have $\sum_{j=0}^\ns \freq_j = \ns$.\exercise{Check that you can express several of the algorithms in~\cref{sec:uniformity} as a function of $\freq$ only:~\cref{exo:reexpress:algos:frequency:only}.}\medskip
 
 The main result discussed in this section is the ``Wishful Thinking Theorem'' of~\citet{Valiant:11}, which applies to testing symmetric properties of distributions. Intuitively, this theorem ensures that ``if the low-degree moments ($\lp[p]$ norms) of two distributions match, then these distributions (up to relabeling) are hard to distinguish.'' To see why this is the case, and justify the name of the theorem, observe that since we focus on symmetric properties all which matters is the fingerprint $\freq$ introduced about; that is, the number of $j$-collisions, for every $j\geq 0$.
 
@@ -599,8 +672,16 @@ To conclude, let us see a direct application of this theorem to the property $\p
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exercises}
+\begin{question}\label{exo:deriving:dep:delta:lb}
+Combine (the second part of)~\cref{app:distances:bh} with (the first part of)~\cref{lemma:kl:chi2} to obtain~\cref{eq:bound:ingster:mgf:uniformity} from~\cref{eq:lecam}. Use it to derive~\cref{theo:uniformity:lb:ingster:with:delta}.
+\end{question}
+
 \begin{question}\label{ex:2/3:lb:applications}
 Verify that applying~\cref{theo:2/3:lb:vv} to (i)~the uniform distribution $\uniform_\ab$ and (ii)~the ``Zipf'' distribution $\q\in\distribs{\ab}$ such that $\q(i) \propto 1/\sqrt{i}$ leads, in both cases, to an $\Omega(\sqrt{\ab}/\dst^2)$ sample complexity lower bound for identity testing.
+\end{question}
+
+\begin{question}\label{exo:reexpress:algos:frequency:only}
+Check that you can express several of the algorithms in~\cref{sec:uniformity} as a function of $\freq$ only (as defined in~\cref{ssec:momentmatching}). Specifically, verify this for~\cref{algo:collision-based,algo:unique-elements,algo:empirical:plugin}. Verify this also for~\cref{algo:chisquare}, keeping in mind that this algorithm was stated and analyzed in the Poissonized setting: what does it change?
 \end{question}
 \begin{question}[$\star$]\label{ex:reduction:monotone}
   Prove that the mapping $\Phi$ defined in~\cref{eq:reduction:monotonicity} does satisfy the requirements of a reduction, for $\ab'=2\ab$ and $\dst'=\dst/2$. That is, if $\p\in\distribs{\ab}$ is $\dst$-far from $\uniform_\ab$, then $\Phi(\p)\in\distribs{2\ab}$ is $\dst'$-far from every distribution $\q\in\property^{\searrow}_{2\ab}$. \textit{(Hint: for any given monotone $\q$, analyse the distance $\totalvardist{\Phi(\p)}{\q}$ according to whether $\q(\ab) > 1/(2\ab)$ or not, relating this to the set $S\subseteq[\ab]$ on which $\p$ is greater than $\uniform_\ab$.)} Moreover, show that this loss by a factor $1/2$ in the distance is necessary.
