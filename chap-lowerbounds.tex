@@ -5,19 +5,19 @@ In this chapter, we will cover several techniques and ``ready-to-use'' theorems 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Indistinguishability, Le Cam, and Ingster's method}
 
-To establish a lower bound on the sample complexity of testing a given property $\property = \bigcup_{\ab=1}^\infty \property_\ab$, we want to come up (for a given $\ab$) with a a ``simple'' family of (pairs of) distributions such that, when chosing such a pair $(\p_\accept, \p_\reject)$ at random, (i)~$\p_\accept$ has the property, but $\p_\reject$ is far from it, so a tester \emph{should} distinguish between the two; but (ii)~unless $\ns$ is large enough, so no algorithm taking $\ns$ samples can actually distinguish between the two. The ``simple'' here is somewhat fuzzy, but can be rephrased as ``a family simple enough to make proving (ii) as painless as possible.''
+To establish a lower bound on the sample complexity of testing a given property $\property = \bigcup_{\ab=1}^\infty \property_\ab$, we want to come up (for a given $\ab$) with a ``simple'' family of (pairs of) distributions such that, when chosing such a pair $(\p_\accept, \p_\reject)$ at random, (i)~$\p_\accept$ has the property, but $\p_\reject$ is far from it, so a tester \emph{should} distinguish between the two; but (ii)~unless $\ns$ is large enough, no algorithm taking $\ns$ samples can actually distinguish between the two. The ``simple'' here is somewhat fuzzy, but can be rephrased as ``a family simple enough to make proving (ii) as painless as possible.''
 
 In a slightly more formal way, the goal is to define two \emph{priors}\footnote{That is, two probability distributions over probability distributions.} $\zeta_\reject,\zeta_\accept$ over probability distributions, such that
 \begin{itemize}
 	\item $\zeta_\accept$ is supported on $\property_\ab$ (\yes-instances); and
 	\item $\zeta_\reject$ is supported on $\overline{\property}^{\dst}_\ab \eqdef \setOfSuchThat{\p\in\distribs{\ab}}{\totalvardist{\p}{\property_\ab}>\dst}$ (\no-instances);
 \end{itemize}
-and then, sets out to show that it is impossible to distinguish two randomly chosen $\p_\accept\sim \zeta_\accept$, $\p_\reject\sim \zeta$ from $\ns$ samples unless $\ns$ is large enough as a function of $\ab$, $\dst$, and possibly $\errprob$. One can also relax a little the above to ask that $\zeta_\reject$ only be \emph{mostly} supported on $\overline{\property}^{\dst}$ (\ie \no-instances are only far from $\property_\ab$ with high probability); and, similarly, one can possibly only require that $\zeta_\accept$ only be mostly supported on $\property_\ab$. One can even allow the random choices of $\p_0$ and $\p_1$ to depend on each other (\ie coupling $\zeta_\accept$ and $\zeta_\reject$). For simplicity, we will not worry too much about this in this chapter.\medskip
+and then, to show that it is impossible to distinguish two randomly chosen $\p_\accept\sim \zeta_\accept$, $\p_\reject\sim \zeta$ from $\ns$ samples unless $\ns$ is large enough as a function of $\ab$, $\dst$, and possibly $\errprob$. One can also relax a little the above to ask that $\zeta_\reject$ only be \emph{mostly} supported on $\overline{\property}^{\dst}$ (\ie $\no$-instances are only far from $\property_\ab$ with high probability); and, similarly, one can possibly only require that $\zeta_\accept$ only be mostly supported on $\property_\ab$. One can even allow the random choices of $\p_0$ and $\p_1$ to depend on each other (\ie coupling $\zeta_\accept$ and $\zeta_\reject$). For simplicity, we will not worry too much about this in this chapter.\medskip
 
 Suppose now we came up with such a prior, and also that we chose $\zeta_\accept,\zeta_\reject$ such that every $\p_\accept, \p_\reject$ are at distance exactly $\dst$. By~\cref{lemma:pearsonneyman}, to distinguish with probability at least $1-\errprob$ between two such distributions $\p_0$ and $\p_1$ from $\ns$ samples, we must have
 \begin{equation}
 	\label{eq:naive:distinguish}
-	1- 2\errprob \leq \totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}
+	1- 2\errprob \leq \totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}\,.
 \end{equation}
 To obtain a lower bound on $\ns$, we need to somehow relate this quantity to $\totalvardist{\p_0}{\p_1}$, which we know is $\dst$. A first natural attempt is to use the fact that total variation distance is subadditive: $\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}} \leq \ns \cdot \totalvardist{\p_0}{\p_1}$, which gives
 \begin{equation}
@@ -92,7 +92,7 @@ is the ``chi-square inner product'' of $\p_{j,\vartheta}$ and $\p_{j,\vartheta'}
 This statement is still slightly too general for our purposes, as in our case all marginals of any fixed $\p_\vartheta^{(\ns)}$ (and those of $\p^{(\ns)}$) are the same, since we take $\ns$ \iid samples. Applying~\cref{lem:ingster} to~\cref{eq:lecam:simpler} (after squaring it to get rid of the square root) leads to
 \begin{equation}
 	\label{eq:lecam:simplest}
-	4(1-2\errprob) \leq \bE{\theta,\theta'\sim\pi}{(1+{H(\theta,\theta')})^\ns} - 1\,,
+	4(1-2\errprob)^2 \leq \bE{\theta,\theta'\sim\pi}{(1+{H(\theta,\theta')})^\ns} - 1\,,
 \end{equation}
 where 
 \begin{align}
@@ -101,7 +101,7 @@ H(\theta,\theta') &\eqdef \bE{x\sim\p_\accept}{\frac{(\p_{\theta}(x)-\p_\accept(
 \end{align}
 At this point, the reader is probably quietly wondering why, exactly, this is an improvement over what we had before, and where this is going. Before going through an application which, hopefully, will answer both of these questions and establish a lower bound for our running example of uniformity testing, let us try to give a heuristic argument.
 
-Suppose that we pick our prior over \no-instance well, so that $\bE{\theta}{\p_{\vartheta}}=\p_1$: that is, the average of our \no-instances is the \yes-instance $\p_1$, which sounds like a reasonable thing to go for. If we expand the RHS of~\cref{eq:lecam:simplest}, we get
+Suppose that we pick our prior over \no-instance well, so that $\bE{\theta}{\p_{\theta}}=\p_1$: that is, the average of our \no-instances is the \yes-instance $\p_1$, which sounds like a reasonable thing to go for. If we expand the RHS of~\cref{eq:lecam:simplest}, we get
 \begin{align*}
 \bE{\theta,\theta'}{(1+{H(\theta,\theta')})^\ns} - 1 
 &=\bE{\theta,\theta'}{1+\ns H(\theta,\theta') + \dots } - 1 \\
@@ -110,11 +110,11 @@ Suppose that we pick our prior over \no-instance well, so that $\bE{\theta}{\p_{
 Recalling the definition of $H(\theta,\theta')$ and by independence of $\theta,\theta'$, we can then rewrite this first-order term as
 \begin{align*}
 \ns \bE{\theta,\theta'}{H(\theta,\theta')}
-&= \ns \bE{\theta,\theta'}{\bE{x\sim\p_\accept}{\frac{(\p_{\vartheta}(x)-\p_\accept(x))(\p_{\vartheta'}(x)-\p_\accept(x))}{\p_\accept(x)^2}}}\\
-&=\ns \bE{x\sim\p_\accept}{\frac{(\bE{\theta}{\p_{\vartheta}(x)}-\p_\accept(x))(\bE{\theta'}{\p_{\vartheta'}(x)}-\p_\accept(x))}{\p_\accept(x)^2}}
+&= \ns \bE{\theta,\theta'}{\bE{x\sim\p_\accept}{\frac{(\p_{\theta}(x)-\p_\accept(x))(\p_{\theta'}(x)-\p_\accept(x))}{\p_\accept(x)^2}}}\\
+&=\ns \bE{x\sim\p_\accept}{\frac{(\bE{\theta}{\p_{\theta}(x)}-\p_\accept(x))(\bE{\theta'}{\p_{\theta'}(x)}-\p_\accept(x))}{\p_\accept(x)^2}}
 = 0
 \end{align*}
-the last equality since $\bE{\theta}{\p_{\vartheta}(x)}=\bE{\theta'}{\p_{\vartheta'}(x)}=\p_\accept(x)$ (we chose our prior well!). This means that the first-order term (at least) of that expansion cancels out entirely: which is good news, as the more cancellations we get the more likely the overall thing will be small, and the better the upper bound we can hope for. That being said, it is worth illustrating this with an example.
+the last equality since $\bE{\theta}{\p_{\theta}(x)}=\bE{\theta'}{\p_{\theta'}(x)}=\p_\accept(x)$ (we chose our prior well!). This means that the first-order term (at least) of that expansion cancels out entirely: which is good news, as the more cancellations we get the more likely the overall thing will be small, and the better the upper bound we can hope for. That being said, it is worth illustrating this with an example.
 
 
 \paragraph{Uniformity testing lower bound.} Let us get back to our running example, uniformity testing. We saw  in~\cref{chap:identity} (in various ways) that the sample complexity of uniformity testing over a known domain of size $\ab$ is $\bigO{\sqrt{\ab}/\dst^2}$. Can we show that this is optimal (up to constant factors)?
@@ -134,7 +134,7 @@ that is, where $\theta_i\in\bool$ determines whether the perturbation for elemen
 	\label{eq:paninski:construction:distance}
 	\totalvardist{\p_\theta}{\uniform_\ab} = \frac{3}{2}\dst > \dst
 \end{equation}
-since each element of the domain contributes exactly $3\dst$ to the $\lp[1]$ distance; and that we have $N\eqdef 2^{\ab/2}$ such \no-instances (so, indeed, exponentially many in $\ab$). To define our prior $\zeta_\reject$, since we do not have any reason to do anything more complicated we will simply take the uniform distribution over all these $2^{\ab/2}$ \no-instances; equivalently, in terms of parameter $\theta$ we will define our prior $\pi$ as the uniform distribution over $\Theta=\bool^{\ab/2}$, so the $\ab/2$ values $\theta_i$ are \iid Rademacher random variables.
+since each element of the domain contributes exactly $3\dst/\ab$ to the $\lp[1]$ distance; and that we have $N\eqdef 2^{\ab/2}$ such \no-instances (so, indeed, exponentially many in $\ab$). To define our prior $\zeta_\reject$, since we do not have any reason to do anything more complicated we will simply take the uniform distribution over all these $2^{\ab/2}$ \no-instances; equivalently, in terms of parameter $\theta$ we will define our prior $\pi$ as the uniform distribution over $\Theta=\bool^{\ab/2}$, so the $\ab/2$ values $\theta_i$ are \iid Rademacher random variables.
 
 
 One can then check that
@@ -156,12 +156,12 @@ This is going well: using $1+u \leq e^u$ and the fact that the $\theta^{\vphanto
 %&= e^{\frac{81\dst^2\ns^2}{\ab}} - 1
 &\leq e^{\frac{81\dst^4\ns^2}{\ab}} - 1 \label{eq:bound:ingster:mgf:uniformity}
 \end{align}
-where the second inequality follows from Hoeffding's Lemma.\footnote{Since the random variable $\theta^{\vphantom{'}}_i\theta'_i$ is uniform on $\bool$, we could have computed that expectation exactly; but this would have involved some $\cosh$ which we would have to upper bound later on anyway.}
+where the second inequality follows from Hoeffding's Lemma.\footnote{Since the random variable $\theta^{\vphantom{'}}_i\theta'_i$ is uniform on $\bool$, we could have computed that expectation exactly; but this would have involved some unwieldy $\cosh$ which we would have to upper bound later on anyway.}
 
 Combining this with~\cref{eq:lecam:simplest} and massaging the inequality, we get that $\ns$ must satisfy
 \begin{equation}
 \label{eq:uniformity:lb:ingster:inequality}
-	4(1-2\errprob) \leq e^{\frac{81\dst^4\ns^2}{\ab}} - 1
+	4(1-2\errprob)^2 \leq e^{\frac{81\dst^4\ns^2}{\ab}} - 1
 \end{equation}
 \ie $\dst^4\ns^2/\ab \gtrsim 1$ (for $\errprob \leq 1/2$). We proved our lower bound! 
 \begin{theorem}
