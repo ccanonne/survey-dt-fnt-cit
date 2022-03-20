@@ -784,6 +784,15 @@ Importantly, all methods and results covered in this chapter focused on minimax 
 Combine (the second part of)~\cref{app:distances:bh} with (the first part of)~\cref{lemma:kl:chi2} to obtain~\cref{eq:bound:ingster:mgf:uniformity} from~\cref{eq:lecam}. Use it to derive~\cref{theo:uniformity:lb:ingster:with:delta}.
 \end{question}
 
+LaTeX Warning: Reference `exo:notrealproba:lb' on page 1 undefined on input lin
+e 216.
+
+[108]
+
+\begin{question}[$\star$]\label{exo:paninski:mi:lb}
+Recall that we defined the \no-instances in~\cref{ssec:dk16} by~\cref{eq:notpaninski:construction} (measures, instead of \emph{bona fide} probability measures) in order to guarantee mutual independence of $\occur_1,\dots,\occur_\ab$ (conditioned on $\mathbf{b}$. Check the argument to see which part of the argument would fail if we had used~\cref{eq:paninski:construction} instead. Then, modify the argument to fix this, and obtain the same sample complexity lower bound. \textit{(Hint: we still have mutual independence of the $\ab/2$ random variables $(\occur_1, \occur_2),\dots,(\occur_{\ab-1}, \occur_\ab)$ conditioned on $\mathbf{b}$. Establish the analogue of~\cref{eq:mutualinfobound} with $\occur_1=j,\occur_2=\ell$ instead of $\occur_1=j$, and proceed from there.}
+\end{question}
+
 \begin{question}\label{ex:2/3:lb:applications}
 Verify that applying~\cref{theo:2/3:lb:vv} to (i)~the uniform distribution $\uniform_\ab$ and (ii)~the ``Zipf'' distribution $\q\in\distribs{\ab}$ such that $\q(i) \propto 1/\sqrt{i}$ leads, in both cases, to an $\Omega(\sqrt{\ab}/\dst^2)$ sample complexity lower bound for identity testing.
 \end{question}
