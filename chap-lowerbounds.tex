@@ -2,6 +2,7 @@ In this chapter, we will cover several techniques and ``ready-to-use'' theorems 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Indistinguishability, Le Cam, and Ingster's method}
+	\label{ssec:ingster}
 
 To establish a lower bound on the sample complexity of testing a given property $\property = \bigcup_{\ab=1}^\infty \property_\ab$, we want to come up (for a given $\ab$) with a ``simple'' family of (pairs of) distributions such that, when chosing such a pair $(\p_\accept, \p_\reject)$ at random, (i)~$\p_\accept$ has the property, but $\p_\reject$ is far from it, so a tester \emph{should} distinguish between the two; but (ii)~unless $\ns$ is large enough, no algorithm taking $\ns$ samples can actually distinguish between the two. The ``simple'' here is somewhat fuzzy, but can be rephrased as ``a family simple enough to make proving (ii) as painless as possible.''
 
@@ -70,7 +71,7 @@ Let us further assume our family of $\no$-instances are parameterized as $\{\p_\
 \end{equation}
 where we invoked the relation between total variation distance and chi-square divergence (\cref{app:distances:chi2:tv}) for the second inequality. At this point, the reason for using this inequality might appear quite mysterious: why $\chi^2$ instead of, say, KL divergence, or Hellinger distance, or basically \emph{anything else}? The reason lies in the following lemma, which shows how to bound the chi-square divergence between a mixture and a single, honest-to-goodness product distribution:
 \begin{lemma}[Ingster's method]
-	\label{lem:ingster}
+	\label{lemma:ingster}
 Consider a random variable $\theta$ such that, for each realization
 $\theta=\vartheta$, $\p_\vartheta^{(\ns)}=\p_{1,\vartheta} \otimes \dots \otimes \p_{\ns,\vartheta}$ is a product distribution. Further, let
 $\p^{(\ns)} = \p_1 \otimes \dots \otimes \p_\ns$ be a fixed product
@@ -87,7 +88,7 @@ is the ``chi-square inner product'' of $\p_{j,\vartheta}$ and $\p_{j,\vartheta'}
 \bE{x\sim\p}{\frac{(\q(x)-\p(x))(\q'(x)-\p(x))}{\p(x)^2}}=\sum_{x\in\domain} \frac{(\q(x)-\p(x))(\q'(x)-\p(x))}{\p(x)}\,,
 \] and when $\q=\q'$ this is equal to $\chisquare{\q}{\p}$.}
 \end{lemma}
-This statement is still slightly too general for our purposes, as in our case all marginals of any fixed $\p_\vartheta^{(\ns)}$ (and those of $\p^{(\ns)}$) are the same, since we take $\ns$ \iid samples. Applying~\cref{lem:ingster} to~\cref{eq:lecam:simpler} (after squaring it to get rid of the square root) leads to
+This statement is still slightly too general for our purposes, as in our case all marginals of any fixed $\p_\vartheta^{(\ns)}$ (and those of $\p^{(\ns)}$) are the same, since we take $\ns$ \iid samples. Applying~\cref{lemma:ingster} to~\cref{eq:lecam:simpler} (after squaring it to get rid of the square root) leads to
 \begin{equation}
 	\label{eq:lecam:simplest}
 	4(1-2\errprob)^2 \leq \bE{\theta,\theta'\sim\pi}{(1+{H(\theta,\theta')})^\ns} - 1\,,
@@ -188,8 +189,111 @@ Every testing algorithm for uniformity must have sample complexity $\ns(\ab,\dst
 \end{theorem}
 \noindent We did not even have to start everything from scratch. Not too bad!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{DK16}
+\section{Indistinguishability via Fano: a bit of mutual information}
+	\label{ssec:dk16}
+We will now cover another lower bound method, based on bounding an information-theoretic quantity, the mutual information $\mutualinfo{\mathbf{b}}{X}$ between two suitable random variables. As in the previous session, the first step is to come up with our two priors $\zeta_\accept,\zeta_\reject$ over \yes- and \no-instances (and, in particular, to show that either all or most of the $\no$-instances are indeed $\dst$-far from the property).
 
+The second step is to look at the following process: (1)~pick a uniformly random bit $\mathbf{b}\in\{0,1\}$; (2)~draw a distribution $\p$ from $\zeta_{\mathbf{b}}$; (3)~take $\ns$ \iid samples from $\p$. The key idea is that if one has a testing algorithm for our property (say, correct with probability $2/3$), then one can use it to distinguish between $\zeta_0$ and $\zeta_1$~--~but then, one can use \emph{this} to guess the value of $\mathbf{b}$ with probability at least $2/3$ based on the $\ns$ samples observed. Intuitively, this must mean those $\ns$ samples $X=(X_1,\dots,X_\ns)$ carry some non-trivial amount of information about $\mathbf{b}$, that is, that the mutual information $\mutualinfo{\mathbf{b}}{X}$ is ``large.'' This is made formal in the next lemma:
+\begin{fact}
+	\label{fact:fano}
+ Let $\mathbf{b}\in\{0,1\}$ be a uniformly random bit, and $X$ be a random variable taking values in some set $S$. If there exists an algorithm $\Algo$ such that
+ $
+ 	\bPr{\Algo(X)=\mathbf{b}} \geq 2/3
+ $ (where the randomness is over $\mathbf{b}, X$, and the internal randomness of $\Algo$), then $\mutualinfo{\mathbf{b}}{X} \geq 2/25$.
+\end{fact}
+\begin{proof}
+We have 
+\begin{align*}
+	\mutualinfo{\mathbf{b}}{X} &= \entropy{\mathbf{b}} - \entropy{\mathbf{b}\mid X} = 1 - \entropy{\mathbf{b}\mid X} \\
+	&\geq 1-h(\bPr{\Algo(X)\neq \mathbf{b}}) \geq 1-h(1/3) \\
+	&> 2/25\,,
+\end{align*}
+where the first inequality is Fano's (using that $\mathbf{b}$ takes values in $\{0,1\}$) and the second is monotonicity of the binary entropy function $h(x) = -x\log x - (1-x)\log(1-x)$.
+\end{proof}
+The third step is to upper bound $\mutualinfo{\mathbf{b}}{X}$ as a function of $\ab$, $\dst$, and $\ns$, relying on the ``nice'' properties of mutual information (\eg chain rule, data-processing inequality, and whatever sticks after repeated readings of~\citet[Chapter~2]{CoverThomas:06}). To make the best use of these nice properties, it is typically useful to make two additional simplifications:
+\begin{itemize}
+	\item First, instead of exactly $\ns$ samples, in stage (3) of the sampling process above we pick $N\sim\poisson{\ns}$ samples (where $N$ is independent of $\mathbf{b}$ and $X$). This is the ``Poissonized sampling'' setting we saw in~\cref{chap:identity}, and it will allow us to argue that the number of times $\occur_{i}$ each element $i$ of the domain is seen are independent random variables (conditioned on the draw of $\p$), which will \emph{considerably} simplify our analysis of $\mutualinfo{\mathbf{b}}{X}$. This Poissonization trick can be done roughly without loss of generality, as discussed in~\cref{app:poissonization}.
+	\item Second, we will want to relax our requirement that the \no-instances are \emph{actual} probability distributions, and only ask that they be \emph{measures} (not necessarily summing to one!), as long as they sum to something close to one with high probability: say, $1/2\leq \normone{\p} \leq 3/2$ with probability $1-o(1)$ (over the choice of $\p\sim\zeta_\reject$). This one appears to be with a little more loss of generality, but it turns out this can be assumed without losing much. (See~\cref{exo:notrealproba:lb}.) 
+\end{itemize}
+\noindent But again, let us go through an example to make this concrete.
+
+\paragraph{Uniformity testing lower bound.} Our single \yes-instance is again the uniform distribution $\uniform_\ab$, which takes care of defining $\zeta_\accept$. However, we will use a slightly different prior $\zeta_\reject$ than in the previous section for our $\no$-instances: the reason is that, for the $2^{\ab/2}$ \no-instances defined in~\cref{eq:paninski:construction}, the individual probabilities of elements $2i$ ans $2i-1$ were not independently chosen (this was the whole point: they compensated each other to have a total probability mass of one overall). As a result, when choosing a \no-instance, we would have some annoying dependencies between $\occur_{2i-1}$ and $\occur_{2i}$, even after conditioning on $\textbf{b}$.  We \emph{could} handle these dependencies here, but this introduces some extra bean counting: the reader is encouraged to do so in~\cref{exo:paninski:mi:lb}, in this section we will do something slightly different.
+
+Namely, we will use the second relaxation discussed above, and just define our prior $\zeta_\reject$ as the uniform prior over $2^\ab$ distributions indexed by $\theta\in\bool^\ab$, with
+\begin{equation}
+	\label{eq:notpaninski:construction}
+	\p_\theta(i) = 
+		\frac{1+\theta_{i} \cdot 3\dst}{\ab}, \qquad i\in[\ab]
+\end{equation}
+(\ie compared to~\cref{eq:paninski:construction}, we do not ``pair'' elements together). As a result, we only can say that any given $\p_\theta$ will have
+\begin{equation}
+	\sum_{i=1}^\ab \p_\theta(i) = 1 + \frac{3\dst}{\ab}\sum_{i=1}^\ab \theta_i \in [1-3\dst,1+3\dst]
+\end{equation}
+(and actually have $\sum_{i=1}^\ab \p_\theta(i) = 1+O(\dst/\sqrt{\ab})$ with high probability over the choice of $\theta$); but that is enough for us. What this \emph{does} buy us is that, combined with the Poissonization sampling assumption discussed above, \emph{conditioned on $\mathbf{b}$} the random variables $\occur_1,\dots,\occur_\ab$ are mutually independent, with either $\occur_i\sim\poisson{\ns/\ab}$ (if $\mathbf{b}=\accept$) or $\occur_i\sim \frac{1}{2}\poisson{(1+3\dst)/\ab}+\frac{1}{2}\poisson{(1-3\dst)/\ab}$ (if $\mathbf{b}=\reject$).\medskip
+
+Thus, all that remains is getting a good upper bound on $\mutualinfo{\mathbf{b}}{X}$, where $X$ is the set of $\poisson{\ns}$ samples from our 3-step process. Since the order of the $N$ samples in $X$ does not matter, we have 
+$
+\mutualinfo{\mathbf{b}}{X} = \mutualinfo{\mathbf{b}}{(\occur_1,\dots,\occur_\ab)}
+$, and can write
+\begin{align*}
+\mutualinfo{\mathbf{b}}{X} 
+&= \entropy{\occur_1,\dots,\occur_\ab} - \entropy{(\occur_1,\dots,\occur_\ab) \mid \mathbf{b}}  \\
+&= \entropy{\occur_1,\dots,\occur_\ab} - \sum_{i=1}^\ab \entropy{\occur_i \mid \mathbf{b}}  \tag{conditional independence}\\
+&\leq \sum_{i=1}^\ab \entropy{\occur_i} - \sum_{i=1}^\ab \entropy{\occur_i \mid \mathbf{b}}  \tag{subadditivity}\\
+&= \sum_{i=1}^\ab\mutualinfo{\mathbf{b}}{\occur_i}\,,
+\end{align*}
+which means that to bound $\mutualinfo{\mathbf{b}}{X} $ it suffices to analyze each $\mutualinfo{\mathbf{b}}{\occur_i}$ separately. In our particular case, by symmetry of the uniform distribution and of our prior (uniform prior over all our ``Paninski'' \no-instances), all those $\mutualinfo{\mathbf{b}}{\occur_i}$'s are equal:
+\begin{equation}
+	\mutualinfo{\mathbf{b}}{X}  \leq \ab \mutualinfo{\mathbf{b}}{\occur_1}\,.
+\end{equation}
+To analyse this, we first replace the RHS by something a little bit more manageable, to get the following:
+\begin{equation}
+	\label{eq:mutualinfobound}
+	\mutualinfo{\mathbf{b}}{X}  
+	%\leq \frac{\ab}{2} \sum_{j=0}^\infty \frac{\Paren{\bPr{\occur_1=j\mid \mathbf{b}=\reject }-\bPr{\occur_1=j\mid \mathbf{b}=\accept }}^2}{\bPr{\occur_1=j\mid \mathbf{b}=\reject }+\bPr{\occur_1=j\mid \mathbf{b}=\accept }}
+	\leq \frac{\ab}{2} \sum_{j=0}^\infty \bPr{\occur_1=j\mid \mathbf{b}=\accept }\Paren{1-  \frac{\bPr{\occur_1=j\mid \mathbf{b}=\reject }}{\bPr{\occur_1=j\mid \mathbf{b}=\accept }}  }^2 
+\end{equation}
+To see where this comes from, recall that mutual information is expected KL divergence, and chi-square divergence upper bounds KL: and~\cref{eq:mutualinfobound} is actually a ``chi-square type'' quantity in disguise.
+\begin{align}
+	\mutualinfo{\mathbf{b}}{\occur_1} 
+	&= \bE{\mathbf{b}}{\kldiv{P_{\occur_1\mid \mathbf{b}}}{P_{\occur_1}}} \notag\\
+	&\leq \bE{\mathbf{b}}{\chisquare{P_{\occur_1\mid \mathbf{b}}}{P_{\occur_1}}} \notag\\
+	&= \frac{1}{2}\Paren{\chisquare{P_{\occur_1\mid \mathbf{b}=\accept}}{P_{\occur_1}} + \chisquare{P_{\occur_1\mid \mathbf{b}=\reject}}{P_{\occur_1}}}\notag\\
+	&= \frac{1}{2}\Big(\sum_{j=0}^\infty \frac{\Paren{\bPr{\occur_1=j\mid \mathbf{b}=\accept }-\bPr{\occur_1=j }}^2}{\bPr{\occur_1=j}}  \notag\\
+	&\qquad+ \sum_{j=0}^\infty \frac{\Paren{\bPr{\occur_1=j\mid \mathbf{b}=\reject }-\bPr{\occur_1=j }}^2}{\bPr{\occur_1=j}} \Big) \notag\\
+	&=\frac{\ab}{2} \sum_{j=0}^\infty \frac{\Paren{\bPr{\occur_1=j\mid \mathbf{b}=\reject }-\bPr{\occur_1=j\mid \mathbf{b}=\accept }}^2}{\bPr{\occur_1=j\mid \mathbf{b}=\reject }+\bPr{\occur_1=j\mid \mathbf{b}=\accept }} \\
+	&= \frac{\ab}{2} \sum_{j=0}^\infty \bPr{\occur_1=j\mid \mathbf{b}=\accept }\frac{ \Paren{1-  \frac{\bPr{\occur_1=j\mid \mathbf{b}=\reject }}{\bPr{\occur_1=j\mid \mathbf{b}=\accept }}  }^2}{1+\frac{\bPr{\occur_1=j\mid \mathbf{b}=\reject }}{\bPr{\occur_1=j\mid \mathbf{b}=\accept }}}  \notag
+\end{align}
+using for the second-to-last equality that, since $\mathbf{b}$ is a uniform bit, $\bPr{\occur_1=j} = \frac{1}{2}\bPr{\occur_1=j\mid \mathbf{b}=\accept }+\frac{1}{2}\bPr{\occur_1=j\mid \mathbf{b}=\reject }$ for all $j\geq 0$.\smallskip
+
+In view of bounding the RHS of~\cref{eq:mutualinfobound}, it is time to take advantage of what we know: after all, we know what our \no-instances and \yes-instance look like, and we chose them for a reason. Recalling that we work in the Poissonized sampling model, $\occur_{1}\sim\poisson{\ns\p(1)}$, so we can compute
+\begin{align*}
+\bPr{\occur_1=j\mid \mathbf{b}=\accept }
+&= e^{-\ns/\ab} \frac{(\ns/\ab)^j}{j!} \\
+\bPr{\occur_1=j\mid \mathbf{b}=\reject }
+&= \frac{1}{2}\Paren{ e^{-\frac{\ns(1+3\dst)}{\ab}} \frac{(\ns(1+3\dst)/\ab)^j}{j!}  + e^{-\frac{\ns(1-3\dst)}{\ab}} \frac{(\ns(1-3\dst)/\ab)^j}{j!} }
+\end{align*}
+and, in particular,
+\begin{align}
+\frac{\bPr{\occur_1=j\mid \mathbf{b}=\reject }}{\bPr{\occur_1=j\mid \mathbf{b}=\accept }}
+&= \frac{1}{2}\Paren{ e^{-\frac{3\ns\dst}{\ab}} (1+3\dst)^j  + e^{\frac{3\ns\dst}{\ab}} (1-3\dst)^j}\,.
+\end{align}
+We can plug this back into~\cref{eq:mutualinfobound}, to get
+\begin{align}
+\mutualinfo{\mathbf{b}}{X}  &\leq \frac{\ab}{2} e^{-\ns/\ab}\sum_{j=0}^\infty \frac{(\ns/\ab)^j}{j!}\Paren{ 1- \frac{e^{-\frac{3\ns\dst}{\ab}} (1+3\dst)^j  + e^{\frac{3\ns\dst}{\ab}} (1-3\dst)^j}{2}}^2 \notag\\
+&= \frac{\ab}{2}\Paren{\cosh\Paren{ \frac{9\ns\dst^2}{\ab} }-1} \leq \frac{\ab}{2}\Paren{ e^{\frac{81\ns^2\dst^4}{2\ab^2}}-1}\,;
+\end{align}
+the last inequality being $\cosh u \leq e^{u^2/2}$, and the equality following from either a fastidious but manageable computation involving known converging series, or a quick computation involving Julia, Mathematica, or one's weapon of choice.
+
+Since we know by~\cref{fact:fano} that we must have $\mutualinfo{\mathbf{b}}{X} \gtrsim 1$, putting the two together implies that we must have
+\[
+	\frac{81\ns^2\dst^4}{2\ab^2} \geq \ln\Paren{1+\frac{4}{25\ab}} \asymp \frac{1}{\ab}
+\]
+proving our lower bound:
+\begin{theorem}
+  \label{theo:uniformity:lb:dk16}
+Every testing algorithm for uniformity must have sample complexity $\ns(\ab,\dst,1/3) = \Omega(\sqrt{\ab}/\dst^2)$.
+\end{theorem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Indistinguishability via moment-matching}
 \label{ssec:momentmatching}
@@ -664,10 +768,14 @@ To conclude, let us see a direct application of this theorem to the property $\p
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}
-\tbc
-\citet{BlaisCG17} for another type of reductions (via communication complexity)
 
-\cnote{Discuss briefly the difference with \emph{learning} (Assouad)}?
+The contents of~\cref{ssec:ingster} (mostly) follow the exposition of~\citet{Pollard:2003} of the celebrated work of Le Cam (\eg~\citet{LeCam73}). The $\chi^2$ method described (\cref{lemma:ingster}) is, to the best of the author's knowledge, due to Ingster, and often referred to as the Ingster--Suslina method after~\citep{IngsterS03}.~\cref{ssec:dk16} (mostly) follows the Fano-based framework of~\citet{DiakonikolasK16}, with some simplifications and (hopefully not) the occasional new typo.
+
+The results discussed in~\cref{ssec:momentmatching} are due to~\citet{Valiant:11}; those from~\cref{ssec:vv:instancebyinstance} first appeared in~\citet{VV:14:FOCS}, before the journal version~\citep{ValiantV17}.
+
+The reduction-based method from~\cref{ssec:lb:reductions} was introduced in~\citet{CDGR:16} (the journal version appearing later as~\citep{CDGR:17:journal}), which also includes a variant for tolerant testing. This is not the only type of reduction-based method known; for a different flavour entirely (reduction from communication complexity), the reader is encouraged to consult~\citet{BlaisCG19}.
+
+Importantly, all methods and results covered in this chapter focused on minimax \emph{testing} lower bounds. While they can also be used to establish sample complexity lower bounds for estimation questions (since, essentially, ``learning is harder than testing,'' as briefly discussed in~\cref{chap:what}), there are many situations where the bounds obtained by these methods will not be optimal for estimation tasks. The reader interested in estimation \textit{versus} testing lower bound methods is referred to the foundational paper of~\citet{Yu97}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
