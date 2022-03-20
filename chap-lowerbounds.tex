@@ -784,10 +784,11 @@ Importantly, all methods and results covered in this chapter focused on minimax 
 Combine (the second part of)~\cref{app:distances:bh} with (the first part of)~\cref{lemma:kl:chi2} to obtain~\cref{eq:bound:ingster:mgf:uniformity} from~\cref{eq:lecam}. Use it to derive~\cref{theo:uniformity:lb:ingster:with:delta}.
 \end{question}
 
-LaTeX Warning: Reference `exo:notrealproba:lb' on page 1 undefined on input lin
-e 216.
+\begin{question}\label{exo:notrealproba:lb}
+Let $\p$ be a measure (not necessarily a probability measure) such that the $\lp[1]$ distance between $\p$ and $\property_\ab$ satisfies $\lp[1](\p,\property_\ab)>2\dst$, and $1/2\leq \normone{\p} \leq 3/2$. Defining $\p' \eqdef \p/\normone{\p}$ (an actual probability distribution), provide a lower bound on $\totalvardist{\p}{\property_\ab}$. Moreover, show that obtaining $\ns$ ``samples'' from the Poisson process with measure $\p$ is equivalent to getting $\poisson{\ns\normone{\p}}$ samples from the distribution $\p'$.
 
-[108]
+Conclude with how one could use a testing algorithm $\Algo$ for property $\property_\ab$ given $\poisson{\ns}$ samples (\ie in the Poissonized sampling model) to distinguish between two families of measures (\yes- and \no-instances) far in $\lp[1]$ distance, thus justifying the relaxed assumption from~\cref{ssec:dk16}.
+\end{question}
 
 \begin{question}[$\star$]\label{exo:paninski:mi:lb}
 Recall that we defined the \no-instances in~\cref{ssec:dk16} by~\cref{eq:notpaninski:construction} (measures, instead of \emph{bona fide} probability measures) in order to guarantee mutual independence of $\occur_1,\dots,\occur_\ab$ (conditioned on $\mathbf{b}$. Check the argument to see which part of the argument would fail if we had used~\cref{eq:paninski:construction} instead. Then, modify the argument to fix this, and obtain the same sample complexity lower bound. \textit{(Hint: we still have mutual independence of the $\ab/2$ random variables $(\occur_1, \occur_2),\dots,(\occur_{\ab-1}, \occur_\ab)$ conditioned on $\mathbf{b}$. Establish the analogue of~\cref{eq:mutualinfobound} with $\occur_1=j,\occur_2=\ell$ instead of $\occur_1=j$, and proceed from there.}
