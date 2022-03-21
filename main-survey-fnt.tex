@@ -138,6 +138,7 @@ to highlight the unifying techniques.
 %\nomenclature{$x\sim \p$}{$x$ is sampled from the probability distribution $\p$}
 \nomenclature[6]{$a_n {\displaystyle\operatorname*{\sim}_{n\to \infty}} b_n$}{Asymptotic equivalence: $\lim_{n\to\infty} \frac{a_n}{b_n} = 1$ (stronger than $a_n = \Theta(b_n)$, as the ``hidden constant'' is $1$).}
 \nomenclature[7]{$a_n \gg b_n$}{(Informal) $a_n$ is much larger than, or ``sufficiently'' large compared to, $b_n$.}
+\nomenclature[8]{$\log$, $\ln$}{Throughout, $\log$ denotes the logarithm in base 2 and $\ln$ the natural logarithm.}
 \printnomenclature
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -183,13 +184,7 @@ to highlight the unifying techniques.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Testing with Constrained Measurements}
   \label{chap:constrained}
-\cnote{Discuss what those can be (local privacy, noisy channels, linear of
-partial measurements, etc). Focus on communication constraints ($\numbits$-bit
-measurements). Talk about adaptive schemes?}
-\section{Continuous distributions and quantization}
-\section{Random hashing and domain compression}
-  \label{sec:domain:compression}
-\section{Application: distributed inference}
+\input{chap-constrained}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -232,7 +227,7 @@ measurements). Talk about adaptive schemes?}
 % Wright.}
 
 \begin{acknowledgements}
-The author is grateful to Aditya Vikram Singh and Sampson Wong, for their valuable comments and feedback on this survey; and to Mike Casey, for his patience during the time it took to write it.
+The author is grateful to Yuhan Liu, Aditya Vikram Singh, and Sampson Wong for their valuable comments and feedback on this survey; and to Mike Casey, for his patience during the time it took to write it.
 \end{acknowledgements}
 
 \appendix
