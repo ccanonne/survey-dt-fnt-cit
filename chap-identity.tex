@@ -1337,13 +1337,6 @@ In this section, we have covered and analyzed seven different algorithms for uni
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Identity testing}
   \label{sec:identity}
-%\cnote{Discuss the instance-optimal setting as well, and the relation to uniformity testing.}
-%\tbc
-%\begin{itemize}
-%\item chi-square tester
-%\item testing via $\lp[2]$ (and why it fails, then the DK16 trick; then, relation to chi-square)
-%\item $\lp[1]$ reduction (Goldreich)
-%\end{itemize}
 Having developed techniques, insights, and mathematical muscle memory for the task of uniformity testing, we now turn to its natural generalization, \emph{identity testing}, where we now seek to test whether the unknown distribution $\p$ is equal to some specific, fixed reference distribution $\q$~--~our ``model''~--~of which we have the full, explicit description. Fortunately, many of the ideas from the previous chapter can be extended or reused for this more general problem; as we will see in the last subsection, there even exists a way to reuse the exact same algorithms as for uniformity. But first, let us get reacquainted  with a familiar algorithm, the $\chi^2$ tester.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
