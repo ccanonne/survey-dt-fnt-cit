@@ -1,0 +1,23 @@
+%\cnote{Discuss what those can be (local privacy, noisy channels, linear of partial measurements, etc). Focus on communication constraints ($\numbits$-bit measurements). Talk about adaptive schemes?}
+
+To conclude this survey, we will venture outside the usual sampling setting, and consider the following question: \emph{what happens when the algorithm does not get to see the $\ns$ \iid samples?}
+
+This may seem absurd at first: well, then, the algorithm is in trouble, isn't it? Yet, this type of questions does in fact capture many natural (or interesting) settings. Among others:
+\begin{description}
+	\item[Communication constraints:] The data is divided among $\ns$ users, each holding a single sample\footnote{One could also, of course, consider scenarios where users hold multiple samples each; it is, however, a little more complicated to handle.} (observation), and a central server seeks to perform the testing task. Unfortunately, the users each have a stringent \emph{bandwidth constraint}, preventing them from sending their full data point to the server: instead, they are limited to only send $\numbits$ of information.
+	\item[Limited measurements:] Data is hard to measure, and physical devices (or social incentive mechanisms) are imperfect or restricted. For instance, it may only be possible to perform a specific type of one-bit measurement to each data point: fix a threshold, and only learn whether the value is greater. Or it may be the case that sensors can be very accurate either for higher temperatures, or lower ones, but not both: which ones to choose to deploy?
+	\item[Quantization:] Very often, the underlying signal is continuous, but the measurement is intrinsically discrete. Which quantization scheme to choose? Should it be chosen once and for all, or should various quantization schemes be combined, different for distinct measurements?
+	\item[Privacy:] Sometimes the data is not only distributed across many users, but also sensitive: \eg medical data, location information, or financial records. The users, while willing to send some information to the central server in order to perform the testing task, seek to preserve the privacy of their personal data. This is captured, \eg by the framework of (local) differential privacy~\citep{DworkMNS06,KLNRS:11,DJW:13:FOCS}, which guarantees (in a formal sense) that nobody~--~even the central server~--~can infer too much about any single user's data point.
+	\item[Streaming and memory-limited devices:] In some cases, the measurements are performed (or the data observed) sequentially by a device with limited working memory. The algorithm thus cannot store the totality of the dataset before performing computations on it, but instead must maintain a small ``sketch'' of the samples seen so far, and base its final output on this sketch only.
+	\item[Noisy channels:] We conclude this (non-exhaustive) list with the example of settings where the measurements are performed locally, and sent to a central entity for processing through a noisy communication channel. Each such transmission can be subject to data corruption, either through random noise or adversarially.
+\end{description}
+This is a \emph{short} concluding chapter, and we will not cover all (or, indeed, most) of the above applications; the interested reader is referred to~\cref{sec:constrained:notes} for a few pointers. Instead, we will focus on the first setting, that of communication constraints, where each of $\ns$ users observes a single (independent) sample from the same unknown distribution $\p\in\distribs{\ab}$, but must abide by a tight communication budget of $\numbits \ll \log\ab$ bits. We will also focus on upper bounds (algorithms), and on our by-now-familiar example of uniformity testing.
+
+\section{Setting(s), and the devil lurking in the details}
+\section{Simulate-and-Infer}
+  \label{sec:domain:compression}
+\section{Random hashing and domain compression}
+  \label{sec:domain:compression}
+\section{Historical notes}
+  \label{sec:constrained:notes}
+\section{Exercises}
