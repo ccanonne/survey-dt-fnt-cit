@@ -1,9 +1,39 @@
-\tbc
-\cnote{KL is in nats! Use $\ln$ everywhere.}
-\cnote{$\domain$ discrete here. Extends to continuous via R-N.}
+We here focus on distributions over discrete domains; all of the stated results do extend to the continuous settings, replacing ratios by Radon--Nikodym derivatives and sums by suitable integrals.
 
-\todonote{\cref{fact:dpi} as a consequence of TV being an $f$-divergence. Subaddidivity of KL and squared Hellinger.}
+We briefly recall the definitions of the distance measures between probability distributions we will use here. This list is by no means exhaustive, of course: there be (many more) dragons. 
+\begin{definition}
+For two probability distributions $\p_1,\p_2$ over the same domain $\domain$, the \emph{Kullback--Leibler divergence} (in nats), \emph{chi--square divergence}, and \emph{Hellinger distance} are given by
+\begin{align}
+	\kldiv{\p_1}{\p_2} &= \sum_{x\in\domain} \p_1(x) \ln \frac{\p_1(x)}{\q_1(x)} \\
+	\chisquare{\p_1}{\p_2} &= \sum_{x\in\domain} \frac{(\p_1(x)-\q_1(x))^2}{\q_1(x)} \\
+	\hellinger{\p_1}{\p_2} %&= \Paren{\frac{1}{2}\sum_{x\in\domain} \Paren{\sqrt{\p_1(x)}-\sqrt{\q_1(x)}}^2}^{1/2}  \notag\\
+	&= \frac{1}{\sqrt{2}}\normtwo{\sqrt{\p}-\sqrt{\q}}\,,
+\end{align}
+with the convention that $0\ln 0 = 0$. Note that the first two are not symmetric, do not satisfy the triangle inequality, and are unbounded.
+\end{definition}
 
+Importantly, TV distance, squared Hellinger, KL divergence, and chi-square divergence are all instances of \emph{$f$-divergences}, which directly endows them with many desirable properties~--~among which joint convexity and the data-processing inequality (\cref{fact:dpi}).
+
+Squared Hellinger, KL divergence, and chi-square divergence also ``tensorize'' nicely: specifically, for any product probability distributions $\p_1\otimes\cdots\otimes\p_n$ and $\q_1\otimes\cdots\otimes\q_n$, we have
+\begin{align}
+\kldiv{\p_1\otimes\cdots\otimes\p_n}{\q_1\otimes\cdots\otimes\q_n} 
+&= \sum_{i=1}^n \kldiv{\p_i}{\q_i} \\
+\chisquare{\p_1\otimes\cdots\otimes\p_n}{\q_1\otimes\cdots\otimes\q_n} 
+&= \prod_{i=1}^n \Paren{1+\chisquare{\p_i}{\q_i}} - 1
+\end{align}
+and
+\begin{align}
+\hellinger{\p_1\otimes\cdots\otimes\p_n}{\q_1\otimes\cdots\otimes\q_n}^2 
+&= 1 - \prod_{i=1}^n (1-\hellinger{\p_i}{\q_i}^2) \notag\\
+&\leq \sum_{i=1}^n \hellinger{\p_i}{\q_i}^2
+\end{align}
+while TV distance is much less cooperative, only giving the weaker
+\begin{equation}
+\totalvardist{\p_1\otimes\cdots\otimes\p_n}{\q_1\otimes\cdots\otimes\q_n} \leq \sum_{i=1}^n \totalvardist{\p_i}{\q_i}
+\end{equation}
+(typically much looser, loosing up to a factor $\sqrt{n}$ compared to what one would get via, say, Hellinger).
+
+We now state (and prove) several useful lemmas relating these various distance measures.
 \begin{lemma}
   \label{app:distances:hellinger}
 For every $\p,\q$ on $\domain$, 
