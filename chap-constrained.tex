@@ -115,12 +115,22 @@ We have now seen a general technique to obtain private-coin protocols under comm
   \label{theo:public-coin}
 There exists a public-coin testing protocol for uniformity under $\numbits$-bits communication constraints using $\ns(\ab,\dst,\numbits, 1/3) = O(\ab/(2^{\numbits/2} \dst^2))$ users. Moreover, this is optimal, even among \emph{interactive} protocols.
 \end{theorem}
+Recall that the ``domain compression'' technique described in~\cref{theo:random:dct:hashing} lets us trade \emph{distance} for \emph{domain size}: namely, we can replace distance $\dst$ but domain size $\ab$ by
+distance $\dst'\asymp\dst\sqrt{L/\ab}$ but domain size $L$, for any $2\leq L\leq \ab$ of our choosing.\footnote{Ignoring some technical details, as this is only guaranteed to hold with constant probability and thus requires some amplification by repetition (losing a constant factor in the sample complexity), as in~\cref{ssec:random:hashing}.} Since each user has $\numbits$ bits to send, it is natural to set $L \eqdef 2^\numbits$: this way, they have enough communication budget to send their full induced sample from this new domain, after which the server can run, again, its favorite (non-distributed) uniformity testing algorithm from~\cref{sec:uniformity} on the $\ns$ samples over $[L]$, with distance parameter $\dst'$.
+
+\noindent Doing so, what we get is a sample complexity
+\begin{equation}
+	\ns \asymp \frac{\sqrt{L}}{\dst'^2} \asymp \frac{\ab}{\dst^2 \sqrt{L}} = \frac{\ab}{\dst^22^{\numbits/2}}
+\end{equation}
+which is exactly what we were after. We are done!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}
   \label{sec:constrained:notes}
-Limited randomness (note that Algo 5 mentioned 4-wise randomness)
+Most of the material covered or hinted at in this last chapter can be found in the sequence of papers~\citet{AcharyaCT:IT1,AcharyaCT19b,AcharyaCFST21}, as well as (for the interactive setting specifically) in~\citet{AcharyaCLST21,AcharyaCST20}. Beyond this line of work (with which, for obvious reasons, the author of this survey is quite familiar), there is an extensive recent body of work addressing this type of information or measurement constraints in the context of estimation (learning) tasks. Focusing on distribution testing,~\citet{DiakonikolasGKR19} and~\citet{AminJM20,BerrettB20} consider goodness-of-fit testing under, respectively, communication or memory constraints, and local privacy constraints.
 
-simulate-and-infer for estimation, and nonparametric estimation
+An extension of the Domain Compression Lemma (DCL) accounting for the amount of public randomness available (length of the common randomness seed), and providing a tight trade-off with respect to this extra parameter as well was obtained in~\citet{AcharyaCHST20}. The DCL itself found applications beyond the constrained measurements described here, and was recently used to obtain uniformity testing algorithms under notions of differential privacy called \emph{pan-privacy}~\citep{AminJM20} and \emph{shuffle privacy}~\citep{BalcerCJM21,CL:22}, enabling one to easily obtain public-coin algorithms from private-coin ones.
+
+The Simulate-and-Infer technique discussed in~\cref{sec:simulate:infer} is not specific to testing, and was also recently leveraged for nonparametric estimation (\ie, learning of continuous Besov densities) in~\citet{ACST:21b}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exercises}
 identity reduction
