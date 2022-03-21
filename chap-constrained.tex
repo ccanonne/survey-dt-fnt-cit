@@ -2,7 +2,7 @@
 
 To conclude this survey, we will venture outside the usual sampling setting, and consider the following question: \emph{what happens when the algorithm does not get to see the $\ns$ \iid samples?}
 
-This may seem absurd at first: well, then, the algorithm is in trouble, isn't it? Yet, this type of questions does in fact capture many natural (or interesting) settings. Among others:
+This may seem absurd at first: well, then, the algorithm is in trouble, isn't it? Yet, this type of question does in fact capture many natural (or interesting) settings. Among others:
 \begin{description}
 	\item[Communication constraints:] The data is divided among $\ns$ users, each holding a single sample\footnote{One could also, of course, consider scenarios where users hold multiple samples each; it is, however, a little more complicated to handle.} (observation), and a central server seeks to perform the testing task. Unfortunately, the users each have a stringent \emph{bandwidth constraint}, preventing them from sending their full data point to the server: instead, they are limited to only send $\numbits$ of information.
 	\item[Limited measurements:] Data is hard to measure, and physical devices (or social incentive mechanisms) are imperfect or restricted. For instance, it may only be possible to perform a specific type of one-bit measurement to each data point: fix a threshold, and only learn whether the value is greater. Or it may be the case that sensors can be very accurate either for higher temperatures, or lower ones, but not both: which ones to choose to deploy?
@@ -13,11 +13,73 @@ This may seem absurd at first: well, then, the algorithm is in trouble, isn't it
 \end{description}
 This is a \emph{short} concluding chapter, and we will not cover all (or, indeed, most) of the above applications; the interested reader is referred to~\cref{sec:constrained:notes} for a few pointers. Instead, we will focus on the first setting, that of communication constraints, where each of $\ns$ users observes a single (independent) sample from the same unknown distribution $\p\in\distribs{\ab}$, but must abide by a tight communication budget of $\numbits \ll \log\ab$ bits. We will also focus on upper bounds (algorithms), and on our by-now-familiar example of uniformity testing.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Setting(s), and the devil lurking in the details}
+Before doing anything else, it is important to define~--~and discuss~--~this communication-limited setting. As mentioned, we have $\ns$ \iid samples $X_1,\dots,X_\ns$ drawn from the same unknown distribution $\p\in\distribs{\ab}$. These samples are distributed among $\ns$ users, where user $i$ observes sample $X_i$ and, from it, computes an $\numbits$-bit message $Y_i\in\{0,1\}^\numbits$ and sends it to the central server.
+
+Upon observing these $\ns$ messages $Y_1,\dots, Y_\ns$, the central server (which does not have itself any sample from $\p$) runs an algorithm to test whether $\p$ is uniform, or $\dst$-far from it, and must be correct with probability $1-\errprob$. 
+
+Note that we will implicitly assume afterwards that $\numbits\leq \log\ab$,\footnote{To avoid this implicit assumption, we could just replace $\numbits$ by $\numbits\land\log\ab$ in every statement, but that is neither nice to read nor to write.} since otherwise each user can simply send their full sample (which only takes $\log\ab$ bits to encode) to the server, and we are back in our familiar setting, with a tight $\Theta(\sqrt{\ab}/\dst^2)$ sample complexity bound for uniformity testing. Given this new communication constraint, we know that the new bound on $\ns$, which is both the number of users and the number of samples, will be \emph{at least} $\Theta(\sqrt{\ab}/\dst^2)$; but, most likely, higher (and should depend on $\numbits$).
+
+\begin{figure}\centering
+\input{fig-ic}
+\caption{Depiction of the communication-constrained setting, in its (almost) full, glorious generality. The orange dashed box highlights that, in the public-coin setting, the users can jointly randomize their messages even though they do not directly communicate.   The red dotted arrows indicate that, in the (sequentially) interactive setting, user $i$ observes the messages $Y_1,\dots,Y_{i-1}$, and can choose their own message $Y_i$ based on those (as well as $X_i$).\label{fig:models:distributed}}
+\end{figure}
+
+\paragraph{But what do the users know, exactly?} We assume that the users are not given the parameters $\dst,\errprob$, but know $\ab$: since they perform the measurement, they probably are aware of the domain of the data. They also know the details the protocol they must follow to compute the message to send (so, in particular, we can assume they know the total number of users $\ns$, if needed), and are given a way to identify themselves in this protocol (\ie each user has a unique ID).
+
+\paragraph{But what do the users share, exactly?} Now, we said that user $i$ (for $1\leq i\leq \ns$) computes their message $Y_i\in\{0,1\}^\numbits$ from $X_i$. Let us make it a bit more formal: user $i$ is equipped with a (possibly randomized) function $W_i\colon \domain\to\{0,1\}^\numbits$, which is decided ahead of time as part of the overall protocol the users and server follow; and sets $Y_i \eqdef W_i(X_i)$.
+
+Note that we allow $W_i$ to differ across users: we do not require that they all use the same mapping from observation to messages. We also allow it to be randomized, which, as we will see, can be quite useful: but this raises the question of \emph{which random seed is used}. Are $W_1,\dots,W_\ns$ randomized independently (\ie each $W_i$ has its own, ``private'' random seed $R_i$, independent of both the inputs $X_1,\dots,X_\ns$ and of the other $R_j$'s)? Are they randomized jointly (\ie each $W_i$ has its own, ``private'' random seed $R_i$ as before, \emph{and} a shared random seed $U$ which all users and the server observe~--~still independent of the inputs $X_1,\dots,X_\ns$, of course)? Or do we go even further, and do we allow $W_i$ to depend on the messages previously sent, that is, we allow user $i$ to observe $Y_1,\dots,Y_{i-1}$ before sending their own message?
+
+The answer is: any of the above, choose your own adventure. Each of the 3 settings above captures a different scenario, and has its own pros and cons:
+\begin{itemize}
+	\item Independent randomization (no common random seed, only private randomness), and no seeing previous messages: this is the \emph{private-coin} setting, sometimes called private-coin ``simultaneous message-passing'' (SMP). It is possibly the simplest to implement, which is a clear advantage; however, it is also the most restrictive, and thus we can expect the sample complexity to be the worst in this setting.
+	\item Joint randomization (common random seed available, on top of private randomness), and no seeing previous messages: this is the \emph{public-coin} setting. It makes sense in scenarios where the server can broadcast a message to all users, or when some earlier synchronization between devices has been performed ahead of time. More permissive than the private-coin setting, so we can hope to achieve better sample complexity.
+	\item \emph{Sequentially interactive:} common random seed available, on top of private randomness, \emph{and} users get to see the messages sent by users before them. This is the most challenging to implement, and can come at the cost of delays and latencies; still, it might also allow for better sample complexity, so\dots{} maybe things balance out?
+\end{itemize}
+There are even more permissive settings (\eg the so-called ``blackboard model,'' also known as \emph{tree protocols}), but this is already quite a lot to absorb. The three settings discussed above are depicted (with more or less success) in~\cref{fig:models:distributed}.
+
+\paragraph{But what can the users \emph{achieve}, exactly?} In the next section,~\cref{sec:simulate:infer}, we will see a simple, yet powerful technique, \emph{simulate-and-infer}, which leads to a $O(\ab^{3/2}/2^\numbits\dst^2)$ sample complexity for uniformity testing in the private-coin setting (\cref{theo:private-coin}). Viewed differently, this is 
+\begin{equation}
+		\underbrace{\frac{\ab}{2^\numbits}}_{\substack{\text{Cost of distributed}\\\text{setting}}}\cdot \underbrace{\frac{\sqrt{\ab}}{\dst^2}}_{\substack{\text{Cost in the}\\\text{centralized setting}}}
+\end{equation}
+and happens to be optimal (no private-coin protocol for uniformity testing can do better, as a function of $\ab,\dst,\numbits$). As a sanity check, the first factor disappears when $\numbits = \log\ab$, which is comforting.\smallskip
+
+We will then see that, somewhat suprisingly, \emph{public randomness helps a lot for testing}. In~\cref{sec:domain:compression}, using the \emph{domain compression} technique introduced in~\cref{ssec:random:hashing}, we will see that public-coin protocols can achieve the much better $O(\ab/2^{\numbits/2}\dst^2)$ sample complexity for uniformity testing; or, equivalently,
+\begin{equation}
+		\underbrace{\sqrt{\frac{\ab}{2^\numbits}}}_{\substack{\text{Cost of distributed}\\\text{setting}}}\cdot \underbrace{\frac{\sqrt{\ab}}{\dst^2}}_{\substack{\text{Cost in the}\\\text{centralized setting}}}
+\end{equation}
+%(Again, the first term disappears when $\numbits$ reaches $\log\ab$.) 
+What is perhaps even more surprising is that this is also optimal, \emph{even} when one allows sequentially interactive protocols! So, public randomness helps; but interaction? Not so much.
+
+
+Oh, one last detail: to make things slightly more confusing: since we are in a distributed setting, we now talk about testing \emph{protocols}, not algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Simulate-and-Infer}
-  \label{sec:domain:compression}
+  \label{sec:simulate:infer}
+  
+\begin{theorem}
+  \label{theo:private-coin}
+There exists a private-coin testing protocol for uniformity under $\numbits$-bits communication constraints using $\ns(\ab,\dst,\numbits, 1/3) = O(\ab^{3/2}/(2^\numbits \dst^2))$ users. Moreover, this is optimal among all such private-coin protocols.
+\end{theorem}
+  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Random hashing and domain compression}
   \label{sec:domain:compression}
+  
+\begin{theorem}
+  \label{theo:public-coin}
+There exists a public-coin testing protocol for uniformity under $\numbits$-bits communication constraints using $\ns(\ab,\dst,\numbits, 1/3) = O(\ab/(2^{\numbits/2} \dst^2))$ users. Moreover, this is optimal, even among \emph{interactive} protocols.
+\end{theorem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}
   \label{sec:constrained:notes}
+Limited randomness (note that Algo 5 mentioned 4-wise randomness)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exercises}
+identity reduction
+error amplification
+generalize to different $\ell_i$

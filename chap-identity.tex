@@ -952,7 +952,7 @@ The proof of this lemma established a little more than stated: first, we actuall
 Second, although our proof via the MGF used full independence of the $\xi_i$'s (and thus a truly uniformly random set $S$), this was only to obtain bounds on the first 4 moments of $Z$, which is all that the Paley--Zygmund lemma eventually requires. Any distribution for $S$ with the same first 4 moments will then lead to the same guarantees! In particular, instead of a truly uniformly random $S$, one can instead use a $4$-wise independent hash function, which requires significantly less randomness and can be much easier.
 \end{remark}
 
-Finally, we conclude this section by mentioning a generalization of the binary hashing lemma~\cref{lemma:random:binary:hashing} to an arbitrary number of parts:
+Finally, we conclude this section by mentioning a generalization of the binary hashing lemma (\cref{lemma:random:binary:hashing}) to an arbitrary number of parts:
 \begin{theorem}[Domain Compression Lemma]
   \label{theo:random:dct:hashing}
   There exist absolute constants $c_1,c_2>0$ such that the following holds. For any $2\leq \ell\leq \ab$ and any $\p,\q\in\distribs{\ab}$,
@@ -1833,7 +1833,7 @@ Moreover, for any $\p\in\distribs{\ab}$, we have
 Some final bookkeeping: we lose an extra factor $\log L = \log\log(\ab/\dst)$ for a union bound over all $L+1$ tests performed, by actually running each of them with error probability $\errprob \eqdef 1/(3(L+1))$. Overall, modulo to the missing details ``left to the reader,''\exercise{That's you!} we established the following:
 \begin{theorem}
   \label{theo:bucketing}
-The bucketing-based tester is testing algorithm for identity with sample complexity $\ns(\ab,\dst,1/3) = \tilde{O}(\sqrt{\ab}/\dst^2)$.
+The bucketing-based tester is a testing algorithm for identity with sample complexity $\ns(\ab,\dst,1/3) = \tilde{O}(\sqrt{\ab}/\dst^2)$.
 \end{theorem}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
