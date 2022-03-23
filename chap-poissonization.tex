@@ -1,6 +1,33 @@
-\tbc
-Include the transformation from Lemma 4.3.3 of Paul Valiant's thesis\\\\\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\fish}{\hspace{1pt}{\cdot}\kern -4pt {\subset}\kern -3pt {\rtimes}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In the usual, standard sampling setting, the algorithm is given $\ns$ \iid samples from a distribution $\p\in\distribs{\ab}$. This is sometimes called \emph{multinomial} sampling setting, as then the vector of counts $(\occur_1,\dots,\occur_\ab)$ (where $\occur_i$ is the number of times we see element $i\in[\ab]$ among the $\ns$ samples) follows a multinomial distribution with parameters $\ns$ and $(\p(1),\dots,\p(\ab))$.
 
-An unfortunate aspect of this is that those $\occur_1,\dots,\occur_\ab$ are not independent: each of them is marginally a Binomial random variable, with $\occur_i \sim \binomial{\ns}{\p(i)}$, but those are dependent, since for instance $\occur_1+\dots+\occur_\ab=\ns$.\footnote{More specifically, the $\occur_i$'s are \emph{negatively associated}; see~\cref{def:negative:association}.}
+An unfortunate aspect of this is that those $\occur_1,\dots,\occur_\ab$ are not independent: each of them is marginally a Binomial random variable, with $\occur_i \sim \binomial{\ns}{\p(i)}$, but those are dependent, since for instance $\occur_1+\dots+\occur_\ab=\ns$.\footnote{More specifically, the $\occur_i$'s are \emph{negatively associated}; see~\cref{def:negative:association}.} In turn, this can make many computations annoying or complicated.
+
+A possible solution to this is to work instead in the \emph{Poissonized sampling setting}, where the algorithm is given a \emph{random} number of samples. Specifically, the sampling process is as follows. Given an integer $\ns$,
+\begin{enumerate}
+	\item Draw $N\sim\poisson{\ns}$;
+	\item Draw $N$ \iid samples $X_1,\dots, X_N$ from $\p$;
+	\item Provide $X_1,\dots, X_N$ to the algorithm.
+\end{enumerate}
+Equivalently, assume we have an infinite sequence $(X_i)_{i=1}^\infty$ of \iid samples from $\p$, and the algorithm is provided the first $N$ of them, where $N\sim\poisson{\ns}$ and $(X_i)_{i=1}^\infty$ are mutually independent. We can then define a \emph{property testing in the Poissonized setting} exactly as in~\cref{def:testing}, except for the fact that the ``sample complexity'' $\ns(\ab,\dst,\errprob)$ is now referring to the parameter of $N$ (the Poisson random variable which is the number of samples actually given to the algorithm).
+
+The reasons to do this are summarized in the following fact.
+\begin{fact}
+Fix any $\p\in\distribs{\ab}$, and let $(\occur_1,\dots,\occur_\ab)$ denote the vector of counts among the samples in the Poissonized sampling setting with parameter $\ns$. Then (1)~for every $i\in[\ab]$, $N_i\sim\poisson{\ns\p(i)}$, and (2)~$\occur_1,\dots,\occur_\ab$ are mutually independent.
+\end{fact}
+Moreover, tail bounds on Poisson concentration (\cref{theo:main:poisson:bounds}) imply that
+\begin{equation}
+	\bPr{ \frac{\ns}{2} \leq N \leq \frac{3\ns}{2}} \geq 1-2e^{-\ns/12}
+\end{equation}
+which is at least $1-\errprob$ if $\ns \geq 12\ln(2/\errprob)$. This can be used to show the following:
+\begin{lemma}
+	Suppose there exists a tester for property $\property$ in the Poissonized setting with sample complexity $\ns^{\fish}(\ab,\dst,\errprob)$. Then there exists a tester for property $\property$ (in the standard sampling setting) with sample complexity $\ns(\ab,\dst,\errprob)=\max\Paren{\frac{3}{2}\cdot \ns^{\fish}(\ab,\dst,\errprob/2), 18\ln(4/\errprob)}$.
+\end{lemma}
+\noindent We also have a converse statement:
+\begin{lemma}
+	Suppose there exists a tester for property $\property$ (in the standard sampling setting) with sample complexity $\ns(\ab,\dst,\errprob)$. Then there exists a tester for property $\property$ in the Poissonized setting with sample complexity $\ns^{\fish}(\ab,\dst,\errprob)=\max\Paren{2\cdot \ns(\ab,\dst,\errprob/2), 12\ln(4/\errprob)}$.
+\end{lemma}
+See, \eg~\citet[Section~4.3]{Valiant:11} and references within, or~\citet[Appendix~D.3]{Canonne:15:Survey} for more on Poissonization.
