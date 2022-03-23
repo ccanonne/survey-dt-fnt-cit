@@ -1,0 +1,6 @@
+\tbc
+Include the transformation from Lemma 4.3.3 of Paul Valiant's thesis
+
+In the usual, standard sampling setting, the algorithm is given $\ns$ \iid samples from a distribution $\p\in\distribs{\ab}$. This is sometimes called \emph{multinomial} sampling setting, as then the vector of counts $(\occur_1,\dots,\occur_\ab)$ (where $\occur_i$ is the number of times we see element $i\in[\ab]$ among the $\ns$ samples) follows a multinomial distribution with parameters $\ns$ and $(\p(1),\dots,\p(\ab))$.
+
+An unfortunate aspect of this is that those $\occur_1,\dots,\occur_\ab$ are not independent: each of them is marginally a Binomial random variable, with $\occur_i \sim \binomial{\ns}{\p(i)}$, but those are dependent, since for instance $\occur_1+\dots+\occur_\ab=\ns$.\footnote{More specifically, the $\occur_i$'s are \emph{negatively associated}; see~\cref{def:negative:association}.}

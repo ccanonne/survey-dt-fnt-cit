@@ -1200,6 +1200,7 @@ If $\ns \leq \ab$, we have
 \end{lemma}
 Here, we will introduce (and use) another concept we have not seen yet, that of \emph{negative association} between random variables. This is a stronger notion than negative correlation, and is very useful when dealing with random variables which are dependent ``but in a way which helps us'' (to prove concentration):
 \begin{definition}[Negative Association]
+\label{def:negative:association}
 The random variables $X_1,\dots, X_n$ are said to be \emph{negatively associated} if, for all disjoint subsets $I,J\subseteq [\ns]$ and functions $f\colon \R^{|I|} \to \R$, $g\colon \R^{|J|} \to \R$, we have
 \[
     \bEE{f((X_i)_{i\in I})g((X_j)_{j\in J})} \leq \bEE{f((X_i)_{i\in I})}\bEE{g((X_j)_{j\in J})} \
