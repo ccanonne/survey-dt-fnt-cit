@@ -30,4 +30,4 @@ which is at least $1-\errprob$ if $\ns \geq 12\ln(2/\errprob)$. This can be used
 \begin{lemma}
 	Suppose there exists a tester for property $\property$ (in the standard sampling setting) with sample complexity $\ns(\ab,\dst,\errprob)$. Then there exists a tester for property $\property$ in the Poissonized setting with sample complexity $\ns^{\fish}(\ab,\dst,\errprob)=\max\Paren{2\cdot \ns(\ab,\dst,\errprob/2), 12\ln(4/\errprob)}$.
 \end{lemma}
-See, \eg~\citet[Section~4.3]{Valiant:11} and references within, or~\citet[Appendix~D.3]{Canonne:15:Survey} for more on Poissonization.
+These two lemmas allow use to transfer upper and lower bounds establish the Poissonized sampling setting to the standard one, and vice versa. For more on Poissonization, see, \eg~\citet[Section~4.3]{Valiant:11} and references within, or~\citet[Appendix~D.3]{Canonne:15:Survey}.
