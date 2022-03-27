@@ -49,7 +49,7 @@ This follows from the following (simple) observation: if we have an algorithm $\
 	&= \bE{\p\sim\zeta}{\bP{x\sim\p^{\otimes\ns}}{\Algo(x)=\accept}}\\
 	&\geq \bE{\p\sim\zeta}{1-\errprob} = 1-\errprob\;;
 \end{align*}
-and, similarly, for mixtures of $\no$-instances and probability to output $\reject$. It is worth enphasizing that here, the mixture is over $\ns$-fold distributions $\p^{\otimes\ns}$, \emph{not} over the distributions themselves: that is, we first pick $\p$ according to our prior $\zeta$, then take all $\ns$ samples from the same $\p$~--~this is very different from taking $\ns$ samples from the mixture $\bE{\zeta}{\p}$, which would mean we pick a new $\p$ for each sample! That is,
+and, similarly, for mixtures of $\no$-instances and probability to output $\reject$.\footnote{In theoretical computer science, this observation is often referred to as (the easy direction of) Yao's Minimax Principle: see, \eg~\citet[Appendix~A.1]{Goldreich:14} for a discussion.} It is worth emphasizing that here, the mixture is over $\ns$-fold distributions $\p^{\otimes\ns}$, \emph{not} over the distributions themselves: that is, we first pick $\p$ according to our prior $\zeta$, then take all $\ns$ samples from the same $\p$~--~this is very different from taking $\ns$ samples from the mixture $\bE{\zeta}{\p}$, which would mean we pick a new $\p$ for each sample! That is,
 \begin{equation}
 	\bE{\p\sim\zeta}{\p^{\otimes\ns}} \neq \bE{\p\sim\zeta}{\p}^{\otimes\ns}
 \end{equation}
