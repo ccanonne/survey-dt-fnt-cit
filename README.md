@@ -1,5 +1,7 @@
 # Topics and Techniques in Distribution Testing (A Biased but Representative Sample)
 
+Author: Clément Canonne
+
 ## What is this survey?
 To quote and paraphrase the first chapter:
 
