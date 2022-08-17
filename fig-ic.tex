@@ -1,0 +1,64 @@
+\scalebox{0.7}{
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=20mm, semithick]
+  \node[circle,draw,minimum size=13mm] (A) {$X_1$};
+  \node[circle,draw,minimum size=13mm] (B) [right of=A] {$X_2$};
+  \node[circle,draw,minimum size=13mm] (BB) [right of=B] {$X_3$};
+  \node (C) [right of=BB] {$\dots$};
+  \node[circle,draw,minimum size=13mm] (DD) [right of=C] {$X_{\ns-2}$};
+  \node[circle,draw,minimum size=13mm] (D) [right of=DD] {$X_{\ns-1}$};
+  \node[circle,draw,minimum size=13mm] (E) [right of=D] {$X_\ns$};
+  
+  \node[rectangle,draw,minimum width=13mm,minimum height=7mm,fill=gray!20!white] (WA) [below of=A] {$W_1$};
+  \node[rectangle,draw,minimum width=13mm,minimum height=7mm,fill=gray!20!white] (WB) [below of=B] {$W_2$};
+  \node[rectangle,draw,minimum width=13mm,minimum height=7mm,fill=gray!20!white] (WBB) [below of=BB] {$W_3$};
+  \node[rectangle,minimum width=13mm,minimum height=7mm,fill=none] (WC) [below of=C] {$\dots$};
+  \node[rectangle,draw,minimum width=13mm,minimum height=7mm,fill=gray!20!white] (WDD) [below of=DD] {$W_{\ns-2}$};
+  \node[rectangle,draw,minimum width=13mm,minimum height=7mm,fill=gray!20!white] (WD) [below of=D] {$W_{\ns-1}$};
+  \node[rectangle,draw,minimum width=13mm,minimum height=7mm,fill=gray!20!white] (WE) [below of=E] {$W_\ns$};
+  
+  \node[draw,dashed,orange,fit=(WA) (WB) (WBB) (WC) (WDD) (WD) (WE)] {};
+  \node[circle,draw,minimum size=13mm,fill=white] (YA) [below of=WA] {$Y_1$};
+  \node[circle,draw,minimum size=13mm,fill=white] (YB) [below of=WB] {$Y_2$};
+  \node[circle,draw,minimum size=13mm,fill=white] (YBB) [below of=WBB] {$Y_3$};
+  \node[circle,minimum size=13mm] (YC) [below of=WC] {$\dots$};
+  \node[circle,draw,minimum size=13mm,fill=white] (YDD) [below of=WDD] {$Y_{\ns-2}$};
+  \node[circle,draw,minimum size=13mm,fill=white] (YD) [below of=WD] {$Y_{\ns-1}$};
+  \node[circle,draw,minimum size=13mm,fill=white] (YE) [below of=WE] {$Y_\ns$};
+  
+  \begin{scope}[on background layer]
+  \draw[->] (YA) edge[red,densely dotted, thick] (WB);
+  \draw[->] (YA) edge[red,densely dotted, thick] (WBB);
+  \draw[->] (YA) edge[red,densely dotted, thick] (WDD);
+  \draw[->] (YA) edge[red,densely dotted, thick] (WE);
+  \draw[->] (YB) edge[red,densely dotted, thick] (WBB);
+  \draw[->] (YB) edge[red,densely dotted, thick] (WDD);
+  \draw[->] (YB) edge[red,densely dotted, thick] (WD);
+  \draw[->] (YB) edge[red,densely dotted, thick] (WE);
+  \draw[->] (YBB) edge[red,densely dotted, thick] (WDD);
+  \draw[->] (YBB) edge[red,densely dotted, thick] (WD);
+  \draw[->] (YBB) edge[red,densely dotted, thick] (WE);
+  \draw[->] (YDD) edge[red,densely dotted, thick] (WD);
+  \draw[->] (YDD) edge[red,densely dotted, thick] (WE);
+  \draw[->] (YD) edge[red,densely dotted, thick] (WE);
+  \end{scope}
+  
+  \node (P) [above of=C] {$\p$};
+  \node[rectangle,draw, minimum size=10mm] (R) [below of=YC] {Server};
+  \node (out) [below of=R,node distance=13mm] {output};
+
+  \draw[->] (P) edge[densely dashed,bend right=10] (A)(A) edge (WA)(WA) edge (YA)(YA) edge[bend right=10] (R);
+  \draw[->] (P) edge[densely dashed,bend right=5] (B)(B) edge (WB)(WB) edge (YB)(YB) edge[bend right=5] (R);
+  \draw[->] (P) edge[densely dashed] (BB)(BB) edge (WBB)(WBB) edge (YBB)(YBB) edge (R);
+  \draw[->] (P) edge[densely dashed] (DD)(DD) edge (WDD)(WDD) edge (YDD)(YDD) edge (R);
+  \draw[->] (P) edge[densely dashed,bend left=5] (D)(D) edge (WD)(WD) edge (YD)(YD) edge[bend left=5] (R);
+  \draw[->] (P) edge[densely dashed,bend left=10] (E)(E) edge (WE)(WE) edge (YE)(YE) edge[bend left=10] (R);
+  \draw[->] (R) edge (out);
+%   \path (B) edge [loop above] node {1,1,L} (B)
+%             edge              node {0,1,L} (C)
+%         (C) edge              node {0,1,L} (D)
+%             edge [bend left]  node {1,0,R} (E)
+%         (D) edge [loop below] node {1,1,R} (D)
+%             edge              node {0,1,R} (A)
+%         (E) edge [bend left]  node {1,0,R} (A);
+\end{tikzpicture}
+}
