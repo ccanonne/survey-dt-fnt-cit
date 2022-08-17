@@ -4,10 +4,10 @@ We briefly recall the definitions of the distance measures between probability d
 \begin{definition}
 For two probability distributions $\p_1,\p_2$ over the same domain $\domain$, the \emph{Kullback--Leibler divergence} (in nats), \emph{chi--square divergence}, and \emph{Hellinger distance} are given by
 \begin{align}
-	\kldiv{\p_1}{\p_2} &= \sum_{x\in\domain} \p_1(x) \ln \frac{\p_1(x)}{\q_1(x)} \\
-	\chisquare{\p_1}{\p_2} &= \sum_{x\in\domain} \frac{(\p_1(x)-\q_1(x))^2}{\q_1(x)} \\
-	\hellinger{\p_1}{\p_2} %&= \Paren{\frac{1}{2}\sum_{x\in\domain} \Paren{\sqrt{\p_1(x)}-\sqrt{\q_1(x)}}^2}^{1/2}  \notag\\
-	&= \frac{1}{\sqrt{2}}\normtwo{\sqrt{\p}-\sqrt{\q}}\,,
+	\kldiv{\p_1}{\p_2} &= \sum_{x\in\domain} \p_1(x) \ln \frac{\p_1(x)}{\p_2(x)} \\
+	\chisquare{\p_1}{\p_2} &= \sum_{x\in\domain} \frac{(\p_1(x)-\p_2(x))^2}{\p_2(x)} \\
+	\hellinger{\p_1}{\p_2} %&= \Paren{\frac{1}{2}\sum_{x\in\domain} \Paren{\sqrt{\p_1(x)}-\sqrt{\p_2(x)}}^2}^{1/2}  \notag\\
+	&= \frac{1}{\sqrt{2}}\normtwo{\sqrt{\p_1}-\sqrt{\p_2}}\,,
 \end{align}
 with the convention that $0\ln 0 = 0$. Note that the first two are not symmetric, do not satisfy the triangle inequality, and are unbounded.
 \end{definition}

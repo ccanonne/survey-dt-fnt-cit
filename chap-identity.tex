@@ -24,17 +24,17 @@ The sample complexity of uniformity testing with distance parameter $\dst\in(0,1
 
 Although the sample complexity is of course a key aspect, there are several things to consider in a testing algorithm. To name a few:
 \begin{description}
-  \item[Data efficiency:] does the algorithm achieve the optimal sample complexity $\Theta(\sqrt{\ab}/\dst^2)$?
-  \item[Time efficiency:] how fast is the algorithm to run (as a function of $\ab,\dst$, and the number of samples $\ns$)?
-  \item[Memory efficiency:] how much memory does the algorithm require (as a function of $\ab,\dst$, and $\ns$)?
-  \item[Simplicity:] is the algorithm simple to describe and implement?
-  \item[``Simplicity'':] is the algorithm simple to \emph{analyze}? This is not just a one-time thing: adapting and building upon a given algorithm will be much easier if the analysis does not require a long succession of technical, very specific, and complex steps.
-  \item[Robustness:] how \emph{tolerant} is the algorithm to breaches of the promise? That is, does it accept distributions which are not \emph{exactly} uniform as well, or is it very brittle?
+  \item[Data efficiency:] Does the algorithm achieve the optimal sample complexity $\Theta(\sqrt{\ab}/\dst^2)$?
+  \item[Time efficiency:] How fast is the algorithm to run (as a function of $\ab,\dst$, and the number of samples $\ns$)?
+  \item[Memory efficiency:] How much memory does the algorithm require (as a function of $\ab,\dst$, and $\ns$)?
+  \item[Simplicity:] Is the algorithm simple to describe and implement?
+  \item[``Simplicity'':] Is the algorithm simple to \emph{analyze}? This is not just a one-time thing: adapting and building upon a given algorithm will be much easier if the analysis does not require a long succession of technical, very specific, and complex steps.
+  \item[Robustness:] How \emph{tolerant} is the algorithm to breaches of the promise? That is, does it accept distributions which are not \emph{exactly} uniform as well, or is it very brittle?
   \item[Elegance:] This is somewhat subjective, and each of us might have a different view of what it means. If you have strong feelings about this, however, know that you are not alone.
   \item[Generalizable:] Does the algorithm have other features that might be desirable in other settings? For instance, if the algorithm has low sensitivity (in the Lipschitz sense), then it will be more resilient to adversarial perturbations of some of the samples -- this is great for, \eg differential privacy applications. 
 \end{description}
 
-In this chapter, we will have a detailed look at 7 different uniformity testing algorithms, each with its pros and cons. For each of them, we will provide a full proof of their performance, which will help us illustrate several techniques and ideas underlying the analysis of distribution testing algorithms. 
+In this chapter, we will have a detailed look at seven different uniformity testing algorithms, each with its pros and cons. For each of them, we will provide a full proof of their performance, which will help us illustrate several techniques and ideas underlying the analysis of distribution testing algorithms. 
 \cref{tab:summary:uniformity:testing} summarizes the names, and some of the specificities, of those seven algorithms: we will discuss them in more detail in~\cref{ssec:uniformity:discussion}. 
 \begin{table}[ht]\centering\footnotesize
   \def\arraystretch{1.25}%  1 is the default, change whatever you need
@@ -449,7 +449,7 @@ as in~\cref{algo:unique-elements}.
 \]
 using moments of a Binomial random variable and~\cref{eq:relation:collisionprob:distance:uniform}.\exercise{Check it!} This does look like a reasonable way to estimate the distance to uniformity \emph{via} the $\lp[2]$ distance again\dots{} unfortunately, the variance will be quite annoying, due to the correlations between terms of the sums.
 
-To make the task easier, it is helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, which will greatly simplifies the analysis. Then, under this (slightly different) sampling model the $\occur_i$'s become independent, with $\occur_i\sim\poisson{\ns\p(i)}$: this is called \emph{Poissonization}\index{Poissonization}, and can be done more or less without loss of generality since a $\poisson{\ns}$ random variable will be between $0.99\ns$ and $1.01\ns$ with overwhelming probability. (See~\cref{app:poissonization} for more on Poissonization, and why we can use it ``without loss of generality'').
+To make the task easier, it is helpful to think of taking $\poisson{\ns}$ samples instead of exactly $\ns$, which will greatly simplify the analysis. Then, under this (slightly different) sampling model the $\occur_i$'s become independent, with $\occur_i\sim\poisson{\ns\p(i)}$: this is called \emph{Poissonization}\index{Poissonization}, and can be done more or less without loss of generality since a $\poisson{\ns}$ random variable will be between $0.99\ns$ and $1.01\ns$ with overwhelming probability. (See~\cref{app:poissonization} for more on Poissonization, and why we can use it ``without loss of generality'').
 
 \begin{algorithm}[ht!]
   \begin{algorithmic}[1]
@@ -609,7 +609,7 @@ That's the thing, though: the devil is in the $o(1)$ details. Sure, $\expect{Z_4
   \caption{\label{algo:empirical:plugin}\sc empirical-distance tester}
 \end{algorithm}
 
-For simplicity of exposition, we focus here on the case $\ns \leq \ab$, though the analysis of the test can be performed for extended to all parameter regimes -- see~\citet{DiakonikolasGPP18} for the full general case. The argument proceeds in two steps: first, computing and bounding the expectation of $Z_4$ under the uniform and the far cases separately is not going to really work, so instead we will bound the expectation gap $\Delta(\p)\eqdef \bE{\p}{Z_4}-\bE{\uniform_{\ab}}{Z_4}$ directly (a little like in the case of the unique elements-based tester). Then, once the gap in expectation is established, we will once again argue concentration of $Z_4$ as usual by a variance-based (Chebyshev's inequality) argument~--~but this time diversifying our toolkit and using a different tool, the Efron--Stein lemma, to bound the variance.
+For simplicity of exposition, we focus here on the case $\ns \leq \ab$, though the analysis of the test can be extended to all parameter regimes~--~see~\citet{DiakonikolasGPP18} for the full general case. The argument proceeds in two steps: first, computing and bounding the expectation of $Z_4$ under the uniform and the far cases separately is not going to really work, so instead we will bound the expectation gap $\Delta(\p)\eqdef \bE{\p}{Z_4}-\bE{\uniform_{\ab}}{Z_4}$ directly (a little like in the case of the unique elements-based tester). Then, once the gap in expectation is established, we will once again argue concentration of $Z_4$ as usual by a variance-based (Chebyshev's inequality) argument~--~but this time diversifying our toolkit and using a different tool, the Efron--Stein lemma, to bound the variance.
 %instead by invoking a more powerful (and slightly fancier) concentration inequality.\todonote{Revisit this.}
 
 \paragraph{The expectation gap $\Delta(\p)$.} From the definition of total variation distance, we can rewrite
@@ -685,7 +685,7 @@ Before turning to proving concentration of $Z_4$ (that is, showing that the expe
   &= \frac{1}{\ab} \sum_{i=1}^\ab \indic{\occur_i = 0} \label{eq:empirical:S:alt}
 \end{align}
 where the last equality follows from $\sum_{i=1}^\ab \occur_i = \ns$. 
-That is, in this regime, $Z_4$ is exactly the fraction of \emph{unseen elements} of the domain; this readily allows one to retrieve~\cref{eq:empirical:tv:mu}, and also lets us relate $Z_4$ to the ``unique elements'' statistic $Z_2$ from~\cref{sec:uniformity:unique}.\footnote{Again, this relation only holds in the specific regime $\ns \leq \ab$; while we do nto cover the case $\ns > \ab$ here, the guarantees of $Z_4$ extend to this other regime; the identity~\cref{eq:empirical:S:alt}, however, does not.}
+That is, in this regime, $Z_4$ is exactly the fraction of \emph{unseen elements} of the domain; this readily allows one to retrieve~\cref{eq:empirical:tv:mu}, and also lets us relate $Z_4$ to the ``unique elements'' statistic $Z_2$ from~\cref{sec:uniformity:unique}.\footnote{Again, this relation only holds in the specific regime $\ns \leq \ab$; while we do not cover the case $\ns > \ab$ here, the guarantees of $Z_4$ extend to this other regime; the identity~\cref{eq:empirical:S:alt}, however, does not.}
 
 \paragraph{Concentration of $Z_4$.} As you may have guessed, we will show that $Z_4$ concentrates around its expectation via Chebyshev's inequality, which requires us to bound $\Var[Z_4]$ in both the uniform and ``far'' cases. In order to diversify our toolkit, we will do so by invoking the \emph{Efron--Stein inequality}\index{Efron--Stein inequality}, which allows us to bound the variance of a function of $\ns$ independent random variables by the expected quadratic change of this function when only one sample is re-randomized: for a function $f$ of $\ns$ variables,
 \begin{align}
@@ -734,7 +734,7 @@ so it would be quite nice if we could argue this was, in some sense, the \emph{o
 \begin{definition}
 Let $A,B$ be two (real-valued) random variables. We say that $A$ \emph{stochastically dominates} $B$ if $\bPr{A \geq t} \geq \bPr{B \geq t}$ for all $t\in\R$; or, in terms of cumulative distribution functions, $F_A(t) \leq F_B(t)$ for all $t$.
 \end{definition}
-In our case, we have a random variable $Z_4$, and in the ``far'' case we want to prove $\bPr{Z_4 \geq \tau}$ is large (where $\tau$ is our threshold, based on the expectation gap). So if, for each $\p$ in the `far'' case, we can argue there is a $\p'$  with $\norminf{\p'} \lesssim 1/\ab$ (i.e., which we know how to analyze) such that $Z_4(\p)$ stochastically dominates $Z_4(\p')$, then we are good.
+In our case, we have a random variable $Z_4$, and in the ``far'' case we want to prove $\bPr{Z_4 \geq \tau}$ is large (where $\tau$ is our threshold, based on the expectation gap). So if, for each $\p$ in the ``far'' case, we can argue there is a $\p'$  with $\norminf{\p'} \lesssim 1/\ab$ (i.e., which we know how to analyze) such that $Z_4(\p)$ stochastically dominates $Z_4(\p')$, then we are good.
 
 To do so, we need two more steps: first, the notion of \emph{majorization}, and how this relates to stochastic dominance.
 \begin{definition}
@@ -1157,7 +1157,7 @@ where, as before, $\occur_j$ is the number of occurrences of $j$ among the $\nss
 \end{equation}
 which should be roughly (making a few not necessarily warranted approximations) $\expect{\p(S)}\approx \nss\normtwo{\p}^2$. Under the uniform distribution, this is exactly $(1-(1-1/\ab)^{\nss})\approx \nss/\ab$, where the approximation is valid for $\nss\ll \ab$.
 
-Great: we have a new estimator for (more or less) the $\lp[2]$ norm. Now, assuming things went well, at the end of this first stage we have a set $S$ such that $\p(S)$ is approximately either $\nss/\ab$ or $\nss\normtwo{\p}^2\geq \nss(1+\Omega(\dst^2))/\ab$ (we just argued that this is what happens \emph{in expectation}).\footnote{The tricky part, of course, will be to argue that $\p(S)$ does concentrate enough around its expectation for this to also happen with constant probability.} So, let's do a second stage! Take the next $\nst \eqdef \ns-\nss$ samples, and count the number of them which fall in $S$: this is allows you to estimate $\p(S)$  up to an additive $\nss\dst^2/\ab$, as long as
+Great: we have a new estimator for (more or less) the $\lp[2]$ norm. Now, assuming things went well, at the end of this first stage we have a set $S$ such that $\p(S)$ is approximately either $\nss/\ab$ or $\nss\normtwo{\p}^2\geq \nss(1+\Omega(\dst^2))/\ab$ (we just argued that this is what happens \emph{in expectation}).\footnote{The tricky part, of course, will be to argue that $\p(S)$ does concentrate enough around its expectation for this to also happen with constant probability.} So, let's do a second stage! Take the next $\nst \eqdef \ns-\nss$ samples, and count the number of them which fall in $S$: this allows you to estimate $\p(S)$  up to an additive $\nss\dst^2/\ab$, as long as
 \[
       \nst \gg \frac{\ab}{\nss\dst^4}
 \]
@@ -1167,7 +1167,7 @@ Great: we have a new estimator for (more or less) the $\lp[2]$ norm. Now, assumi
   \begin{algorithmic}[1]
     \Require Multisets $S_1, S_2$ of $\nss$ and $\nst$ samples $x_1,\dots,x_{\nss}\in \domain$, $y_1,\dots,y_{\nst}\in \domain$, parameters $\dst\in(0,1]$ and $\ab = \abs{\domain}$
     \State Set $\tau \gets \frac{\nss\dst^2}{64\ab}$
-    \State Compute $S$, the \emph{set} of samples from $S_1$. \Comment{Can be done in $O(\nss\log\nss)$ time, and $O(\nss)$ expected (\eg, via cuckoo hashing).}
+    \State Compute $S$, the \emph{set} of samples from $S_1$. \Comment{Can be done in $O(\nss\log\nss)$ time, and $O(\nss)$ expected (\eg via cuckoo hashing).}
     \State Compute \Comment{Can be done in $O(\nst)$ time.}
     \[
         Z_7 = \frac{1}{\nst} \sum_{t=1}^{\nst} \indic{y_t\in S}\,.
@@ -1207,7 +1207,7 @@ The random variables $X_1,\dots, X_n$ are said to be \emph{negatively associated
 \]
 whenever $f,g$ are both non-increasing or both non-decreasing. 
 \end{definition}
-As it turns out, the sample counts $N_1,\dots,N_\ab$ are negatively associated (see, \eg,~\citep[Section~2.2]{DubhashiR98}), which we will use below.\footnote{What we will use does not require the full power of negative associativity and could be obtained directly, but it is a good concept to know, so~--~why not?} 
+As it turns out, the sample counts $N_1,\dots,N_\ab$ are negatively associated (see, \eg~\citep[Section~2.2]{DubhashiR98}), which we will use below.\footnote{What we will use does not require the full power of negative associativity and could be obtained directly, but it is a good concept to know, so~--~why not?} 
 We will rely on this to bound the variance explicitly, starting with the expected square:
 \begin{align*}
   \expect{\p(S)^2} 
@@ -1425,7 +1425,7 @@ The $\chi^2$-based tester (\cref{algo:chisquare:identity}) is a testing algorith
 This was relatively painless, and shows that the general case of identity testing is no harder than uniformity testing~--~up to constant factors. The key insight, here, was to use this ``mixture trick'' (\cref{eq:trick:mixture}) to replace $\q$ by a slightly modified version, $\q'$ with some nice guarantees. (Of course, if in practice the known $\q$ already satisfies $\min_i \q(i) \geq 1/(2\ab)$, this step is not necessary.)\smallskip
 
 
-One can interpret this trick as applying a suitable randomized transformation to the samples (\ie to the input distribution), which maps the reference distribution $\q$ to something a little closer to uniform, while somewhat preserving the pairwise distances between distributions. That is, coming up with a pair of mappings $(\Phi,\Psi)$ with $\Phi\colon\distribs{\ab} \to \distribs{\ab'}$ and $\Psi\colon[\ab]\to[\ab']$, such that (1)~$\Phi(\q)\approx \uniform_{\ab'}$, (2)~$\operatorname{dist}(\Phi(\p),\Phi(\q))\approx \operatorname{dist}(\p,\q)$ for all $\p$, and (3)~$x\sim \Psi(\p)$ whenever $x\sim\p$.
+One can interpret this trick as applying a suitable randomized transformation to the samples (\ie to the input distribution), which maps the reference distribution $\q$ to something a little closer to uniform, while somewhat preserving the pairwise distances between distributions. That is, coming up with a pair of mappings $(\Phi,\Psi)$ with $\Phi\colon\distribs{\ab} \to \distribs{\ab'}$ and $\Psi\colon[\ab]\to[\ab']$, such that (1)~$\Phi(\q)\approx \uniform_{\ab'}$, (2)~$\operatorname{dist}(\Phi(\p),\Phi(\q))\approx \operatorname{dist}(\p,\q)$ for all $\p$, and (3)~$\Psi(x)\sim \Phi(\p)$ whenever $x\sim\p$.
 
 Here, we chose $\ab=\ab'$ and $\Phi(\p) = \frac{1}{2}\p+\frac{1}{2}\uniform_\ab$ (and $\operatorname{dist}$ being the total variation distance, for a rather liberal interpretation of $\approx$), which worked for the $\chi^2$-based tester; in the next two subsections, we will see variants of this idea, applying more generally to any tester.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

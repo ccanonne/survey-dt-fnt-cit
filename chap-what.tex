@@ -165,9 +165,9 @@ We will see a concrete example of this technique in~\cref{ex:unif:adaptive}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Why total variation distance?}
 
-The standard formulation of distribution testing, as stated in~\cref{def:testing}, is tied to a specific metric between probability distribution: the total variation distance (\cref{def:tv}). It is natural to wonder of that choice is arbitrary, and, if not, what motivates it.
+The standard formulation of distribution testing, as stated in~\cref{def:testing}, is tied to a specific metric between probability distributions: the total variation distance (\cref{def:tv}). It is natural to wonder if that choice is arbitrary, and, if not, what motivates it.
 \begin{itemize}
-  \item Total variation distance provides a \emph{very strong guarantee}, and for instance is the most stringent of all $\lp[p]$ norms. This has practical consequences: if a source of data passes the test, then it will by nearly ``as good as if it had the desired property'' as far as \emph{any} algorithm is concerned. 
+  \item Total variation distance provides a \emph{very strong guarantee}, and for instance is the most stringent of all $\lp[p]$ norms. This has practical consequences: if a source of data passes the test, then it will be nearly ``as good as if it had the desired property'' as far as \emph{any} algorithm is concerned. 
   \item It is \emph{well-behaved}: total variation distance defines a proper metric, and thus satisfies for instance the triangle inequality (which cannot be said about, for instance, Kullback--Leibler divergence). It is also nicely bounded, and will not take infinite values due to pathological reasons.
   \item It satisfies the \emph{data processing inequality} (\cref{fact:dpi}), which means it is robust to preprocessing. If data comes from two sources close in total variation distance, then post-processing this data cannot make their distribution statistically further apart. This is not the case for, among others, the $\lp[2]$ metric.
   \item Its relation to hypothesis testing: total variation distance has a natural and precise interpretation in terms of \emph{distinguishability}. This is formalized in~\cref{lemma:pearsonneyman}, and makes total variation distance the ``right'' notion of distance in applications such as cryptography, and when arguing about indistinguishability of data sources.
@@ -190,7 +190,7 @@ Fix any test $\Algo$ distinguishing between two distributions $\p_0$ and $\p_1$,
 \begin{align*}
   \alpha+\beta 
   &= \probaDistrOf{\p_0,R}{\Algo(X,R)=1} + \probaDistrOf{\p_1,R}{\Algo(X,R)=0} \\
-  &= \shortexpect_{R}[ \probaDistrOf{\p_0}{\Algo(X,R)=1} ] + \shortexpect_{\Algo}[ \probaDistrOf{\p_1}{\Algo(X,R)=0} ] \\
+  &= \shortexpect_{R}[ \probaDistrOf{\p_0}{\Algo(X,R)=1} ] + \shortexpect_{R}[ \probaDistrOf{\p_1}{\Algo(X,R)=0} ] \\
   &= \shortexpect_{R}[ \probaDistrOf{\p_0}{\Algo(X,R)=1} + \probaDistrOf{\p_1}{\Algo(X,R)=0} ]
 %   \totalvardist{\p}{\q}
 \end{align*}

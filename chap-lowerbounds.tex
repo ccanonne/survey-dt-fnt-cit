@@ -63,7 +63,7 @@ $\totalvardist{\bE{\zeta_\reject}{\p_\reject^{\otimes\ns}}}{\bE{\zeta_\accept}{\
 
 \cref{eq:lecam} (and what leads to it) is often referred to as \emph{Le Cam's two-point method}. Once we are there, however, we are left with the task of bounding this total variation distance between two mixtures, which seems anything but easy. In some cases, still, we \emph{can} proceed further: an important example is when one of the two mixtures (say, $\zeta_\accept$) is actually concentrated on a single distribution $\p_\accept$ (as we will see soon, this is the same for uniformity testing, for instance, where $\property_\ab$ is a singleton). 
 
-Let us further assume our family of $\no$-instances are parameterized as $\{\p_\theta\}_{\theta\in\Theta}$, and rewrite our mixture of $\no$-instances $\zeta_1$ as a probability distribution $\pi$ over $\Theta$. Picking a \no-instance $\p_\reject$ from $\zeta_1$ becomes equivalent to picking $\theta\sim\pi$, and returning $\pi_\theta$. Then, with this extra assumption and this rewriting,~\cref{eq:lecam} becomes
+Let us further assume our family of $\no$-instances are parameterized as $\{\p_\theta\}_{\theta\in\Theta}$, and rewrite our mixture of $\no$-instances $\zeta_1$ as a probability distribution $\pi$ over $\Theta$. Picking a \no-instance $\p_\reject$ from $\zeta_1$ becomes equivalent to picking $\theta\sim\pi$, and returning $\p_\theta$. Then, with this extra assumption and this rewriting,~\cref{eq:lecam} becomes
 \begin{equation}
 	\label{eq:lecam:simpler}
 	1-2\errprob \leq \totalvardist{\bE{\theta\sim\pi}{\p_\theta^{\otimes\ns}}}{\p_\accept^{\otimes\ns}}
