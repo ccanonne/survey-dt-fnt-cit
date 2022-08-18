@@ -41,7 +41,7 @@ Why? We did not really take advantage of our ``priors,'' really, we just fixed t
 \end{equation}
 which conceivably could lead to some improvement. That will not be enough, though: if $\totalvardist{\p_0^{\otimes\ns}}{\p_1^{\otimes\ns}}\asymp \ns\dst^2$ for every random choice of $\p_0,\p_1$~--~or even most of them~--~then taking this extra expectation will not buy us anything. That is unfortunate, but we can do better! We can put the expectation \emph{inside} the total variation distance.
 
-This follows from the following (simple) observation: if we have an algorithm $\Algo$ which correctly outputs \accept with probability at least $1-\errprob$ upon seeing $\ns$ samples from \emph{any} distribution $\p$~--~that is, when given one sample from $\p^{\otimes\ns}$, then that algorithm must also be correct when given a sample from any mixture $\mu = \bE{\zeta}{\p^{\otimes\ns}}=\sum_{\p}\zeta(\p)\p^{\otimes\ns}$ of those $\p^{\otimes\ns}$'s:
+This follows from the following (simple) observation: if we have an algorithm $\Algo$ which correctly outputs \accept with probability at least $1-\errprob$ upon seeing $\ns$ samples from \emph{any} distribution $\p$~--~that is, when given one sample from $\p^{\otimes\ns}$~--~then that algorithm must also be correct when given a sample from any mixture $\mu = \bE{\zeta}{\p^{\otimes\ns}}=\sum_{\p}\zeta(\p)\p^{\otimes\ns}$ of those $\p^{\otimes\ns}$'s:
 \begin{align*}
 	\bP{x\sim\mu}{\Algo(x)=\accept}
 	&= \bE{x\sim\mu}{\indic{\Algo(x)=\accept}}
@@ -311,7 +311,7 @@ Symmetric properties are nice in the sense that, when considering them, one can 
 \]
 where $\freq_{j} = \sum_{i=1}^\ab \indic{\occur_{i}=j}$ is the number of elements of the domain which appear exactly $j$ times among the $\ns$ samples. In particular, we always have $\sum_{j=0}^\ns \freq_j = \ns$.\exercise{Check that you can express several of the algorithms in~\cref{sec:uniformity} as a function of $\freq$ only:~\cref{exo:reexpress:algos:frequency:only}.}\medskip
 
-The main result discussed in this section is the ``Wishful Thinking Theorem'' of~\citet{Valiant:11}, which applies to testing symmetric properties of distributions. Intuitively, this theorem ensures that ``if the low-degree moments ($\lp[p]$ norms) of two distributions match, then these distributions (up to relabeling) are hard to distinguish.'' To see why this is the case, and justify the name of the theorem, observe that since we focus on symmetric properties all which matters is the fingerprint $\freq$ introduced about; that is, the number of $j$-collisions, for every $j\geq 0$.
+The main result discussed in this section is the ``Wishful Thinking Theorem'' of~\citet{Valiant:11}, which applies to testing symmetric properties of distributions. Intuitively, this theorem ensures that ``if the low-degree moments ($\lp[p]$ norms) of two distributions match, then these distributions (up to relabeling) are hard to distinguish.'' To see why this is the case, and justify the name of the theorem, observe that since we focus on symmetric properties all which matters is the fingerprint $\freq$ introduced above; that is, the number of $j$-collisions, for every $j\geq 0$.
 
 Now, given a distribution $\p$, the number of $j$-collisions in $\ns$ samples has expectation 
 \[
@@ -416,7 +416,7 @@ From this, we get
 	\sum_{j=2}^\infty \frac{\abs{m^{\yes}(j)-m^{\no}(j)}}{\sqrt{1+\max(m^{\yes}(j),m^{\no}(j))}}
 	\leq \frac{1}{2\sqrt{\ab}} \cdot 144\dst^2\frac{\ns}{\ab} = \frac{72\dst^2\ns}{\sqrt{\ab}}\,.
 \end{equation}
-This in turn will be less than $1/24$ for $\ns \leq \sqrt{\ab}/(1728\dst^2)$. Success! Recalling finally the condition $\ns \ll \ab/$ (for the first condition of the Wishful Thinking theorem to hold) which imposes $\dst \gg 1/\ab^{1/4}$, by invoking~\cref{theo:valiant:wishful} we get the result we wanted:
+This in turn will be less than $1/24$ for $\ns \leq \sqrt{\ab}/(1728\dst^2)$. Success! Recalling finally the condition $\ns \ll \ab$ (for the first condition of the Wishful Thinking theorem to hold) which imposes $\dst \gg 1/\ab^{1/4}$, by invoking~\cref{theo:valiant:wishful} we get the result we wanted:
 \begin{theorem}
   \label{prop:uniformity:lb:valiant}
 Every testing algorithm for uniformity must have sample complexity $\ns(\ab,\dst,1/3) = \Omega(\sqrt{\ab}/\dst^2)$, provided that $\dst \geq 1/\ab^{1/4}$.
@@ -451,7 +451,7 @@ where $Z$ is uniformly random on $\bool^\ab$.
 This is a bit of a mouthful, so let's break~\cref{theo:vv:lb} down before seeing a few corollaries and applications. First, given a reference distribution $\q$, and a choice of ``element-wise perturbations'' values $\alpha_1,\dots,\alpha_\ab$,~\cref{eq:vv:def:hardcase} says we should define a ``hard instance'' by setting $\p(i) = (1\pm \alpha_i)\q(i)$, choosing the sign independently and uniformly at random for every $i$, and then normalizing the resulting $\p$ to make it a true probability distribution. After doing this,~\cref{eq:vv:lb:samples} states that distinguishing $\q$ from a hard instance $\p$ chosen randomly this way requires
 $
 \Omega(1/\sqrt{\sum_i \alpha_i^4\q(i)^2})
-$ samples. Finally,~\cref{eq:vv:proba:far} tells us that (until some mild condition on the $\alpha_i$'s), most of those hard instances are actually \emph{far} from $\q$; in particular, we will typically want to choose the $\alpha_i$'s so that the guaranteed distance
+$ samples. Finally,~\cref{eq:vv:proba:far} tells us that (under some mild condition on the $\alpha_i$'s), most of those hard instances are actually \emph{far} from $\q$; in particular, we will typically want to choose the $\alpha_i$'s so that the guaranteed distance
 $
 \frac{1}{4}\sum_{i=1}^\ab \alpha_i\q(i)
 $ is equal to our parameter $\dst$.\medskip
@@ -695,7 +695,7 @@ By the above discussion, the lower bound on uniformity testing directly implies 
 	\label{theo:lb:testing:monotonicity}
 Every testing algorithm for $\property^{\searrow}$ (monotonicity) must have sample complexity $\ns(\ab,\dst,1/3) = \Omega(\sqrt{\ab}/\dst^2)$.
 \end{theorem}
-\noindent(As a side note, this is known to be tight, as least for $\dst \gg \sqrt{\log\ab}/\ab^{1/4}$.) Crucially, reductions comes with another advantage: if we were to introduce another parameter (focusing on the dependence on $\errprob$, for instance), or work with constrained measurements as in~\cref{chap:constrained}, then as long as our reduction goes through in the setting considered, we only need to derive the uniformity testing lower bound in that setting to immediately get the corresponding lower bound for monotonicity testing as well. As said earlier, reductions are great to avoid unnecessary work!
+\noindent(As a side note, this is known to be tight, at least for $\dst \gg \sqrt{\log\ab}/\ab^{1/4}$.) Crucially, reductions comes with another advantage: if we were to introduce another parameter (focusing on the dependence on $\errprob$, for instance), or work with constrained measurements as in~\cref{chap:constrained}, then as long as our reduction goes through in the setting considered, we only need to derive the uniformity testing lower bound in that setting to immediately get the corresponding lower bound for monotonicity testing as well. As said earlier, reductions are great to avoid unnecessary work!
 
 \paragraph{A general result.} The above reduction was quite specific to monotonicity testing: ideally, we would like more general statements, allowing us to derive as many lower bounds as possible while having to think as little as possible. In the rest of this section, we are going to describe such a result, which can be seen as some converse to the ``testing-by-learning'' baseline from~\cref{lemma:learning:baseline}. The high-level idea is as follows: suppose we have two properties $\property' \subseteq \property$, and we know that $\property'$ is hard to test. Then we want to conclude that $\property$, too, is hard to test~--~at least as hard as $\property'$. (In our earlier example, $\property'$ was uniformity, and $\property$ monotonicity: since the uniform distribution is monotone, the inclusion indeed holds.)
 
