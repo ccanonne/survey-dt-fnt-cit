@@ -910,7 +910,7 @@ Write $\delta \eqdef \p-\q\in\R^\ab$, so that $\p(S)-\q(S) = \sum_{i=1}^\ab \del
 \[
   \bEE{Z^2} = \sum_{1\leq i,j\leq \ab} \delta_i\delta_j \bEE{\xi_i\xi_j} = \sum_{i=1}^\ab \delta_i^2 = \normtwo{\delta}^2\,,
 \]
-so what we want to prove can be rewritten $\bPr{ Z^2 \geq \frac{1}{2} \bEE{Z^2} } \geq 1/48$. That is, we want an \emph{anticoncentration} result,\footnote{Indeed, we aim to show that, with constant probability, $Z$ stays away from its expectation $\bEE{Z}=0$~--~\ie that it does not concentrate too much around $\bEE{Z}$.} which suggests one of the most versatile tools for this, the Paley--Zygmund inequality:
+so what we want to prove can be rewritten $\bPr{ Z^2 \geq \frac{1}{2} \bEE{Z^2} } \geq 1/48$. That is, we want an \emph{anticoncentration} result,\footnote{Indeed, we aim to show that, with constant probability, $Z$ stays away from its expectation $\bEE{Z}=0$~--~\ie that it does not concentrate too much around $\bEE{Z}$.} which suggests one of the most versatile tools for this, the Paley--Zygmund inequality:\footnote{The Paley--Zygmund inequality is not technically an anticoncentration result itself, but instead a concentration inequality, as it states that the probability of the lower tail (far below the expectation) cannot be too large. Still, it is often used to derive anticoncentration results when applied to quantities of the form $U=(X-\bEE{X})^2$, as it then provides a lower bound on the probability that $|X-\bEE{X}|$ is large (\ie that $X$ is away from its expectation).}
 \begin{theorem}[Paley--Zygmund inequality]
   \label{theo:pz}
 Let $U$ be a non-negative random variable with finite variance. Then, for every $\theta\in[0,1]$,
