@@ -217,7 +217,7 @@ The third step is to upper bound $\mutualinfo{\mathbf{b}}{X}$ as a function of $
 \end{itemize}
 \noindent But again, let us go through an example to make this concrete.
 
-\paragraph{Uniformity testing lower bound.} Our single \yes-instance is again the uniform distribution $\uniform_\ab$, which takes care of defining $\zeta_\accept$. However, we will use a slightly different prior $\zeta_\reject$ than in the previous section for our $\no$-instances: the reason is that, for the $2^{\ab/2}$ \no-instances defined in~\cref{eq:paninski:construction}, the individual probabilities of elements $2i$ ans $2i-1$ were not independently chosen (this was the whole point: they compensated each other to have a total probability mass of one overall). As a result, when choosing a \no-instance, we would have some annoying dependencies between $\occur_{2i-1}$ and $\occur_{2i}$, even after conditioning on $\textbf{b}$.  We \emph{could} handle these dependencies here, but this introduces some fastidious accounting: the reader is encouraged to do so in~\cref{exo:paninski:mi:lb}, in this section we will do something slightly different.
+\paragraph{Uniformity testing lower bound.} Our single \yes-instance is again the uniform distribution $\uniform_\ab$, which takes care of defining $\zeta_\accept$. However, we will use a slightly different prior $\zeta_\reject$ than in the previous section for our $\no$-instances: the reason is that, for the $2^{\ab/2}$ \no-instances defined in~\cref{eq:paninski:construction}, the individual probabilities of elements $2i$ ans $2i-1$ were not independently chosen (this was the whole point: they compensated each other to have a total probability mass of one overall). As a result, when choosing a \no-instance, we would have some annoying dependencies between $\occur_{2i-1}$ and $\occur_{2i}$, even after conditioning on $\textbf{b}$.  We \emph{could} handle these dependencies here, but this introduces some tedious accounting: the reader is encouraged to do so in~\cref{exo:paninski:mi:lb}, in this section we will do something slightly different.
 
 Namely, we will use the second relaxation discussed above, and just define our prior $\zeta_\reject$ as the uniform prior over $2^\ab$ distributions indexed by $\theta\in\bool^\ab$, with
 \begin{equation}
@@ -281,9 +281,9 @@ and, in particular,
 We can plug this back into~\cref{eq:mutualinfobound}, to get
 \begin{align}
 \mutualinfo{\mathbf{b}}{X}  &\leq \frac{\ab}{2} e^{-\ns/\ab}\sum_{j=0}^\infty \frac{(\ns/\ab)^j}{j!}\Paren{ 1- \frac{e^{-\frac{3\ns\dst}{\ab}} (1+3\dst)^j  + e^{\frac{3\ns\dst}{\ab}} (1-3\dst)^j}{2}}^2 \notag\\
-&= \frac{\ab}{2}\Paren{\cosh\Paren{ \frac{9\ns\dst^2}{\ab} }-1} \leq \frac{\ab}{2}\Paren{ e^{\frac{81\ns^2\dst^4}{2\ab^2}}-1}\,;
+&= \frac{\ab}{2}\Paren{\cosh\Paren{ \frac{9\ns\dst^2}{\ab} }-1} \leq \frac{\ab}{2}\Paren{ e^{\frac{81\ns^2\dst^4}{2\ab^2}}-1}\,; \label{eq:mutualinfo:ub}
 \end{align}
-the last inequality being $\cosh u \leq e^{u^2/2}$, and the equality following from either a fastidious but manageable computation involving known converging series, or a quick computation involving Julia, Mathematica, or one's weapon of choice.
+the last inequality being $\cosh u \leq e^{u^2/2}$, and the equality following from either a tedious but manageable computation involving known converging series, or a quick computation involving Julia, Mathematica, or one's weapon of choice.
 
 Since we know by~\cref{fact:fano} that we must have $\mutualinfo{\mathbf{b}}{X} \gtrsim 1$, putting the two together implies that we must have
 \[
@@ -294,6 +294,9 @@ proving our lower bound:
   \label{theo:uniformity:lb:dk16}
 Every testing algorithm for uniformity must have sample complexity $\ns(\ab,\dst,1/3) = \Omega(\sqrt{\ab}/\dst^2)$.
 \end{theorem}
+
+To conclude this section, a small remark: in~\cref{fact:fano}, we fixed a probability of error $1/3$, leading to the bound $\mutualinfo{\mathbf{b}}{X} \geq 2/25$. This can be generalized easily to probability of error $1-\errprob$, with a corresponding bound $\mutualinfo{\mathbf{b}}{X} \geq 1-h(\errprob)$; however, this approach will not lead to a non-trivial dependence on $\errprob$ when considering $\ns(\ab,\dst,\errprob)$. This is because, no matter how small $\errprob$, $\mutualinfo{\mathbf{b}}{X} \leq 1$  (as $\mathbf{b}$ is a single bit): so the left-hand-side of~\cref{eq:mutualinfo:ub} cannot be shown to grow unboundedly as $\errprob$ goes to 0.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Indistinguishability via moment-matching}
 \label{ssec:momentmatching}
@@ -326,8 +329,9 @@ for all $j\geq 1$; or, equivalently,
 \[
 	\frac{|\ns^j\norm{\p^\yes}_j^j - \ns^j\norm{\p^\no}_j^j|}{\sqrt{\max(\ns^j\norm{\p^\yes}_j^j, \ns^j\norm{\p^\no}_j^j)}} \ll 1
 \] 
-for all $j\geq 1$, then we could \emph{hope} that the two distributions are indistinguishable from their fingerprints on $\ns$ samples. Well, the reasoning above is flawed in a few ways, but can be made rigorous with enough work; and, luckily, someone else took care of this already:
-\begin{theorem}[Wishful Thinking Theorem {\citep[Theorem 4.10]{Valiant:11}}]\label{theo:valiant:wishful}
+for all $j\geq 1$, then we could \emph{hope} that the two distributions are indistinguishable from their fingerprints on $\ns$ samples. Well, the reasoning above is flawed in a few ways, but can be made rigorous with enough work. Luckily, someone else took care of this already, by showing that closeness of moments implies closeness (in total variation distance) of the distributions of fingerprints:
+\begin{theorem}[Wishful Thinking Theorem {\citep[Theorem 4.10]{Valiant:11}}]
+	\label{theo:valiant:wishful}
   Fix any \emph{symmetric} property $\property$. Given a positive integer $\ns$, a distance parameter $\dst\in(0,1]$, and two distributions $\p^\yes,\p^\no\in\distribs{\ab}$, suppose the following conditions hold:
   \begin{enumerate}
     \item $\norminf{\p^\yes},\norminf{\p^\no} \leq \frac{1}{500\ns}$;
@@ -343,7 +347,7 @@ for all $j\geq 1$, then we could \emph{hope} that the two distributions are indi
 \noindent (Side remark: the term $j=1$ does not appear in the sum, since $\ns\norm{\p}_1=\ns$ for every distribution $\p$, and so this term always cancels out.)\medskip
 %\noindent (We observe that we only reproduced here one of the three sufficient conditions given in the original, more general theorem; as this will be the only one we need.)
 
-To see the strength of this theorem , let us use it to prove the $\bigOmega{\sqrt{\ab}/\dst^2}$ lower bound for uniformity testing. Our distribution $\p^\yes$ will, of course, have to be the uniform distribution $\uniform_\ab$ itself; as for $\p^{\no}$, let us take it to be any of the instances of ``Paninski construction'' (\cref{eq:paninski:construction}), so that
+To see the strength of this theorem, let us use it to prove the $\bigOmega{\sqrt{\ab}/\dst^2}$ lower bound for uniformity testing. Our distribution $\p^\yes$ will, of course, have to be the uniform distribution $\uniform_\ab$ itself; as for $\p^{\no}$, let us take it to be any of the instances of ``Paninski construction'' (\cref{eq:paninski:construction}), so that
 \[
 	\p^{\no}(2i) = \frac{1+3\dst}{\ab}, \qquad \p^{\no}(2i-1) = \frac{1-3\dst}{\ab}, \qquad 1\leq i\leq \ab/2
 \]
@@ -712,7 +716,8 @@ As we will see momentarily, this is indeed the case, albeit for a very specific 
 with probability at least $1-\delta$, where $C\geq 1$ is an absolute constant.
 \end{definition}
 In other terms, an agnostic learning algorithm works even in the unrealizable setting (when $\p\notin\class_\ab$), and its output is ``nearly as good'' as the best candidate from $\class_\ab$ would be. The main result of this section is the following theorem, which roughly states that ``if a property is easy to learn, then it is as hard to test as its hardest sub-property:''
-\begin{theorem}[Hardness by Reduction]\label{theo:hardness:subclass}
+\begin{theorem}[Hardness by Reduction]
+	\label{theo:hardness:subclass}
   Fix any property $\property$, and suppose there exists $\property'\subseteq \property$ such that the following holds.
   \begin{enumerate}
     \item\label{theo:hardness:subclass:item1} Agnostic learning of $\property$ (with a given ``agnostic constant'' $C\geq 1$) has sample complexity at most $\ns_{\mathcal{L}}(\ab,\dst,\delta)$;
@@ -764,7 +769,20 @@ To conclude, let us see a direct application of this theorem to the property $\p
 
 % Exercise VV17 for Binomial + this -> LB for PBDs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%\section{Application: distributed inference}
+\subsection{Some open questions}
+We again provide three open problems for this chapter.
+
+\begin{openproblem}
+	The lower bound given in~\cref{theo:2/3:lb:vv} involves the quantity $\lVert\tilde{\q}^{-\!\max}_{-4\dst}\rVert_{2/3}$, which may seem odd at first sight. However, there exists a (nearly) matching upper bound for this identity testing question, with the very-similar-looking quantity $\lVert\tilde{\q}^{-\!\max}_{-\dst}\rVert_{2/3}$. Yet, as observed in~\citet{BlaisCG19}, the factor $4$ between the two quantities can, for some references distributions $\q$, result in a superconstant gap between open and lower bounds. Can this factor $4$ be entirely removed? If not, what is the tight sample complexity?
+\end{openproblem}
+
+\begin{openproblem}
+The reduction-based approach given in the previous section (\cref{theo:hardness:subclass}) requires the existence of an \emph{agnostic} learner for the property of interest, and its proof crucially relies on this. Whether the existence of a ``standard'' learner (not agnostic) is sufficient to obtain an analogous result is an interesting open problem.
+\end{openproblem}
+
+\begin{openproblem}
+The arguments underlying both~\cref{theo:valiant:wishful,theo:vv:lb} seem tied to a \emph{constant} probability of error (\eg $1/3$), and it is not clear to the author of this survey whether they can be generalized to obtain a dependence on a vanishing error probability $\errprob$. For instance, getting a tight dependence on $\errprob$ in~\cref{theo:2/3:lb:vv} would be quite valuable, in view of the $\sqrt{\log(1/\errprob)}$ dependence for uniformity testing.
+\end{openproblem}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}

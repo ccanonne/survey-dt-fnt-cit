@@ -73,7 +73,7 @@ To establish this, we will describe a very simple technique, \emph{simulate-and-
 For any $1\leq \numbits \leq \log\ab$, there exists a private-coin protocol which lets the server simulate an expected $\ns' \asymp \ns 2^\numbits/\ab$ \iid samples from an unknown distribution $\p\in\distribs{\ab}$, given the $\numbits$-bit messages from $\ns$ users, each holding an independent sample from this $\p$.
 \end{theorem}
 
-We will not prove this theorem in detail, but instead give the main idea, starting with the case $\numbits=1$, showing how to generate \emph{one} sample from $\ns=2\ab$ users. The generalisation to $\numbits\geq 2$ is then a little fastidious, but relatively straightforward: see~\cref{exo:simulate:infer}. 
+We will not prove this theorem in detail, but instead give the main idea, starting with the case $\numbits=1$, showing how to generate \emph{one} sample from $\ns=2\ab$ users. The generalisation to $\numbits\geq 2$ is then a little cumbersome, but relatively straightforward: see~\cref{exo:simulate:infer}. 
 
 Start by partitioning these $2\ab$ users in pairs: say, users $2i-1$ and $2i$, for $1\leq i\leq \ab$. Pair $i$ will be ``assigned'' element $i$ of the domain, and the one-bit message they will send are just the indicators
 \[
@@ -124,9 +124,24 @@ distance $\dst'\asymp\dst\sqrt{L/\ab}$ but domain size $L$, for any $2\leq L\leq
 \end{equation}
 which is exactly what we were after. We are done!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Some open questions}
+As before, we discuss three open problems related to this chapter's contents.
+
+\begin{openproblem}
+	This chapter focused on ``hard'' constraints: for instance, bandwidth constraints where a given user cannot send more than $\numbits$ bits, or (local) privacy constraints where a user's message must satisfy a stringent privacy constraint. One could try and generalize this to \emph{soft} constraints, modelling this by a suitable (application-dependent?) cost function, where for instance sending $\numbits$ bits has a cost $\textsf{cost}(\numbits)$, and the objective is to minimize the total cost. (The ``hard constraint'' setting then corresponding to a threshold cost function, going from $0$ to $\infty$.)
+\end{openproblem}
+
+\begin{openproblem}
+Another interesting direction, briefly touched upon in~\cref{exo:heterogeneous}, is that of \emph{heterogeneous} constraints, where each user comes with a different constraint (possibly qualitatively different). For instance, a subset of users might have privacy constraints, some others bandwidth limitations, and a third group be subject to noisy communication channels. Can one obtain general algorithmic techniques to handle these in a unified fashion?
+\end{openproblem}
+
+\begin{openproblem}
+To conclude, a very concrete open question: what if the various parameters of the problem are known to the server, but not to the users? In the case of distribution testing (esp. uniformity testing), this typically will be the domain size $\ab$: note that all techniques covered in this chapter (Simulate-and-Infer and Domain Compression) did require knowing $\ab$. But what can be done if the users only have a very loose bound on $\ab$, or, worse, no \emph{a priori} knowledge of it at all?
+\end{openproblem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}
   \label{sec:constrained:notes}
-Most of the material covered or hinted at in this last chapter can be found in the sequence of papers~\citet{AcharyaCT:IT1,AcharyaCT19b,AcharyaCFST21}, as well as (for the interactive setting specifically) in~\citet{AcharyaCLST21,AcharyaCST20}. Beyond this line of work (with which, for obvious reasons, the author of this survey is quite familiar), there is an extensive recent body of work addressing this type of information or measurement constraint in the context of estimation (learning) tasks. Focusing on distribution testing,~\citet{DiakonikolasGKR19} and~\citet{AminJM20,BerrettB20} consider goodness-of-fit testing under, respectively, communication or memory constraints, and local privacy constraints.
+Most of the material covered or hinted at in this last chapter can be found in the sequence of papers~\citet{AcharyaCT:IT1,AcharyaCT19b,AcharyaCFST21}, as well as (for the interactive setting specifically) in~\citet{AcharyaCLST21,AcharyaCST20}. Beyond this line of work (with which, for obvious reasons, the author of this survey is quite familiar), there is an extensive recent body of work addressing this type of information or measurement constraint in the context of \emph{estimation} (learning) tasks; see,~\eg~\citet{ZhangDJW13,GargMN14,Shamir14,BravermanGMNW16,YeB18,DuchiJW18,AcharyaSZ19,DuchR19,ButuceaDKS20,BarnesHO20} for some representative papers. Focusing on distribution testing,~\citet{DiakonikolasGKR19} and~\citet{AminJM20,BerrettB20} consider goodness-of-fit testing under, respectively, communication or memory constraints, and local privacy constraints.~\citet{FischerMO18,MeirMO19} focus on uniformity testing in a (slightly different) distributed model, as well as on the power of local rules where each user may hold several samples but is constrained to apply a specific binary test to them (the server then aggregating all those outputs using a simple decision rule, such as \textsf{AND} or \textsf{MAJORITY}). 
 
 An extension of the Domain Compression Lemma (DCL) accounting for the amount of public randomness available (length of the common randomness seed), and providing a tight trade-off with respect to this extra parameter as well was obtained in~\citet{AcharyaCHST20}. The DCL itself found applications beyond the constrained measurements described here, and was recently used to obtain uniformity testing algorithms under two notions of differential privacy called \emph{pan-privacy}~\citep{AminJM20} and \emph{shuffle privacy}~\citep{BalcerCJM21,CL:22}, enabling one to easily obtain public-coin algorithms from private-coin ones.
 

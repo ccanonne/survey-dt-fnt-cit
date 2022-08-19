@@ -918,7 +918,7 @@ Let $U$ be a non-negative random variable with finite variance. Then, for every 
     \bPr{ U \geq \theta \bEE{U} } \geq (1-\theta)^2\frac{\bEE{U}^2}{\bEE{U^2}}\,.
 \]
 \end{theorem}
-We will apply this to $Z^2$, which is indeed non-negative. Unfortunately, this means we need to compute $\bEE{Z^4}$, in order to compare it to $\bEE{Z^2}^2$. We could do so directly, by expanding $\big({\sum_{i=1}^\ab \delta_i \xi_i}\big)^4$, keeping track of the various products appearing and using linearity of expectation. This is quite fastidious; instead, we will take a shortcut and bound the moment-generating function (MGF) of $Z$. For any $\lambda\in\R$,
+We will apply this to $Z^2$, which is indeed non-negative. Unfortunately, this means we need to compute $\bEE{Z^4}$, in order to compare it to $\bEE{Z^2}^2$. We could do so directly, by expanding $\big({\sum_{i=1}^\ab \delta_i \xi_i}\big)^4$, keeping track of the various products appearing and using linearity of expectation. This is quite cumbersome; instead, we will take a shortcut and bound the moment-generating function (MGF) of $Z$. For any $\lambda\in\R$,
 \[
   \bEE{e^{\lambda Z}} 
   = \prod_{i=1}^\ab \bEE{e^{\lambda\delta_i \xi_i}}
@@ -1837,6 +1837,21 @@ This concludes this section on identity testing: to summarize, we saw 4 differen
 All four approaches have their pros and cons: the first might be more efficient in practice, while the second can generalize to other problems than identity testing (namely, any testing problem where bringing down the $\lp[2]$ norm of some probability distribution helps). The third, besides being intellectually satisfying, naturally extends to other settings such as the ``constrained measurements'' ones discussed in~\cref{chap:constrained}. Finally, the fourth, albeit not optimal, not only introduces the very useful bucketing technique, but is often ``good enough'' to get nearly optimal results. Of course, more broadly, we may be tempted to say that the more techniques at our disposal, the better; and that four is greater than one.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Some open questions}
+We now list three open problems, in increasing degree of generality and vagueness. We encourage the reader to think about them, and (hopefully!) solve them.
+
+\begin{openproblem}
+The analysis of the bipartite collision tester, leading to~\cref{theo:bipartite:collision-based:general}, leads to the requirement that $\min(\ns_1,\ns_2)  = \bigOmega{\min(\ab\norminf{\p},\sqrt{\ab})/\dst^2}$. It would be interesting to remove or relax this requirement, or alternatively show that it is necessary. In the latter case, this would lead to a larger range of parameters for uniformity testing in the streaming (memory-limited) setting, based on the work of~\citet{DiakonikolasGKR19}.
+\end{openproblem}
+
+\begin{openproblem}
+	\label{op:differentdelta}
+As described in~\cref{chap:what}, in distribution testing we typically ask for the same Type~I and Type~II errors, with a single parameter $\errprob$ (set to $1/3$ in most of this chapter, as justified in that first chapter). Pinpointing the right dependence on the two types of errors when we allow them to be fixed independently (\ie $\errprob_\reject$, $\errprob_\accept$) would be interesting, and lead to greater flexibility as well as possible savings in some applications, or when taking a union bound over many tests.
+\end{openproblem}
+
+\begin{openproblem}
+One underlying and recurring assumption is that the samples we observe are \iid However, the assumption of independence is not always justified, and understanding what type of dependencies can be allowed~--~and what tests are robust to mild ``failures of independence''~--~is an interesting direction. As a first step, one could start by characterizing the minimum requirements for the tests covered in this chapter: can some of them still work with pairwise independence? $t$-wise independence, for some small $t$?
+\end{openproblem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Historical notes}
 From the computer science perspective, distribution testing begun with the influential work of~\citet{GoldreichGR98}, who define it as a variant of the general paradigm of property testing.~\citet{GoldreichR00} then implicitly relied on uniformity testing (or, more specifically, uniformity testing with respect to $\lp[2]$ distance) to test whether the endpoints of short random walks of a graph were uniformly distributed. To do so, they introduced and analyzed the collision-based tester, although their analysis did not lead to the optimal sample complexity, but instead to a quartic dependence on $\dst$. A systematic study of distribution testing was then initiated in~\citet{BatuFRSW00}, focusing on closeness (two-sample) testing; identity testing was first considered in~\citet{BFFKRW:01}. These papers, and many which followed, introduced several important and versatile algorithmic ideas, such as the \emph{bucketing} technique from~\cref{ssec:bucketing}, and reductions between distribution testing questions. However, it is only with the work of~\citet{Paninski08} that the tight bound of $\bigTheta{\sqrt{\ab}/\dst^2}$ for uniformity testing was established through both an information-theoretic lower bound and a matching upper bound via the unique-elements tester we covered in~\cref{sec:uniformity:unique}.\footnote{With some caveats: the upper bound is restricted to the regime $\dst \gtrsim1/\ab^{1/4}$, and its original analysis had a flaw, discussed in p.~\pageref{note:paninski:flaw}.} Interestingly, the optimality of first uniformity tester proposed, the collision-based tester of~\citet{GoldreichR00}, was only established nearly two decades later, by~\citet{DiakonikolasGPP19}.
