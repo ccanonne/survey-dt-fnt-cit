@@ -347,14 +347,23 @@
 \newcommand{\Paren}[1]{\mleft(#1\mright)}
 %\newcommand{\Brace}[1]{\mleft[#1\mright]}
 
-\newcommand{\ns}{{\textcolor{purple}{n}}} % Number of samples
-\newcommand{\tc}{{\textcolor{ForestGreen}{t}}} % Time complexity
-\newcommand{\ab}{{\textcolor{cyan}{k}}} % alphabet (domain) size
-\newcommand{\errprob}{{\textcolor{pink!50!blue}{\delta}}} % alphabet (domain) size
-\newcommand{\numbits}{{\textcolor{orange}{\ell}}}
 \newcommand{\pbits}{s}
 \newcommand{\priv}{\varrho}
-\newcommand{\dst}{\textcolor{red}{\eps}}
 \newcommand{\dims}{d}
 \newcommand{\zdims}{k}
 \newcommand{\prm}{p}
+\ifnum\withcolors=1
+	\newcommand{\ns}{{\textcolor{purple}{n}}} % Number of samples
+	\newcommand{\tc}{{\textcolor{ForestGreen}{t}}} % Time complexity
+	\newcommand{\ab}{{\textcolor{cyan}{k}}} % alphabet (domain) size
+	\newcommand{\errprob}{{\textcolor{pink!50!blue}{\delta}}} % error probability
+	\newcommand{\numbits}{{\textcolor{orange}{\ell}}}
+	\newcommand{\dst}{\textcolor{red}{\eps}}
+\else
+	\newcommand{\ns}{n} % Number of samples
+	\newcommand{\tc}{t} % Time complexity
+	\newcommand{\ab}{k} % alphabet (domain) size
+	\newcommand{\errprob}{\delta} % error probability
+	\newcommand{\numbits}{\ell}
+	\newcommand{\dst}{\eps}
+\fi

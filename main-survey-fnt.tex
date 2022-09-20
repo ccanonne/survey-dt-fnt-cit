@@ -14,7 +14,7 @@
 %\usepackage{draftwatermark}
 %\SetWatermarkLightness{0.95}
 
-\def\withcolors{1}
+\def\withcolors{0}
 \def\withnotes{0}
 \usepackage{ccanonne}
 
@@ -55,17 +55,25 @@
 \newcommand{\exercise}[1]{\marginnote{\textbf{E:} #1}}
 
 \ifnum\withnotes=1
-\newcommand{\tbc}{\noindent\hl{\sc{}to be continued}\xspace}
+	\newcommand{\tbc}{\noindent\hl{\sc{}to be continued}\xspace}
 \else
-\newcommand{\tbc}{}
+	\newcommand{\tbc}{}
 \fi
 
 
-\newcommand{\nss}{\textcolor{red}{\ns_1}}
-\newcommand{\nst}{\textcolor{red}{\ns_2}}
-\newcommand{\nsu}{\textcolor{red}{\ns_3}}
-\newcommand{\occur}{\textcolor{red}{N}}
-\newcommand{\freq}{\textcolor{purple}{F}}
+\ifnum\withcolors=1
+	\newcommand{\nss}{\textcolor{red}{\ns_1}}
+	\newcommand{\nst}{\textcolor{red}{\ns_2}}
+	\newcommand{\nsu}{\textcolor{red}{\ns_3}}
+	\newcommand{\occur}{\textcolor{red}{N}}
+	\newcommand{\freq}{\textcolor{purple}{F}}
+\else
+	\newcommand{\nss}{\ns_1}
+	\newcommand{\nst}{\ns_2}
+	\newcommand{\nsu}{\ns_3}
+	\newcommand{\occur}{N}
+	\newcommand{\freq}{F}
+\fi
 
 
 %% Subsections in the ToC (set to 1 for sections only)
