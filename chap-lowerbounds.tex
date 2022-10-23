@@ -514,7 +514,7 @@ is the generalized Harmonic number of order $1/2$ (and $H_\ab$ will be the usual
 \]
 and so~\cref{theo:uniformity:lb:vv} gives a lower bound of $\bigOmega{\frac{\sqrt{\ab}}{\dst^2\sqrt{\log \ab}}}$ samples. This does not look too bad, especially since we know from~\cref{chap:identity} that an \emph{upper} bound of  $\bigO{{\sqrt{\ab}}/{\dst^2}}$ samples holds. But that leaves a gap of $\sqrt{\log \ab}$ between the two, which could go either way.
 
-However, let us look at this $\q$, and what a typical ``local perturbation'' $\p\in\class$ looks like when we perturb each element by $1\pm\dst$:
+However, let us look at this $\q$, and what a typical ``local perturbation'' $\p\in\class$ looks like when we perturb each element by $1\pm\dst$ (\cref{fig:vv17:lb:zipf}):
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[H]
 	\includegraphics[width=1.0\textwidth]{figures/fig-lowerbound-zipf-pq}
@@ -687,7 +687,7 @@ Applying this to a sample from a probability distribution $\p\in\distribs{\ab}$ 
 	\label{eq:reduction:monotonicity}
 	\Phi(\p)(i) = \frac{1}{2}\p(i\bmod\ab)
 \end{equation}
-which ``duplicates the domain and puts two contiguous copies of $\p$ next to each other.'' Why is it a good thing to consider? For a start, if we apply this to the uniform distribution $\uniform_\ab$, we end up with $\Phi(\uniform_\ab) = \uniform_{2\ab}$, the uniform distribution on our new domain, which is definitely in $\property^{\searrow}_{2\ab}$ (the uniform distribution may not be the most interesting monotone distribution, but it is a monotone distribution nonetheless). So this fits at least half the bill: as you will show in~\cref{ex:reduction:monotone},\exercise{Show this.} it also fits the other half: distributions which are $\dst$-far from uniform are mapped to distributions $\dst'$-far from uniform, where $\dst'\eqdef \dst/2$.
+which ``duplicates the domain and puts two contiguous copies of $\p$ next to each other'' (see~\cref{fig:reduction:monotonicity:example} for an illustration). Why is it a good thing to consider? For a start, if we apply this to the uniform distribution $\uniform_\ab$, we end up with $\Phi(\uniform_\ab) = \uniform_{2\ab}$, the uniform distribution on our new domain, which is definitely in $\property^{\searrow}_{2\ab}$ (the uniform distribution may not be the most interesting monotone distribution, but it is a monotone distribution nonetheless). So this fits at least half the bill: as you will show in~\cref{ex:reduction:monotone},\exercise{Show this.} it also fits the other half: distributions which are $\dst$-far from uniform are mapped to distributions $\dst'$-far from uniform, where $\dst'\eqdef \dst/2$.
 
 \begin{figure}[htbp]\centering
 \includegraphics[width=.45\textwidth]{figures/fig-reduction-uniformity}\hfill
