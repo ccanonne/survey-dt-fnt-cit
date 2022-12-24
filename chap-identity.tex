@@ -1103,16 +1103,16 @@ as in~\cref{algo:bipartite:collision-based}.
     \leq \frac{4\ab}{\nss\nst\dst^4}
     \end{align*}
     using~\cref{eq:var:bipartite:collisions}; this is less than $1/6$ as long as $\nss\nst \geq 24\ab/\dst^4$.
-    \item In the ``far'' case, define $\alpha$ by $\bE{\bar{\p}}{Z_6} = \frac{1+\alpha^2}{\ab}$, so that $\alpha^2\geq \dst^2$ but also
+    \item In the ``far'' case, define $\alpha$ by $\bE{\p}{Z_6} = \frac{1+\alpha^2}{\ab}$, so that $\alpha^2\geq \dst^2$ but also
     $
         \norminf{\p} \leq \normtwo{\p} = \sqrt{(1+\alpha^2)/\ab}
     $. The probability to err by outputting \accept is
     \begin{align*}
         \bP{\p}{Z_6 < \tau}  
-        &\leq \bP{\bar{\p}}{Z_6 <  \tau} 
-        = \bP{\bar{\p}}{Z_6 <  \frac{1+\frac{1}{2}\dst^2}{1+\alpha^2} \bE{\bar{\p}}{Z_6} } \\
-        &\leq \bP{\bar{\p}}{Z_6 <  \Paren{1 - \frac{\alpha^2}{2(1+\alpha^2)}} \bE{\bar{\p}}{Z_6} } \\
-        &\leq \frac{4(1+\alpha^2)^2}{\alpha^4}\cdot \frac{\Var_{\p}[Z_6]}{\bE{\bar{\p}}{Z_6}^2} \\
+        & 
+        = \bP{\p}{Z_6 <  \frac{1+\frac{1}{2}\dst^2}{1+\alpha^2} \bE{\p}{Z_6} } \\
+        &\leq \bP{\p}{Z_6 <  \Paren{1 - \frac{\alpha^2}{2(1+\alpha^2)}} \bE{\p}{Z_6} } \\
+        &\leq \frac{4(1+\alpha^2)^2}{\alpha^4}\cdot \frac{\Var_{\p}[Z_6]}{\bE{\p}{Z_6}^2} \\
         &\leq \frac{\ab}{\nss\nst}\cdot \frac{4(1+\alpha^2)}{\alpha^4} + \frac{\nss+\nst}{\nss\nst}\cdot \frac{20\ab\norminf{\p}}{\alpha^2}  \\
         &\leq \frac{8\ab}{\nss\nst\dst^4} + \frac{40}{\min(\nss,\nst)}\cdot \min\Paren{ \frac{\ab\norminf{\p}}{\alpha^2}, \frac{\sqrt{\ab}\sqrt{1+\alpha^2}}{\alpha^2} } \\
         &\leq \frac{8\ab}{\nss\nst\dst^4} + \frac{40}{\min(\nss,\nst)\dst^2}\min\Paren{\ab\norminf{\p}, \sqrt{2\ab}}
@@ -1443,10 +1443,10 @@ The first idea is, given how convenient $\lp[2]$ distance has proven itself as a
   \begin{algorithmic}[1]
     \Require Multiset of $\ns$ samples $x_1,\dots,x_\ns \in \domain$, parameters $\dst\in(0,1]$ and explicit description of $\q\in\distribs{\ab}$.
     \Comment{Assumes Poissonization}
-    \State Set $\tau \gets 2\ns^2\dst^2$
+    \State Set $\tau \gets 3\ns^2\dst^2$
     \State Compute
     \[
-        Z = \sum_{j\in\domain} \Paren{(\occur_j-\ns\q(i))^2-\occur_j}
+        Z = \sum_{j\in\domain} \Paren{(\occur_j-\ns\q(j))^2-\occur_j}
     \] where $\occur_j \gets \sum_{t=1}^\ns\indic{x_t=j}$.
     \If{ $Z \geq \tau$ } \Return \reject \Comment{Far from $\q$ (in $\lp[2]$)}
     \Else\ 
