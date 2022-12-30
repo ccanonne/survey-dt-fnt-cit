@@ -1,0 +1,874 @@
+%%%% IMPORTANT: to generate the nomenclature
+%% makeindex main-survey-fnt.nlo -s nomencl.ist -o main-survey-fnt.nls
+
+
+% !Mode:: "TeX:DE:UTF-8:Main"
+%
+%
+%JOURNAL CODE  SEE DOCUMENTATION
+\documentclass[biber]{nowfnt} % creates the journal version, needs biber version
+%wrapper for book and ebook are created automatically.
+\usepackage{imakeidx}
+\usepackage[utf8]{inputenc}
+
+%\usepackage{draftwatermark}
+%\SetWatermarkLightness{0.95}
+
+\def\withcolors{1}
+\def\withnotes{1}
+\usepackage{ccanonne}
+
+\usetikzlibrary{shadows}
+\usepackage{framed}
+\usepackage{tabularx}
+\usepackage[nocfg]{nomencl}
+\makenomenclature
+
+% Footnote without marker
+\newcommand\extrafootertext[1]{%
+    \bgroup
+    \renewcommand\thefootnote{\fnsymbol{footnote}}%
+    \renewcommand\thempfootnote{\fnsymbol{mpfootnote}}%
+    \footnotetext[0]{#1}%
+    \egroup
+}
+
+%%%%%%%%%%%%%%%%% Exercises %%%%%%%%%%%%%%%%%
+\newtheorem{question}{Exercise}[chapter]
+
+%\newcommand{\exinline}[1]{(\refstepcounter{question}Exercise~\thequestion\label{#1})}
+
+\crefname{question}{Exercise}{Exercises}
+\Crefname{question}{Exercise}{Exercises}
+\crefname{claim}{Claim}{Claims}
+
+\newtheorem{solution}{Solution}[chapter]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%BIBLIOGRAPHY FILE
+\addbibresource{bibliography.bib}
+
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\renewcommand\tabularxcolumn[1]{m{#1}}% for vertical centering text in X column
+
+
+\usepackage{physics} %% <- redefines var
+\usepackage[fulladjust]{marginnote}
+\renewcommand*{\marginfont}{\scriptsize}
+\setlength{\marginparwidth}{15mm}
+\newcommand{\exercise}[1]{\marginnote{\textbf{E:} #1}}
+
+\ifnum\withnotes=1
+	\newcommand{\tbc}{\noindent\hl{\sc{}to be continued}\xspace}
+\else
+	\newcommand{\tbc}{}
+\fi
+
+
+\ifnum\withcolors=1
+	\newcommand{\nss}{\textcolor{red}{\ns_1}}
+	\newcommand{\nst}{\textcolor{red}{\ns_2}}
+	\newcommand{\nsu}{\textcolor{red}{\ns_3}}
+	\newcommand{\occur}{\textcolor{red}{N}}
+	\newcommand{\freq}{\textcolor{purple}{F}}
+\else
+	\newcommand{\nss}{\ns_1}
+	\newcommand{\nst}{\ns_2}
+	\newcommand{\nsu}{\ns_3}
+	\newcommand{\occur}{N}
+	\newcommand{\freq}{F}
+\fi
+
+
+%% Subsections in the ToC (set to 1 for sections only)
+\setcounter{tocdepth}{2}
+
+%ARTICLE TITLE
+\title{Topics and Techniques in Distribution Testing}
+
+
+%ARTICLE SUB-TITLE
+\subtitle{A Biased but Representative Sample}
+
+
+%AUTHORS FOR COVER PAGE 
+% separate authors by \and, item by \\
+% Don't use verbatim or problematic symbols.
+% _ in mail address should be entered as \_
+% Pay attention to large mail-addresses ...
+
+%if there are many author twocolumn mode can be activated.
+%\booltrue{authortwocolumn} %SEE DOCUMENTATION
+\maintitleauthorlist{
+Cl\'ement L. Canonne \\
+University of Sydney\\
+clement.canonne@sydney.edu.au
+}
+
+%ISSUE DATA AS PROVIDED BY NOW
+\issuesetup
+{%
+ copyrightowner={A.~Heezemans and M.~Casey},
+ volume        = xx,
+ issue         = xx,
+ pubyear       = 2018,
+ isbn          = xxx-x-xxxxx-xxx-x,
+ eisbn         = xxx-x-xxxxx-xxx-x,
+ doi           = 10.1561/XXXXXXXXX,
+ firstpage     = 1, %Explain
+ lastpage      = 18
+ }
+
+%BIBLIOGRAPHY FILE
+\addbibresource{bibliography.bib}
+
+% \usepackage{mwe}
+
+%AUTHORS FOR ABSTRACT PAGE
+\author[1]{Cl\'ement L. Canonne}
+
+\affil[1]{University of Sydney; clement.canonne@sydney.edu.au}
+
+\articledatabox{\nowfntstandardcitation}
+
+\begin{document}
+\makeabstracttitle
+\begin{abstract}
+Solutions to exercises.
+\end{abstract}
+
+\setcounter{chapter}{1}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Testing goodness-of-fit of univariate distributions}
+  \label{chap:identity}
+  
+  
+ \begin{question}\label{ex:identity:monotonicity:lp}
+  Prove the monotonicity of $\lp[p]$ norms: if $1\leq r\leq s \leq \infty$, then $\norm{x}_s \leq \norm{x}_r$ for every $x\in \R^n$.
+\end{question}
+\begin{solution}
+Fix any $1\leq r\leq s < \infty$, and any non-zero $x\in\R^n$ (if $x$ is the zero vector, the inequality is trivially true). Then, since $x' \eqdef x/\norm{x}_s$ has unit $\lp[s]$ norm and $|x'_i| \leq 1$ for all $i$, we get
+\[
+	1 = \sum_{i=1}^n |x'_i|^s \leq \sum_{i=1}^n |x'_i|^r = \norm{x'}_r^r
+\]
+showing that $\norm{x}_s^r \leq \norm{x}_r^r$. Taking the $r$-th root on both side gives the result. Finally, the case $s=\infty$ follows from observing that $\norminf{x} = \max_{1\leq i\leq n} |x_i|^r \leq \sum_{i=1}^n |x_i|^r = \norm{x}_r^r$. 
+\end{solution}
+
+\begin{question}\label{ex:expectation:z2} 
+  Prove Eq. (2.14): that is, the ``unique elements'' statistic $Z_2$ from~Section~2.1.3 has expectation $\bE{\p}{Z_2} = \sum_{i\in\domain} \p(i)(1-\p(i))^{\ns-1}$.
+\end{question}
+\begin{solution}
+By linearity of expectation,
+\[
+\bE{\p}{Z_2} = \frac{1}{\ns}\sum_{i\in\domain} \probaOf{N_i = 1}
+\]
+where $N_i = \sum_{t=1}^\ns \indic{X_t=i}$ follows a Binomial distribution with parameters $\ns$ and $\p(i)$. Thus, $\probaOf{N_i = 1} = \ns \p(i)(1-\p(i))^{\ns-1}$.
+\end{solution}
+\begin{question}\label{ex:uniformity:moments:poisson}
+  Establish Claim~2.2, using (or computing) the expression for the first 4 moments of a $\poisson{\lambda}$ random variable.
+\end{question}
+\begin{solution}
+Let $\lambda,\mu\geq 0$, and $X\sim\poisson{\lambda}$. Then $(X-\mu)^2 = (X-\lambda)^2 + 2(\lambda-\mu)X + \mu^2-\lambda^2$, and so
+\begin{align*}
+	\bEE{(X-\mu)^2 - X} &= \Var[X] - \bEE{X} + 2(\lambda-\mu)\bEE{X} + \mu^2-\lambda^2 \\
+	&= 2(\lambda-\mu)\lambda + \mu^2-\lambda^2
+	= (\lambda-\mu)^2
+\end{align*}
+using the fact that $\Var[X] = \bEE{X} = \lambda$. For the second one, we will also use the identities
+\begin{align*}
+\bEE{X^2} &= \Var[X] + \bEE{X}^2 = \lambda+\lambda^2\\
+\bEE{X^3} &= \lambda+3\lambda^2+\lambda^3\\
+\bEE{X^4} &= \lambda+7\lambda^2+6\lambda^3+\lambda^4
+\end{align*}
+(which are not hard to prove by manipulating the corresponding series $\bEE{X^m} = e^{-\lambda} \sum_{k=0}^{\infty} \frac{\lambda^{m+k}}{k!}$, but are quite tedious).
+Then, a brute-force computation gives
+\begin{align*}
+	&\bEE{((X-\mu)^2 - X)^2} \\
+	&\;= 
+	\mu^4+\bEE{X^4} - (4\mu+2)\bEE{X^3} + (6\mu^2+4\mu+1)\bEE{X^2} - (4\mu^3+2\mu^2)\bEE{X} \\
+	&\;= 
+	\mu^4+\lambda^4+6\lambda^3+7\lambda^2+\lambda
+	- (4\mu+2)(\lambda^3 + 3\lambda^2 + \lambda) \\
+	&\qquad+ (6\mu^2+4\mu+1)(\lambda^2+\lambda) - (4\mu^3+2\mu^2)\lambda \\
+	&= \textcolor{red}{\mu^4}+\textcolor{red}{\lambda^4}+4\lambda^3+\textcolor{blue}{2\lambda^2} - \textcolor{red}{4\mu\lambda^3} - 8\mu\lambda^2 + \textcolor{red}{6\mu^2\lambda^2}+6\mu^2\lambda - \textcolor{red}{4\mu^3\lambda}-2\mu^2\lambda \\
+	&= \textcolor{red}{(\lambda-\mu)^4} + \textcolor{blue}{2\lambda^2}
+	+4\lambda^3- 8\mu\lambda^2+4\mu^2\lambda  \\
+	&= \textcolor{red}{(\lambda-\mu)^4} + \textcolor{blue}{2\lambda^2}
+	+4\lambda(\lambda-\mu)^2
+\end{align*}
+which is the result we wanted. There probably are more elegant ways to prove it, but this one works.
+\end{solution}
+\begin{question}\label{ex:uniformity:bias:coin}
+  Establish the upper bound part of Fact~2.1, by proving \textit{via} an Hoeffding or Chernoff bound that the empirical estimator achieves the stated sample complexity. (The lower bound can be shown by considering the case $\alpha=1/2$, but we have not seen in this chapter the information-theoretic tools to establish it: this will be in Chapter 3)
+\end{question}
+\begin{solution}
+Let $X_1,\dots, X_\ns \sim \bernoulli{\alpha}$ be \iid, and consider the empirical estimator (for $\alpha$), 
+\[
+	\hat{\alpha} \eqdef \frac{1}{\ns}\sum_{i=1}^\ns X_i.
+\]
+By linearity of expectation, we have $\bEE{\hat{\alpha}} = \frac{1}{\ns}\sum_{i=1}^\ns \bEE{X_i} = \alpha$. Moreover, by a Hoeffding bound (Corollary~A.4), we have, for any $\eta>0$,
+\[
+	\bPr{\abs{\hat{\alpha} - \alpha}> \eta} \leq 2e^{-2\eta^2 \ns}
+\]
+which is at most $\errprob$ for
+ $\ns \geq \frac{1}{2\eta^2}\ln\frac{2}{\errprob}$. Thus, having $\ns \eqdef \clg{\frac{1}{2\eta^2}\ln\frac{2}{\errprob}} = \bigO{\frac{\log(1/\errprob)}{\eta^2}}$ suffices.
+
+\end{solution}
+\begin{question}\label{ex:uniformity:bias:coin:testing}
+  Establish the upper bound part of Fact~2.2, by proving \textit{via} a Chernoff bound that appropriately thresholding the empirical estimator achieves the stated sample complexity. (For the lower bound, same remark as for~\cref{ex:uniformity:bias:coin}.)
+\end{question}
+\begin{solution}
+Let $X_1,\dots, X_\ns \sim \bernoulli{\alpha}$ be \iid, $\beta,\eta\in(0,1]$, and consider as before the empirical estimator
+\[
+	\hat{\alpha} \eqdef \frac{1}{\ns}\sum_{i=1}^\ns X_i
+\]
+along with the threshold $\tau \eqdef (1+\frac{\eta}{2})\beta$. We want to argue that, for $\ns$ as in the statement of the exercise:
+\begin{itemize}
+	\item If $\alpha \leq \beta$, then $\bPr{\hat{\alpha} \geq \tau} \leq \errprob$; and
+	\item If $\alpha \geq \beta(1+\eta)$, then $\bPr{\hat{\alpha} < \tau} \leq \errprob$.
+\end{itemize}
+By a Chernoff bound (specifically, Theorem~A.6, (A.7) with $\gamma \eqdef \eta/2\in(0,1]$ and $P_H \eqdef \ns\beta$), in the first case we have
+\[
+	\bPr{\hat{\alpha} \geq \tau} \leq e^{-\frac{\ns\eta^2\beta}{12}}\,
+\]
+while in the second case (by (A.8), with $\gamma \eqdef \frac{\eta}{2(1+\eta)}\in(0,1]$ and $P_L \eqdef \ns(1+\eta)\beta$, so that $(1-\gamma)P_L = \ns(1+\eta/2)\beta$) we get
+\[
+	\bPr{\hat{\alpha} < \tau} \leq e^{-\frac{\ns\eta^2\beta}{4(1+\eta)^2}}
+	\leq e^{-\frac{\ns\eta^2\beta}{16}}\,.
+\]
+Both are at most $\errprob$ as long as $\ns \geq \frac{16}{\beta\eta^2}\ln \frac{1}{\errprob}$. Thus, having $\ns \eqdef \clg{\frac{16}{\beta\eta^2}\ln\frac{1}{\errprob}} = \bigO{\frac{\log(1/\errprob)}{\beta\eta^2}}$ suffices.
+\end{solution}
+\begin{question}\label{ex:uniformity:bipartite}
+  Follow the analysis of Theorem~2.1 to derive, for the bipartite collisions tester, the guarantee Eq.~(2.38) from the variance bound Eq.~(2.37).
+\end{question}
+\begin{solution}
+We have
+\begin{align}
+  \Var[Z_6] 
+  &\leq \frac{1}{\nss\nst}\normtwo{\p}^2 + \frac{\nss+\nst}{\nss\nst}(\norm{\p}_3^3-\normtwo{\p}^4) \tag{2.37}\,,
+\end{align}
+and we want to show that, in the ``far'' case,
+\begin{align}
+  \probaDistrOf{\p}{ Z_6 < \frac{1+2\dst^2}{\ab} }
+  \leq \frac{5\ab}{4\dst^4\nss\nst} + \frac{\nss+\nst}{\nss\nst}\Paren{\frac{2\sqrt{\ab}}{\dst}+\frac{3}{\dst^2}} \tag{2.38}\,.
+\end{align}
+We will mimic the corresponding part of the proof of Theorem~2.1:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Let again $\alpha^2 \eqdef \ab\normtwo{\p-\uniform_\ab}^2 \geq 4\dst^2$, so that $\bEE{Z_6} = \normtwo{\p}^2 = \frac{1+\alpha^2}{\ab}$. Then
+    \begin{align*}
+      \bPr{Z_6 < \frac{1+2\dst^2}{\ab}} 
+      &= \bPr{Z_6 < \frac{1+2\dst^2}{1+\alpha^2}\bEE{Z_6}} \\
+      &= \bPr{Z_6 < \Paren{1-\frac{\alpha^2-2\dst^2}{1+\alpha^2}}\bEE{Z_6}} \\
+      &\leq \bPr{Z_6 < \Paren{1-\frac{\alpha^2}{2(1+\alpha^2)}}\bEE{Z_6}} \tag{as $\alpha^2 \geq 4\dst^2$}\\
+      &\leq \frac{4(1+\alpha^2)^2}{\alpha^4}\cdot \frac{\Var[Z_6]}{\bEE{Z_6}^2} \tag{Chebyshev}\\
+      &\leq \frac{4(1+\alpha^2)^2}{\alpha^4\nss\nst\normtwo{\p}^2} + \frac{4(1+\alpha^2)^2(\nss+\nst)}{\alpha^4\nss\nst}\cdot \frac{\norm{\p}_3^3-\normtwo{\p}^4}{\normtwo{\p}^4} 
+    \end{align*}
+    the last inequality using (2.37). The first term is easily dealt with: recalling that $\normtwo{\p}^2 = (1+\alpha^2)/\ab$,
+    \[
+        \frac{4(1+\alpha^2)^2}{\alpha^4\nss\nst\normtwo{\p}^2} = \frac{4(1+\alpha^2)\ab}{\alpha^4\nss\nst} \leq \frac{5\ab}{4\dst^4\nss\nst}
+    \]
+    the last inequality as in the proof of Theorem~2.1, using that $x>0 \mapsto \frac{1+x}{x^2}$ is decreasing, $\alpha^2\geq 4\dst^2$, and $\dst \leq 1$.
+    
+    To handle the second, we use the inequality proven in (2.12):
+    \begin{align*}
+        \norm{\p}_3^3-\normtwo{\p}^4
+        &\leq \frac{\alpha^{3}}{\ab^{3/2}} + \frac{3\alpha^2}{\ab^2}
+    \end{align*}
+    which as in (2.13) implies
+    \begin{align*}
+        \frac{4(1+\alpha^2)^2}{\alpha^4}\cdot \frac{\norm{\p}_3^3-\normtwo{\p}^4}{\normtwo{\p}^4}
+        %&= \frac{4\ab^2}{\alpha^4}\cdot (\norm{\p}_3^3-\normtwo{\p}^4) \notag\\
+        %&\leq \frac{4\sqrt{\ab}}{\alpha}+ \frac{12}{\alpha^2} \notag\\
+        &\leq \frac{2\sqrt{\ab}}{\dst}+ \frac{3}{\dst^2}\,
+    \end{align*}
+    Combining the two, we get
+    \[
+        \probaDistrOf{\p}{ Z_6 < \frac{1+2\dst^2}{\ab} } \leq \frac{5\ab}{4\dst^4\nss\nst} + \Paren{\frac{3\sqrt{\ab}}{\dst} +\frac{3}{\dst^2\ns}}\frac{\nss+\nst}{\nss\nst}
+    \]
+    as we wanted.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{solution}
+\begin{question}\label{ex:nomallet}
+  Show that, in contrast to what we did in the empirical-distance tester case (Section 2.1.5), one cannot invoke stochastic dominance in the analysis of the bipartite collision tester to obtain the wishful variance bound Eq.~(2.39) instead of Eq.~(2.41). Specifically, show that it fails even for $\ab=2$: if $M\sim\binomial{\nss}{p}$, $N\sim\binomial{\nst}{p}$ and $M'\sim\binomial{\nss}{q}$, $N'\sim\binomial{\nst}{q}$ (all independent) with $1/2\leq q < p \leq 1$, it is \emph{not} always true that
+  \[
+      MN+(\nss-M)(\nst-N) \succeq M'N'+(\nss-M')(\nst-N')
+  \]
+  \emph{Hint: consider the case $\nss=1$, and $\bPr{MN+(\nss-M)(\nst-N)\geq 1}$ as a function of $p$.}
+\end{question}
+\begin{solution}
+If the stochastic dominance relation held, it would imply that $f(p) \eqdef \bPr{MN+(\nss-M)(\nst-N)\geq 1}$ is a non-decreasing function of $p\geq 1/2$. Now, to simplify the search for a counterexample, consider the case $\nss=1$ (so $M\sim\bernoulli{p}$): then
+\begin{align*}
+	f(p) 
+	&= \bPr{MN+(1-M)(\nst-N)\geq 1} \\
+	&= \bPr{M = 1, N > 0 \text{ or } M=0, N < \nst } \\
+	&= p(1-(1-p)^{\nst}) + (1-p)(1-p^{\nst})
+\end{align*}
+using independence of $M,N$. One can try to plot the corresponding function of $p$ for various choices of $\ns_2$, or differentiate to check if it is non-decreasing on $[1/2,1]$. Long story short: it will be non-decreasing for $\ns_2\in\{1,2,3\}$, but for $\ns_2=4$, we get
+\begin{align*}
+	f(p) &= p(1-(1-p)^4) + (1-p)(1-p^4)
+\end{align*}
+which has a local minimum at $p^\ast=\frac{3+\sqrt{3}}{6}$, is decreasing on $[1/2, p^\ast]$ and increasing on $[p^\ast, 1]$. 
+
+\begin{tikzpicture}
+    \begin{axis}[xlabel=$p$, ylabel={$f(p)=\bPr{MN+(1-M)(4-N)\geq 1}$}]
+        \addplot[domain=0.5:1] {x*(1-(1-x)^4) + (1-x)*(1-x^4)};
+    \end{axis}
+\end{tikzpicture}
+
+This gives a counterexample to the statement for, \eg $p=1/2, q=\frac{3+\sqrt{3}}{6}$, $\ns_1=1$ and $\ns_2=4$.
+\end{solution}
+\begin{question}\label{ex:identity:averaging:stochastic} 
+    It is known that $x\preceq y$ if, and only if, $x=Ay$ for some doubly stochastic matrix $A$~\citep[Theorem~2.1]{Arnold87}. Check that the averaging from Lemma~2.7 indeed corresponds to multiplying the pmf $\p$ (seen as a vector) by such a matrix.
+\end{question}
+\begin{solution}
+Recall that a doubly stochastic matrix is a square matrix with non-negative entries, where each row and each column sums to one. In our case, assume for simplicity that the probability distribution $\p$ is non-decreasing, \ie that $\p(1)\geq \dots \geq(\ab)$. This is without loss of generality, since one can permute the domain for this to hold, and doubly stochastic matrices are invariant to such permutations: if $\sigma$ is a permutation of $[\ab]=\{1,2,\dots,\ab\}$ and $A$ is doubly stochastic, then for every $j\in[\ab]$
+\[
+	\sum_{i=1}^\ab A_{\sigma(i),\sigma(j)} = \sum_{i=1}^\ab A_{i,\sigma(j)} = 1
+\]
+and similarly for the columns sums: for every $i\in[\ab]$, $\sum_{j=1}^\ab A_{\sigma(i),\sigma(j)} = \sum_{j=1}^\ab A_{\sigma(i), j} = 1$. Now, with this assumption, then the transformation to obtain $\bar{\p}$ is to average the probability of the first $K=\clg{\ab/2}$ elements, and leave the remaining $\ab-K$ probabilities unchanged. This is achieved by the matrix $A\in\R^{\ab\times\ab}$ consisting of a square $K\times K$ block with all entries equal to $1/K$ in the top left, and the rest being only $\ab-K$ diagonal entries equal to $1$:
+\[
+	A = 
+	\begin{pmatrix}
+	\frac{1}{K} & \cdots & \frac{1}{K} & 0 &\cdots & 0\\
+	\vdots & \ddots & \vdots & 0 &\cdots & 0\\
+	\frac{1}{K} & \cdots & \frac{1}{K} & 0 &\cdots & 0\\
+	0 & \cdots & 0 & 1 &\cdots & 0\\
+	\vdots & \cdots & \vdots & 0 &\ddots & 0\\
+	0 & \cdots & 0 & 0 &\cdots & 1\\
+	\end{pmatrix} =
+	\begin{pmatrix}
+	\frac{1}{K} \mathbf{1}_{K\times K} & \mathbf{0}_{K\times (\ab-K)} \\
+	\mathbf{0}_{(\ab-K)\times K} & {I}_{(\ab-K)\times (\ab-K)} \\
+	\end{pmatrix}
+\]
+It is now easy to check that the matrix $A$ defined above is indeed doubly stochastic, and further that
+\[
+	A \p = 	\begin{pmatrix}
+	\frac{1}{K} & \cdots & \frac{1}{K} & 0 &\cdots & 0\\
+	\vdots & \ddots & \vdots & 0 &\cdots & 0\\
+	\frac{1}{K} & \cdots & \frac{1}{K} & 0 &\cdots & 0\\
+	0 & \cdots & 0 & 1 &\cdots & 0\\
+	\vdots & \cdots & \vdots & 0 &\ddots & 0\\
+	0 & \cdots & 0 & 0 &\cdots & 1\\
+	\end{pmatrix} 
+	\begin{pmatrix}
+	\p(1)\\
+	\vdots \\
+	\p(K)\\
+	\p(K+1)\\
+	\vdots\\
+	\p(\ab)
+	\end{pmatrix} 
+	= \begin{pmatrix}
+	\frac{1}{K}(\p(1)+\dots \p(K))\\
+	\vdots \\
+	\frac{1}{K}(\p(1)+\dots \p(K))\\
+	\p(K+1)\\
+	\vdots\\
+	\p(\ab)
+	\end{pmatrix} 
+	= \bar{\p}
+\]
+as we wanted.
+\end{solution}
+\begin{question}[$\star$]\label{ex:linftycheck}
+  Generalize Lemma~2.13 to relax the condition $\nsu \leq \ab^{2/3}$ to $\nsu \leq \ab^{(s-1)/s}$, for any fixed (constant) integer $s\geq 3$, by considering $s$-collisions instead of $3$-collisions in Algorithm~8. How does the $\lp[\infty]$ guarantee bound in (ii) change with $s$?
+\end{question}
+\begin{solution}
+Fix any $s\geq 4$ (Lemma~2.13 already handled $s=3$). Recalling (2.42), we get that under the uniform distribution $\uniformOn{\ab}$ the probability to observe an $s$-way collision among $\ns$ samples is at most
+\[
+	p(\ns,\ab,s) \leq \frac{1}{\ab^{s-1}}\binom{\ns}{s} \leq \frac{1}{\ab^{s-1}}\Paren{\frac{\ns}{s}}^s
+\]
+which is at most $1/6$ for $\ns \leq \frac{\ab^{1-1/s}}{6^{1/s}s}$. Now, let $C=C(s)$ be a value to be determined in the course of the analysis, and assume that $\norminf{\p}> \frac{C}{\ns}$, so that as in the proof of Lemma~2.13, fixing an arbitrary $i$ such that $\p(i) = \norminf{\p}$, the number of times $i$ appears among the $\ns$ samples, $\occur_i$, is Binomially distributed with parameters $\ns$ and $\norminf{\p}$, and thus mean $\ns\norminf{\p} > C$. Again by a Chernoff bound (specifically, (A.8)), we have that the probability \emph{not} to observe an $s$-way collision on element $i$ is at most, choosing $\gamma$ such that $(1-\gamma) C=s$ and recalling that $s \geq 4$,
+\[
+	\probaOf{\occur_i < s } = \probaOf{\occur_i < (1-\gamma) C } \leq e^{-\gamma^2 C/2} = e^{-\frac{\gamma^2}{2(1-\gamma)}s} \leq e^{-\frac{2\gamma^2}{1-\gamma}}
+\]
+which is less than $1/6$ for (solving numerically), \eg $\gamma \geq 0.82$. From the above, this means that we can take any $C \geq \frac{s}{1-\gamma}$ (so for instance $C = 6s$ suffices).
+
+Putting the two conditions together, what we get is an algorithm which, for any fixed $s\geq 4$, distinguishes  with probability at least $5/6$ between (i)~$\p=\uniformOn{\ab}$ and (ii)~$\norminf{\p}\geq \frac{6s}{\ns}$, provided that $\ns \leq \frac{\ab^{1-1/s}}{6^{1/s}s}$. The algorithm does so by checking if any $s$-way collision happens among the $\ns$ samples, and declaring (i) if, and only if, no such collision is observed.\medskip
+
+\noindent As an example, for $s \asymp\ln \ab$, we get the following:
+\begin{corollary}
+There exists an algorithm which, given $\ns$ \iid samples from some unknown $\p\in\distribs{\ab}$,  distinguishes  with probability at least $5/6$  between (i)~$\p=\uniformOn{\ab}$ and (ii)~$\norminf{\p}\geq \frac{\ln \ab}{\ns}$, provided that $\ns \lesssim \frac{\ab}{\ln \ab}$. 
+\end{corollary}
+\end{solution}
+
+\begin{question}[$\star$]
+  Recall that our $\chi^2$-based statistic (Eq. (2.19)) was analyzed under the Poissonized sampling model, which led us to define it with a $-\occur_i$ term in the numerator. We will show that this term is necessary: that is, under the Poissonization assumption, consider the ``simpler'' statistic
+  \[
+      Z'_3 \eqdef \sum_{i=1}^\ab \frac{(\occur_i-\ns/\ab)^2}{\ns/\ab}\,.
+  \]
+  Show that its expectation is $\ns\ab\normtwo{\p-\uniform_\ab}^2 +\ab$ (so the expectation \emph{gap} remains the same), but that the variance now contains an extra term $\frac{\ab^2}{\ns}$. What sample complexity does this yield?
+\end{question}
+\begin{solution}
+By linearity of expectation, we can just use the same analysis (and the expression established in~\cref{ex:uniformity:moments:poisson}), ``adding back'' the $\bEE{\occur_i} = \ns\p(i)$ terms, to get
+\begin{align*}
+      \bEE{Z'_3} 
+      &= \sum_{i=1}^\ab \frac{\bEE{(\occur_i-\ns/\ab)^2 - \occur_i} + \bEE{\occur_i}}{\ns/\ab} \\
+      &= \frac{\ab}{\ns}\sum_{i=1}^\ab \Paren{\Paren{\ns\p(i)-\frac{\ns}{\ab}}^2 + \ns\p(i)} \\
+      &= \ns\ab \sum_{i=1}^\ab \Paren{\p(i)-\frac{1}{\ab}}^2 + \ab \sum_{i=1}^\ab \p(i) \\
+      &= \ns\ab\normtwo{\p-\uniform_\ab}^2 +\ab\,,
+\end{align*}
+so, indeed, the expectation gap $\bE{\p}{Z'_3} - \bE{\uniformOn{\ab}}{Z'_3} = \ns\ab\normtwo{\p-\uniform_\ab}^2$ remains the same. However, the variance is now (using independence of the summands)
+\begin{align*}
+      \Var[Z'_3] 
+      &= \sum_{i=1}^\ab \frac{\Var[(\occur_i-\ns/\ab)^2]}{\ns^2/\ab^2} \\
+      &= \frac{\ab^2}{\ns^2}\sum_{i=1}^\ab \Paren{\bEE{(\occur_i-\ns/\ab)^4} - \bEE{(\occur_i-\ns/\ab)^2}^2}
+\end{align*}
+At this point, we have to compute this horrible-looking expression. This is quite painful, but as in~\cref{ex:uniformity:moments:poisson} (or using something like Mathematica if one would rather not go through that ordeal again) one can check that, for $X\sim \poisson{\lambda}$ and any $\mu$,
+\begin{equation}
+	\bEE{(X-\mu)^4} - \bEE{(X-\mu)^2}^2 = 2\lambda^2 + 4\lambda(\lambda-\mu)^2 + 4\lambda(\lambda-\mu) + \lambda\,. 
+\end{equation}
+This leads to
+\begin{align*}
+      \Var&[Z'_3] \\
+      &= \frac{\ab^2}{\ns^2}\sum_{i=1}^\ab \Paren{2\ns^2\p (i)^2 + 4\ns^3\p(i)\Paren{\p(i)-\frac{1}{\ab}} ^2 + 4\ns^2\p(i)\Paren{\p(i)-\frac{1}{\ab}} + \ns\p(i)} \\
+      &= \Var[Z_3] + \frac{\ab^2}{\ns^2}\sum_{i=1}^\ab \Paren{4\ns^2\p(i)\Paren{\p(i)-\frac{1}{\ab}} + \ns\p(i)} \\
+      &= \Var[Z_3] + 4\ab^2\sum_{i=1}^\ab \p(i)\Paren{\p(i)-\frac{1}{\ab}} + \frac{\ab^2}{\ns}\\
+      &= \Var[Z_3] + 4\ab^2\Paren{\normtwo{\p}^2 - \frac{1}{\ab}} + \frac{\ab^2}{\ns} \\
+      &= \Var[Z_3] + 4\ab^2\normtwo{\p - \uniformOn{\ab}}^2 + \frac{\ab^2}{\ns}
+\end{align*}
+where we recognized (and took out) the expression of $\Var[Z_3]$ from Section~2.1.4. To see the sample complexity this would lead to, note that to get ``variance $\ll$ (expectation gap)$^2$'' we will need, considering the three terms of $\Var[Z'_3]$ above,
+\begin{align*}
+		\Var[Z_3] &\ll (\ns\ab\normtwo{\p-\uniform_\ab}^2)^2,  \\
+		\ab^2\normtwo{\p - \uniformOn{\ab}}^2 &\ll (\ns\ab\normtwo{\p-\uniform_\ab}^2)^2,  \\
+		\frac{\ab^2}{\ns} &\ll (\ns\ab\normtwo{\p-\uniform_\ab}^2)^2
+\end{align*}
+The first one is exactly what we had in Section~2.1.4, and leads to the condition $\ns \gg \sqrt{\ab}/\dst^2$. The second is not too problematic: after simplication, and recalling that in the ``far'' case we have $\normtwo{\p-\uniform_\ab} \geq 2\dst/\sqrt{\ab}$, this results in the (weaker) condition $\ns \gg \sqrt{\ab}/\dst$. The third one, however, is the bottleneck: again using the bound on $\normtwo{\p-\uniform_\ab}$ in the ``far'' case (the only handle we have on this quantity), it results in the condition
+\[
+		\frac{\ab^2}{\ns} \ll \ns^2\ab^2 \cdot \frac{\dst^4}{\ab^2}
+\]
+which means, reorganizing, that $\ns$ must satisfy
+$
+	\ns \gg \frac{\ab^{2/3}}{\dst^{4/3}}\,.
+$ Altogether, and once made formal via, \eg Chebyshev's inequality as usual, these 3 conditions will yield the sample complexity 
+\[
+		\ns = \bigO{ \max\Paren{\frac{\ab^{2/3}}{\dst^{4/3}},\frac{\sqrt{\ab}}{\dst^2}} }
+\]
+which is suboptimal (and, as a side note, is the expression for the sample complexity of \emph{closeness} testing, the harder testing problem where both $\p$ and $\q$ are unknown).
+\end{solution}
+\begin{question}[$\star$]\label{ex:unif:adaptive}
+Combine the doubling search technique discussed in Section~1.1 with the sample complexity of uniformity testing given in Eq.~(2.50) to prove the following. There is an adaptive uniformity testing algorithm which, on input $\ab$ and $\dst\in(0,1]$, and access to samples from an unknown distribution $\p\in\distribs{\ab}$:
+\begin{itemize}
+  \item correctly distinguishes between (1)~$\p=\uniform_\ab$ and (2)~$\dst(\p)\eqdef \totalvardist{\p}{\uniform_\ab} > \dst$, with probability at least $2/3$;
+  \item always takes at most 
+    \[
+      \bigO{\frac{1}{\dst^2}\Paren{\sqrt{\ab \log \log \frac{1}{\dst} } + \log \log \frac{1}{\dst} }}
+    \] samples; but also
+  \item if $\dst(\p) > \dst$, takes at most
+    \[
+      \bigO{\frac{1}{\dst(\p)^2}\Paren{\sqrt{\ab \log \log \frac{1}{\dst(\p)} } + \log \log \frac{1}{\dst(\p)} }}
+    \] samples, with probability at least $2/3$; and, finally,
+  \item show that this constant-probability bound on the number of samples also holds \emph{in expectation.}
+\end{itemize}
+That is, in the ``far'' case this algorithm never does much worse (up to a $\log\log$ factor) than an ideal algorithm provided with the exact value $\dst(\p)$ and asked to distinguish between $\p=\uniform_\ab$ and $\totalvardist{\p}{\uniform_\ab} = \dst(\p)$.
+\end{question}
+\begin{solution}%[Outline]
+As discussed in Section~1.1, the overall idea is to run a uniformity tester sequentially, with varying parameters (the $j$-th instance, for $0\leq j\leq L$, being run with parameters $\ab, \dst_j, \errprob_j$, for decreasing values of $\dst_j$), and to stop and return $\reject$ if any of the tester's invocations returns \reject. If all of the $L+1$ invocations returns $\accept$, then we return \accept.
+
+Specifically, we set $L\eqdef \clg{\log(1/\dst)}$, and for $0\leq j\leq L$ choose
+\[
+	\dst_j \eqdef 2^{-j}, \qquad \errprob_j \eqdef \frac{2}{\pi^2(j+1)^2}
+\]
+If the unknown distribution $\p$ \emph{is} uniform, then by a union bound all $L+1$ invocations of the uniformity tester will return $\accept$ with overall probability at least
+\[
+	1 - \sum_{j=0}^L \errprob_j \geq 1 - \sum_{j=0}^\infty \errprob_j = 1 - \frac{2}{\pi^2}\sum_{j=0}^\infty \frac{1}{(j+1)^2} = \frac{2}{3}\,.
+\]
+However, if $\dst(\p)\eqdef \totalvardist{\p}{\uniformOn{\ab}} > \dst$, then there exists $1\leq j(\p)\leq L$ such that
+\[
+	\frac{1}{2^{j(\p)}} < \dst(\p) \leq \frac{1}{2^{j(\p)-1}}
+\]
+and so either the algorithm rejects before reaching invocation $j(\p)$ (which is alright) or reaches invocation $j(\p)$, when it then rejects with probability at least
+\[
+	1-\errprob_{j(\p)} = 1-\frac{2}{\pi^2(j(\p)+1)^2} \geq 1-\frac{1}{2\pi^2} \geq \frac{2}{3}.
+\]
+This deals with the correctness; we still need to establish the 3 components of the sample complexity (worst-case as a function of $\dst$, with high probability as a function of $\dst(\p)$ in the non-uniform case, and on expectation as a function of $\dst(\p)$ in the non-uniform case). Let $\ns(\ab,\dst, \errprob)$ denote the optimal sample complexity from Eq.~(2.50).
+\begin{itemize}
+\item Since we are running at most $L+1$ invocations of the uniformity tester, the sample complexity is at most the sum of these $L+1$ sample complexities, and so is bounded by
+\begin{align*}
+	\sum_{j=0}^L \ns(\ab,\dst_j, \errprob_j)
+	&\asymp \sum_{j=0}^L  \frac{\sqrt{\ab\log(1/\errprob_j)} + \log(1/\errprob_j)}{\dst_j^2} \\
+	&\asymp \sum_{j=0}^L  2^{2j}\Paren{\sqrt{\ab\log(j+1)} + \log(j+1)}\\
+	&\asymp 2^{2L}\Paren{\sqrt{\ab\log(L+1)} + \log(L+1)}
+\end{align*}
+which, recalling our choice of $L=\clg{\log(1/\dst)}$, is
+\[
+	\bigO{\frac{\sqrt{\ab\log\log(1/\dst)} + \log\log(1/\dst)}{\dst^2}}
+\]
+as claimed.
+\item In the non-uniform case, where $\dst(\p) > \dst$, it suffices to note that with probability at least $1-\errprob_{j(\p)}$ the algorithm with stop at the $j(\p)$ invocation (where $j(\p)$ is as defined above, within a factor two of $\dst(\p)$). We thus can reuse the above analysis of the sample complexity, but stopping at $j(\p)$, to obtain that with probability at least $1-\errprob_{j(\p)} \geq 2/3$ the number of samples taken will be
+\[
+	\bigO{2^{2j(\p)}\Paren{\sqrt{\ab\log(j(\p)+1)} + \log(j(\p)+1)}}\,,
+\]
+which is $\bigO{\frac{\sqrt{\ab\log\log(1/\dst(\p))} + \log\log(1/\dst(\p))}{\dst(\p)^2}}$.
+\item Finally, to get the same guarantee \emph{on expectation} in the non-uniform case, let $T$ (a random variable) denote the index of the last invocation of the tester, so that $0\leq T \leq L$. We have seen that $T=j(\p)$ with probability at least $1-\errprob_{j(\p)}$; but we have much stronger guarantees! Namely, for any $j > j(\p)$,
+\[
+	\probaOf{T \geq j} \leq \prod_{i=j(\p)}^{j-1}\errprob_{i} \leq \errprob_{j(\p)}^{j-j(\p)}
+\]
+since this means that all invocations from $j(\p)$ onwards must have failed (\ie did not reject even though they should have). The expected sample complexity is then at most
+\[
+	\sum_{j=0}^L \probaOf{T \geq j}\cdot  \ns(\ab,\dst_j, \errprob_j)
+	\leq \sum_{j=0}^{j(\p)} \ns(\ab,\dst_j, \errprob_j)
+	+ \sum_{j=j(\p)+1}^L \errprob_{j(\p)}^{j-j(\p)} \ns(\ab,\dst_j, \errprob_j)\,.
+\]
+We have already analyzed the first term of the RHS, showing it was $\bigO{\frac{\sqrt{\ab\log\log(1/\dst(\p))} + \log\log(1/\dst(\p))}{\dst(\p)^2}}$. The second term is at most (ignoring constants and recalling the setting of $\errprob_j$)
+\begin{align*}
+	\sum_{j=j(\p)+1}^L &\frac{1}{(2\pi^2)^{j-j(\p)}} \cdot 2^{2j}\Paren{\sqrt{\ab\log(j+1)} + \log(j+1)} \\
+	&\leq 2^{2j(\p)}\sum_{j=1}^\infty \Paren{\frac{2}{\pi^2}}^{j}\Paren{\sqrt{\ab\log(j+j(\p)+1)} + \log(j+j(\p)+1)} \\
+	&\lesssim 2^{2j(\p)}\Paren{\sqrt{\ab\log(j(\p)+1)} + \log(j(\p)+1)}
+\end{align*}
+which is $\bigO{\frac{\sqrt{\ab\log\log(1/\dst(\p))} + \log\log(1/\dst(\p))}{\dst(\p)^2}}$ as well. Here, we relied on the fact that $\frac{2}{\pi^2} < 1$ to be able to bound the converging series by its first term: at its core, this is possible because the probability $\probaOf{T \geq j}$ to keep running the tests after reaching $j(\p)$ decreases exponentially quickly with $j$.
+\end{itemize}
+\end{solution}
+\begin{question}\label{ex:mixture:sample}
+Given two probability distributions $\p,\q$, an integer $\ns\geq 1$, and a parameter $\alpha\in[0,1]$, consider the following two sampling processes:
+\begin{itemize}
+  \item Sample $\occur \sim \poisson{\ns}$, and draw $\occur$ \iid samples from the mixture $(1-\alpha)\p+\alpha\q$.
+  \item Sample $\occur \sim \poisson{\ns}$, and draw $\occur$ \iid samples from $\p$. Then, for each $1\leq i\leq \occur$, independently sample $B_i\sim\bernoulli{\alpha}$: if $B_i=1$, replace the $i$-th sample by a new (and independent from everything else) sample drawn from $\q$.
+\end{itemize}
+Show that these two processes result in the same distribution.
+\end{question}
+\begin{solution}[Sketch]
+Condition on a given value of $N$. In both cases, the $N$ samples are mutually independent, so it is enough to show that the marginal distribution of a single sample is the same in both cases. This part is then quite straightforward: suppose $X$ is a sample from the mixture $(1-\alpha)\p+\alpha\q$, and $Y$ obtained by the second process (draw independently $Y'\sim\p$, $Y''\sim \q$, and $B\sim\sim\bernoulli{\alpha}$, and set $Y=(1-B)\cdot Y'+B\cdot Y''$). Then, for all $x$,
+\[
+	\bPr{X=x} =  (1-\alpha)\p(x)+\alpha\q(x)
+\] 
+while
+\begin{align*}
+	\bPr{Y=x} 
+	&=  \probaCond{Y=x}{B=0}\cdot \bPr{B=0} + \probaCond{Y=x}{B=1}\cdot \bPr{B=1} \\
+	&= \probaCond{Y'=x}{B=0}\cdot (1-\alpha) + \probaCond{Y''=x}{B=1}\cdot \alpha \\
+	&=  \p(x)(1-\alpha)+\q(x)\alpha\,.
+\end{align*}
+\end{solution}
+\begin{question}[$\star$]\label{ex:l2:closeness}
+Establish the analogue of Theorem~2.22 for the \emph{two-distribution} case (when both $\p,\q$ are unknown, and you are given $\ns$ \iid samples from each). Specifically, consider the statistic
+$Z'=\sum_{i=1}^\ab \Paren{(X_i-Y_i)^2-X_i-Y_i}$
+for which you will have to establish the following counterpart of Claim~2.2:
+\begin{claim}
+	\label{claim:closeness:moments:poisson}
+If $X\sim\poisson{\lambda}$ and $Y\sim\poisson{\mu}$ are independent, then 
+  $
+  \bEE{(X-Y)^2-X-Y} = (\lambda-\mu)^2
+  $
+  and 
+  $
+  \bEE{((X-Y)^2-X-Y)^2} = (\lambda-\mu)^4 + 2(\lambda+\mu)^2 + 4(\lambda+\mu)(\lambda-\mu)^2
+  $.
+\end{claim}
+\noindent Show that the sample complexity is $O(\max\Paren{\normtwo{\p},\normtwo{\q}}/\dst^2)$. Try to establish the (incomparable) bound $O(\min\Paren{\normtwo{\p},\normtwo{\q}}/\dst^2+1/\dst)$.
+\end{question}
+\begin{solution}
+We will not here establish Claim~2.1, which can be checked by tedious computations \emph{(if you have an elegant proof of this claim, let me know!)}. Consider the following algorithm, the analogue of Algorithm~11 for two unknown distributions:
+\begin{algorithm}[ht!]
+  \begin{algorithmic}[1]
+    \Require Multisets of $\ns$ samples each, $x_1,\dots,x_\ns \in \domain$ and $y_1,\dots,y_\ns \in \domain$, parameters $\dst\in(0,1]$.
+    \Comment{Assumes Poissonization}
+    \State Set $\tau \gets 3\ns^2\dst^2$
+    \State Compute
+    \[
+        Z = \sum_{j\in\domain} \Paren{(\occur_j-\occur_j')^2-\occur_j-\occur_j'}
+    \] where $\occur_j \gets \sum_{t=1}^\ns\indic{x_t=j}$, $\occur_j' \gets \sum_{t=1}^\ns\indic{y_t=j}$.
+    \If{ $Z \geq \tau$ } \Return \reject \Comment{$\p,\q$ far (in $\lp[2]$)}
+    \Else\ 
+      \Return \accept \Comment{$\p,\q$ close (in $\lp[2]$)}
+    \EndIf
+  \end{algorithmic}
+  \caption{\label{algo:l2:closeness}\sc Robust $\lp[2]$ Tester (for Closeness)}
+\end{algorithm}
+The proof will be very similar to that of Theorem~2.22. Assuming Poissonization, if $x_1,\dots,x_\ns$ are independent samples from $\p$ and $y_1,\dots,y_\ns$ from $\q$, we get that, for all $j\in\domain$, $\occur_j\sim\poisson{\ns\p(j)}$  and $\occur'_j\sim\poisson{\ns\q(j)}$ and so, by~\cref{claim:closeness:moments:poisson} above,
+\begin{align}
+	\bE{\p}{Z} = \sum_{j=1}^\ab (\ns\p(j)-\ns\q(j))^2 = \ns^2 \normtwo{\p-\q}^2
+\end{align}
+and
+\begin{align}
+	\Var_{\p}[Z] 
+	&= \sum_{j=1}^\ab \Var\mleft[\Paren{(\occur_j-\occur_j')^2-\occur_j-\occur_j'}\mright] \notag\\
+	&= \sum_{j=1}^\ab \Paren{ \bEE{((\occur_j-\occur_j')^2-\occur_j-\occur_j')^2} -  \ns^4(\p(j)-\q(j))^4}\notag\\
+	&= \sum_{j=1}^\ab \Paren{2\ns^2(\p(j)+\q(j))^2 + 4\ns^3(\p(j)+\q(j))(\p(j)-\q(j))^2}\notag\\
+	&\leq 4\ns^2\Paren{\normtwo{\p}^2+\normtwo{\q}^2} + 4\ns^3(\normtwo{\p}+\normtwo{\q})\normtwo{\p-\q}^2
+\end{align}
+the last step again using $\p(j)+\q(j)\leq \norminf{\p}+\norminf{\q} \leq \normtwo{\p}+\normtwo{\q}$.
+
+\begin{itemize}
+	\item If $\normtwo{\p-\q} \leq \dst$, then $\bE{\p}{Z} \leq \ns^2\dst^2$ and by Markov's inequality
+	\[
+		\bPr{Z \geq 3\ns^2\dst^2 } \leq \frac{\bE{\p}{Z}}{3\ns^2\dst^2} \leq \frac{1}{3}
+	\]
+	\item If $\normtwo{\p-\q} \geq 2\dst$, then $\bE{\p}{Z} \geq 4\ns^2\dst^2$ and by Chebyshev's 
+	\begin{align*}
+		\bPr{Z < 3\ns^2\dst^2 } 
+		&\leq \frac{16\Var_{\p}[Z]}{\bE{\p}{Z}^2} \leq 
+		\frac{64(\normtwo{\p}^2+\normtwo{\q}^2)}{\ns^2\normtwo{\p-\q}^4} + \frac{64(\normtwo{\p}+\normtwo{\q})}{\ns\normtwo{\p-\q}^2} \\
+		&\leq \frac{8\max(\normtwo{\p},\normtwo{\q})^2}{\ns^2\dst^4} + \frac{32\max(\normtwo{\p},\normtwo{\q})}{\ns\dst^2}
+	\end{align*}
+	which is less than $1/3$ for $\ns \geq 100\max(\normtwo{\p},\normtwo{\q})/\dst^2$.
+\end{itemize}
+This establishes the first bound from the exercise.\medskip
+
+The second is a little trickier, and we here only provide an outline.\footnote{If you have a fully written solution you'd like to include, or if you think something isn't quite right, do contact me!} It will relies on the following lemma (which will not be proven here, but can be shown by, \eg adapting~\cite[Lemma~3.1]{BatuC17}):
+\begin{lemma}[{Constant-factor estimate of the $\lp[2]$ norm}]
+There exists an algorithm which, given $\ns$ \iid samples from an unknown distribution $\p\in\distribs{\N}$ and a parameter $\tau\in(0,1]$, outputs a value $\hat{\rho}\in(\tau,1]\cup\{\bot\}$ and has the following guarantees:
+\begin{itemize}
+	\item if $\normtwo{\p} \geq \tau$, then $\hat{\rho} \neq \bot$ with probability at least $9/10$;
+	\item if $\hat{\rho} \neq \bot$, then $\normtwo{\p}/2 \leq \hat{\rho} \leq 2\normtwo{\p}$ with probability at least $9/10$;
+\end{itemize}
+as long as $\ns = \bigTheta{1/\tau}$.
+\end{lemma}
+Essentially, the above state that it is possible to use $\bigO{1/\tau}$ samples to obtain (with high constant probability) a constant-factor estimate of the $\lp[2]$ norm of a distribution if we are promised that this norm is at least $\tau$ (and, if that norm is much less than $\tau$, then we will detect it).
+
+With this at our disposal, we can proceed as follows: 
+\begin{enumerate}
+	\item Set $\tau \asymp \dst$, and use the above algorithm with $\bigO{1/\dst}$ samples from both $\p$ and $\q$ to try and get estimates of their $\lp[2]$ norms. 
+	\item If we get $\bot$ for both, then we know that $\normtwo{\p-\q} \leq \normtwo{\p}+\normtwo{\q} \leq 2\tau \leq \dst$ and we are done;
+	\item If we get estimates $\hat{\rho}_{\p}$, $\hat{\rho}_{\q}\geq \tau$ for both, then 
+		\begin{enumerate}
+			\item we check that those two values are within a (sufficiently) large constant factor of each other: if not, we know that $\normtwo{\p-\q} \geq 2\dst$ and we are done;
+			\item if they are within constant factors, we get that $\normtwo{\p}\asymp \normtwo{\q}$, and so $\min(\normtwo{\p},\normtwo{\q})\asymp \max(\normtwo{\p},\normtwo{\q})$ and we can use the algorithm from the first part, with sample complexity $O(\max\Paren{\normtwo{\p},\normtwo{\q}}/\dst^2)=O(\min\Paren{\normtwo{\p},\normtwo{\q}}/\dst^2)$, and we are done;
+		\end{enumerate}
+	\item If we get an estimate for one (say $\p$ but $\bot$ for the other (say $\q$), then we know that $\normtwo{\q} \leq \tau$ and have a constant-factor estimate $\hat{\rho}_{\p}$ for $\normtwo{\p}$. 
+		\begin{enumerate}
+				\item If $\hat{\rho}_{\p} \gg \dst$, then we know that $\normtwo{\p-\q} \geq \normtwo{\p}-\tau \gg 2\dst$ and we are done.
+				\item If $\hat{\rho}_{\p} \asymp \dst$, then we know that $\max(\normtwo{\p},\normtwo{\q} \asymp \dst$, so we can use the algorithm from the first part, with sample complexity $O(\max\Paren{\normtwo{\p},\normtwo{\q}}/\dst^2) = O(1/\dst)$, and we are done.
+		\end{enumerate}
+\end{enumerate}
+Overall, the sample complexity is $\bigO{\max\Paren{\min\Paren{\normtwo{\p},\normtwo{\q}}/\dst^2}, 1/\dst}$, establishing the second bound from the exercise.
+\end{solution}
+\begin{question}\label{ex:l2:reduction:chisquare}
+Show that the transformation $\Phi$ from Section~2.2.2 (Eq.~(2.59)) ``maps $\chi^2$ divergence to $\lp[2]$ distance'' in the following, approximate way: for any $\p,\q\in\distribs{\ab}$, 
+\[
+	\normtwo{\Phi_\q(\p)-\Phi_\q(\q)}^2 = \sum_{i\in\domain}\frac{(\p(i)-\q(i))^2}{1+\flr{\ab\q(i)}\,.}
+\]
+Conclude that, assuming $\min_i \q(i) \geq 1/(2\ab)$ (as we could in Section~2.2.1 after using the ``mixture trick'' of Eq.~(2.52)), 
+\[
+	\frac{1}{2}\chisquare{\p}{\q}\leq \ab\normtwo{\Phi_\q(\p)-\Phi_\q(\q)}^2 \leq \chisquare{\p}{\q}
+\]
+for every $\p\in\distribs{\ab}$.
+\end{question}
+\begin{solution}
+From the expression of $\Phi$ and with the notation of Section~2.2.2, we have
+\begin{align*}
+	\normtwo{\Phi_\q(\p)-\Phi_\q(\q)}^2
+	&= \sum_{j=1}^{\ab'} \Paren{\Phi_\q(\p)-\Phi_\q(\q)}^2 \\
+	&= \sum_{j=1}^{\ab'} \Paren{\sum_{i=1}^\ab \Paren{\frac{\p(i)}{\ab_i} - \frac{\q(i)}{\ab_i}} \indic{j\in S_i} }^2\\
+	&= \sum_{j=1}^{\ab'} \sum_{i=1}^\ab \indic{j\in S_i}  \Paren{\frac{\p(i)}{\ab_i} - \frac{\q(i)}{\ab_i}}^2 \tag{$\ast$}\\
+	&= \sum_{i=1}^\ab \frac{1}{\ab_i^2} \Paren{\p(i)-\q(i)}^2 \sum_{j=1}^{\ab'}\indic{j\in S_i}  \\
+	&= \sum_{i=1}^\ab \frac{\Paren{\p(i)-\q(i)}^2}{\ab_i}  \\
+\end{align*}
+where for $(\ast)$ we used that exactly one term of the inner sum in non-zero (as each $j\in[\ab]$ belongs to exactly one  set $S_i$), allowing us to bring the sum and indicator outside the square; and later that $\sum_{j=1}^{\ab'}\indic{j\in S_i} = \abs{S_i} = \ab_i$. The result then follows from the definition of $\ab_i=1+\flr{\ab\q(i)}$ (for $i\in[\ab]$).
+
+\noindent Finally, if $\min_i \q(i) \geq 1/(2\ab)$ we get that
+\[
+	\ab\q(i) \leq 1+\flr{\ab\q(i)} \leq 2\ab\q(i), \qquad i\in[\ab]
+\]
+where the RHS is obtained by observing that $\max_{x\geq 1/2} \frac{1+\flr{x}}{x} = 1/2$. This directly implies
+\[
+		\underbrace{\frac{1}{2}\sum_{i=1}^\ab \frac{\Paren{\p(i)-\q(i)}^2}{\q(i)}}_{\frac{1}{2}\chisquare{\p}{\q}} \leq \underbrace{\ab \sum_{i=1}^\ab \frac{\Paren{\p(i)-\q(i)}^2}{1+\flr{\ab\q(i)}}}_{\ab\normtwo{\Phi_\q(\p)-\Phi_\q(\q)}^2} 
+		\leq \underbrace{\sum_{i=1}^\ab \frac{\Paren{\p(i)-\q(i)}^2}{\q(i)}}_{\chisquare{\p}{\q}}
+\]
+as wanted.
+\end{solution}
+
+\begin{question}[$\star\star$]\label{ex:l1:reduction:parameters}
+Generalize the transformation $\Phi$ from Section~2.2.3 in two ways: first, by replacing the mixture $\Phi^{(3)}_\q(\p) = \frac{1}{2}\p+\frac{1}{2}\uniformOn{\ab}$ by $\alpha\p+(1-\alpha)\uniformOn{\ab}$, where $\alpha\in(0,1)$. Second, by replacing the choice $\ab'=4\ab$ in $\Phi^{(2)}(\p)$ by $\ab'=\beta\ab$, for some integer $\beta$ such that $\beta(1-\alpha)\geq 1$.
+\begin{enumerate}
+  \item By tracking down the various restrictions on $\alpha,\beta$ and their use across $\Phi^{(1)}$, $\Phi^{(2)}$, and $\Phi^{(3)}$, show that doing so now maps identity testing with parameters $(\ab,\dst)$ to uniformity testing with parameters 
+  \[
+  	\Paren{\beta\ab,\alpha\Paren{1-\frac{1}{\beta(1-\alpha)}}\dst}
+  \]
+  \item Check that setting $(\alpha,\beta)=(1/2,4)$ as in Section~2.2.3 recovers Theorem~2.28, and the blowup factor of $32$ discussed at the end of the section.
+  \item Recalling that the sample complexity scales as $\sqrt{\ab}/\dst^2$, optimize over $(\alpha,\beta)$ to find the optimal choice of parameters, and prove that the resulting blowup is $\approx 12.2$. %% alpha = 4/5, beta=25
+  \item What would be the optimal choice of $(\alpha,\beta)$, and the corresponding blowup, in a setting where the sample complexity of uniformity testing scales as $\ab/\dst^2$ instead of $\sqrt{\ab}/\dst^2$? (This is not that far-fetched: we will see in Section~4.3 an example of such a setting.)  %alpha=2/3, beta=9, blowup 46
+\end{enumerate}
+\end{question}
+\begin{solution} The solution below follows the aalysis of Section~2.2.3.
+\begin{enumerate}
+  \item By setting things as suggested, we will be able to assume in our analysis of $\Phi^{(2)}$ that $\ab'\q(i) \geq \ab'(1-\alpha)/\ab = \beta(1-\alpha)$ for all $i\in[\ab]$, and then
+  \begin{equation}
+  	\label{eq:exercise:uniformity:reduction:min:qi}
+  	\min_i \frac{\flr{\ab'\q(i)}}{\ab'\q(i)} \geq \frac{\beta(1-\alpha)-1}{\beta(1-\alpha)}
+  \end{equation}
+  (the $\flr{\ab'\q(i)}$ in the numerator is the reason we need to enforce $\beta(1-\alpha)\geq 1$). We then get the analogue of Eq.~(2.65): for every $\p_1,\p_2\in\distribs{\ab}$, 
+  \begin{equation}
+  			\totalvardist{\Phi^{(2)}(\p_1)}{\Phi^{(2)}(\p_2)} \geq \frac{\beta(1-\alpha)-1}{\beta(1-\alpha)}\totalvardist{\p_1}{\p_2}\,,
+  \end{equation}
+  We then only have to take into account the last piece, \ie that $\Phi^{(3)}$ does allow us to assume that Eq.~\eqref{eq:exercise:uniformity:reduction:min:qi} holds, but doing so comes at the cost of shrinking the total variation distance by a factor $\alpha$ as well; so that, when combining $\Phi^{(1)}$, $\Phi^{(2)}$, and $\Phi^{(1)}$ all together, we get a mapping $\Phi$ such that, for every $\p_1,\p_2\in\distribs{\ab}$, 
+  \begin{equation}
+  			\totalvardist{\Phi(\p_1)}{\Phi(\p_2)} \geq \alpha\Paren{1-\frac{1}{\beta(1-\alpha)}}\totalvardist{\p_1}{\p_2}\,.
+  \end{equation}
+  Overall, for any choice of $\alpha\in[0,1]$ and $\beta \geq 1$ such that $\beta(1-\alpha) \geq 1$, we can convert an identity testing instance with parameters $(\ab,\dst)$ to a uniformity testing instance with parameters $(\ab' = \beta\ab, \dst' = \alpha\Paren{1-\frac{1}{\beta(1-\alpha)}})$.
+  \item For $\alpha = 1/2$ and $\beta=4$, we get $\alpha\Paren{1-\frac{1}{\beta(1-\alpha)}} = 1/4$, and so
+  \[
+  	\frac{\sqrt{\ab'}}{\dst'^2} 
+  	= \frac{\sqrt{\beta}}{\Paren{\alpha\Paren{1-\frac{1}{\beta(1-\alpha)}}}^2}\cdot \frac{\sqrt{\ab}}{\dst^2}  
+  	= \frac{\sqrt{4}}{(1/4)^2}\cdot \frac{\sqrt{\ab}}{\dst^2} 
+  	= \boxed{32}\cdot \frac{\sqrt{\ab}}{\dst^2}
+  \]
+  \item From the above, we want to choose $\alpha, \beta$ to minimize the factor
+  \begin{equation}
+  	\label{eq:blowup:factor}
+  	\frac{\sqrt{\beta}}{\Paren{\alpha\Paren{1-\frac{1}{\beta(1-\alpha)}}}^2}
+  \end{equation}
+  subject to $\beta(1-\alpha)\geq 1$, $\alpha\in[0,1]$, $\beta \geq 1$. For the sake of the minimization, it is easier to minimize the square of this quantity, and to set $ \gamma \eqdef \beta(1-\alpha)$, so that we seek to find the minimizer of
+  \[
+  		\frac{\beta}{\alpha^4\Paren{1-\frac{1}{\beta(1-\alpha)}}^4} = \frac{1}{\alpha^4(1-\alpha)} \cdot \frac{\gamma^5}{(\gamma-1)^4}
+  \]
+  subject to $\alpha\in[0,1]$ and $\gamma \geq 1$. The variables are now separated, and we can minimize separately in $\alpha$ and in $\gamma$. This leads to minimizers $\alpha^\ast=4/5$ and $\gamma^\ast=5$. Getting back to our original quantity, we therefore get that it is minimized for $(\alpha,\beta)=(4/5, 25)$, for which the blowup factor in Eq.~\eqref{eq:blowup:factor} is approximately $\boxed{12.21}$.
+  \item If the sample complexity were to scale as $\ab/\dst^2$ instead of $\frac{\sqrt{\ab}}{\dst^2}$, then the blowup factor would become 
+  \begin{equation}
+  	\label{eq:blowup:factor:2}
+  	\frac{\ab'/\dst'^2}{\ab/\dst^2} = \frac{\beta}{\Paren{\alpha\Paren{1-\frac{1}{\beta(1-\alpha)}}}^2}
+  \end{equation}
+  and minimizing this, as before subject to $\beta(1-\alpha)\geq 1$, $\alpha\in[0,1]$, $\beta \geq 1$, leads in the same way to minimizers $(\alpha,\beta)=(2/3, 9)$, for which the blowup factor in Eq.~\eqref{eq:blowup:factor:2} is approximately $\boxed{45.56}$.
+\end{enumerate}
+\end{solution}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Information-theoretic lower bounds}
+  \label{chap:lowerbounds}
+  
+\begin{question}\label{exo:deriving:dep:delta:lb}
+Combine (the second part of) Lemma~B.4 with (the first part of) Lemma~B.5 to obtain Eq.~(3.16) from Eq.~(3.7). Use it to derive Theorem~3.3.
+\end{question}
+\begin{solution}
+Invoking Lemma~B.4 (specifically, Eq.~(B.9)) and Lemma~B.5, we get
+\begin{align*}
+	1-2\errprob 
+	&\leq \totalvardist{\bE{\theta}{\p_\theta^{\otimes\ns}}}{\p_\accept^{\otimes\ns}} \tag{Eq.~(3.7)}\\
+	&\leq 1-\frac{1}{2}e^{-\kldiv{\bE{\theta}{\p_\theta^{\otimes\ns}}}{\p_\accept^{\otimes\ns}}} \tag{Eq.~(B.9)}\\
+	&\leq 1-\frac{1}{2(1+\chisquare{\bE{\theta}{\p_\theta^{\otimes\ns}}}{\p_\accept^{\otimes\ns}}} \tag{Lemma~B.5}
+\end{align*}
+which, reorganizing the inequality, yields Eq.~(3.16):
+\[
+	\frac{1}{4\errprob} \leq 1+\chisquare{\bE{\theta}{\p_\theta^{\otimes\ns}}}{\p_\accept^{\otimes\ns}}\,.
+\]
+Now, since in Eq.~(3.14) we had derived 
+\[
+	\chisquare{\bE{\theta}{\p_\theta^{\otimes\ns}}}{\p_\accept^{\otimes\ns}}
+	= \bE{\theta,\theta'}{(1+{H(\theta,\theta')})^\ns} - 1
+	\leq e^{\frac{81\dst^4\ns^2}{\ab}} - 1
+\]
+we can plug this in Eq.~(3.16) to obtain the necessary inequality 
+\begin{equation}
+\frac{1}{4\errprob} \leq e^{\frac{81\dst^4\ns^2}{\ab}}\,,
+\end{equation}
+that is, $\ns \geq \frac{ \sqrt{ \ab \log(1/(4\errprob)) } }{ 9\dst^2 }$; proving Theorem~3.3. \emph{(As a side note: one can similarly}\exercise{Try it!} \emph{prove a lower bound of $\ns = \bigOmega{\log(1/\errprob)/\dst^2}$ using Lemma~B.4 instead of Pinsker's inequality in Eq.~(3.4); and combining the two leads to the following bound for uniformity testing, 
+\begin{equation}
+	\ns = \bigOmega{\frac{ \sqrt{ \ab \log(1/(\errprob)) } + \log(1/\errprob) }{ \dst^2 }}\,,
+\end{equation}
+which is optimal.}
+\end{solution}
+
+\begin{question}\label{exo:notrealproba:lb}
+Let $\p$ be a measure (not necessarily a probability measure) such that the $\lp[1]$ distance between $\p$ and $\property_\ab$ satisfies $\lp[1](\p,\property_\ab)>2\dst$, and $1/2\leq \normone{\p} \leq 3/2$. Defining $\p' \eqdef \p/\normone{\p}$ (an actual probability distribution), provide a lower bound on $\totalvardist{\p}{\property_\ab}$. Moreover, show that obtaining $\ns$ ``samples'' from the Poisson process with measure $\p$ is equivalent to getting $\poisson{\ns\normone{\p}}$ samples from the distribution $\p'$.
+
+Conclude with how one could use a testing algorithm $\Algo$ for property $\property_\ab$ given $\poisson{\ns}$ samples (\ie in the Poissonized sampling model) to distinguish between two families of measures (\yes- and \no-instances) far in $\lp[1]$ distance, thus justifying the relaxed assumption from~\cref{ssec:dk16}.
+\end{question}
+\begin{solution}
+\tbc
+\end{solution}
+
+\begin{question}[$\star$]\label{exo:paninski:mi:lb}
+Recall that we defined the \no-instances in~\cref{ssec:dk16} by~\cref{eq:notpaninski:construction} (measures, instead of \emph{bona fide} probability measures) in order to guarantee mutual independence of $\occur_1,\dots,\occur_\ab$ (conditioned on $\mathbf{b}$. Check the argument to see which part of the argument would fail if we had used~\cref{eq:paninski:construction} instead. Then, modify the argument to fix this, and obtain the same sample complexity lower bound. \textit{(Hint: we still have mutual independence of the $\ab/2$ random variables $(\occur_1, \occur_2),\dots,(\occur_{\ab-1}, \occur_\ab)$ conditioned on $\mathbf{b}$. Establish the analogue of~\cref{eq:mutualinfobound} with $\occur_1=j,\occur_2=\ell$ instead of $\occur_1=j$, and proceed from there.}
+\end{question}
+\begin{solution}
+\tbc
+\end{solution}
+
+\begin{question}\label{ex:2/3:lb:applications}
+Verify that applying~\cref{theo:2/3:lb:vv} to (i)~the uniform distribution $\uniform_\ab$ and (ii)~the ``Zipf'' distribution $\q\in\distribs{\ab}$ such that $\q(i) \propto 1/\sqrt{i}$ leads, in both cases, to an $\Omega(\sqrt{\ab}/\dst^2)$ sample complexity lower bound for identity testing.
+\end{question}
+\begin{solution}
+\tbc
+\end{solution}
+
+\begin{question}\label{exo:reexpress:algos:frequency:only}
+Check that you can express several of the algorithms in~\cref{sec:uniformity} as a function of $\freq$ only (as defined in~\cref{ssec:momentmatching}). Specifically, verify this for~\cref{algo:collision-based,algo:unique-elements,algo:empirical:plugin}. Verify this also for~\cref{algo:chisquare}, keeping in mind that this algorithm was stated and analyzed in the Poissonized setting: what does it change?
+\end{question}
+\begin{solution}
+\tbc
+\end{solution}
+
+\begin{question}[$\star$]\label{ex:reduction:monotone}
+  Prove that the mapping $\Phi$ defined in~\cref{eq:reduction:monotonicity} does satisfy the requirements of a reduction, for $\ab'=2\ab$ and $\dst'=\dst/2$. That is, if $\p\in\distribs{\ab}$ is $\dst$-far from $\uniform_\ab$, then $\Phi(\p)\in\distribs{2\ab}$ is $\dst'$-far from every distribution $\q\in\property^{\searrow}_{2\ab}$. \textit{(Hint: for any given monotone $\q$, analyse the distance $\totalvardist{\Phi(\p)}{\q}$ according to whether $\q(\ab) > 1/(2\ab)$ or not, relating this to the set $S\subseteq[\ab]$ on which $\p$ is greater than $\uniform_\ab$.)} Moreover, show that this loss by a factor $1/2$ in the distance is necessary.
+\end{question}
+\begin{solution}
+Fix any $\p\in\distribs{\ab}$ such that $\totalvardist{\p}{\uniform_\ab}>\dst$, and let $S\subseteq [\ab]$ the set which witnesses it:
+$S\eqdef \setOfSuchThat{ 1\leq i\leq \ab }{\p(i)> 1/\ab }$ 
+which satisfies 
+\[
+	\p(S)-\uniform_\ab(S) = \uniform_\ab([\ab]\setminus S)- \p([\ab]\setminus S) >\dst
+\]
+Further define $T \eqdef [\ab]\setminus S \subseteq \{1,2,\dots,\ab\}$, and $S+\ab = \setOfSuchThat{i+\ab}{i\in S} \subseteq \{\ab+1,\dots,2\ab\}$. 
+By definition of $\Phi(\p)$, we then have
+\[
+	\uniform_{2\ab}(T)-\Phi(\p)(T)=\Phi(\p)(S+\ab)-\uniform_{2\ab}(S+\ab)= \frac{1}{2}(\p(S)-\uniform_\ab(S)>\frac{\dst}{2}\,.
+\]
+Now, fix any monotone distribution $\q\in\property^{\searrow}_{2\ab}$. We have two cases:
+\begin{itemize}
+\item If $\q(\ab) > 1/(2\ab)$, then, since $\q$ is monotone, $\q(i) > 1/(2\ab)$ for every $i \leq \ab$. This implies
+\[
+	\q(T)-\Phi(\p)(T) \geq \uniform_{2\ab}(T)-\Phi(\p)(T) > \frac{\dst}{2}
+\]
+\item If $\q(\ab) \leq 1/(2\ab)$, then $\q(i) \leq 1/(2\ab)$ for every $i \geq \ab$. This implies
+\[
+	\Phi(\p)(S+\ab)-\q(S+\ab) \geq \Phi(\p)(S+\ab)-\uniform_{2\ab}(S+\ab) > \frac{\dst}{2}
+\]
+\end{itemize}
+This shows that $\totalvardist{\Phi(\p)}{\q} > \dst/2$. For the ``necessary'' part, consider $\p$ such that $\p(1)=1$.
+\end{solution}
+
+\begin{question}\label{ex:testing:pbd}
+\newcommand{\pbd}{\hspace{1pt}{\cdot}\kern -4pt {\subset}\kern -3pt {\rtimes}}
+  A \emph{Poisson Binomial Distribution} (PBD) with parameters $\ab$ and $\vec{p}=(p_1,\dots,p_\ab)$ is the distribution of the sum of $\ab$ independent Bernoulli random variables $X_1,\dots,X_\ab$, where $X_i \sim \bernoulli{p_i}$. (This is a generalization of Binomial distributions, which correspond to $p_1=\dots=p_\ab$.) Let $\property^{\pbd}_{\ab}$ denote the class of all PBDs with parameter $\ab$. Using the facts that (1)~$\property^{\pbd}_{\ab}$ can be agnostically learned with $O(\log^2(1/\dst)/\dst^2)$ samples (independent of $\ab$)~\citep{DDS:PBD:15}, and (2)~the ``standard'' Binomial distribution $\binomial{\ab}{1/2}$ is a PBD, show that testing $\property^{\pbd}_{\ab}$ has sample complexity $\Omega(\ab^{1/4}/\dst^2)$ (as long as $\dst \geq 1/2^{O(\ab^{1/8})}$). \textit{(Hint: combine the results of~\cref{ssec:vv:instancebyinstance,ssec:lb:reductions}.)}
+\end{question}
+\begin{solution}
+\tbc
+\end{solution}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Testing with Constrained Measurements}
+  \label{chap:constrained}
+  
+  \begin{question}\label{exo:error:amplification}
+Verify that the error amplification technique discussed in Lemma~1.1 still goes through in the communication-constrained distributed setting.
+\end{question}
+\begin{solution}[Sketch]
+Regardless of the specific distributed setting (private-coin, public-coin, or sequentially interactive), one can still run $m=\bigO{\log(1/\errprob)}$ independent instances of the protocol on $m$ disjoint sets of users, and use the same argument as in~Lemma~1.1.
+\end{solution}
+
+\begin{question}\label{exo:identity:reduction}
+Verify that the reduction from identity to uniformity testing discussed in Section~2.2.3 still goes through in the communication-constrained distributed setting, both in the private- and public-coin settings. Do the users need to know the reference distribution $\q$?
+\end{question}
+\begin{solution}
+As described in \cite[Proposition~A.16]{AcharyaCT19b}, the reduction does go through, as each user can ``locally'' and independently apply the mapping $\Psi_\q$ to their sample, to get a draw from the distribution $\Phi_\q(\p)$. This preserves the setting of randomness (private- or public-coin), as it only require private randomness; however, as mentioned in~\cite[Remark~A.17]{AcharyaCT19b}, all users \emph{do} need to know the reference distribution $\q$ (in order to be able to compute the mapping~$\Psi_\q$.
+
+However, the two specific approaches seen in Section~4, for private-coin protocols (Section~4.2) and public-coin protocols (Section~4.3) can be used to perform identity testing \emph{even if the users do not know the reference $\q$}. Namely:
+\begin{itemize}
+	\item In the private-coin case, distributed simulation (Theorem~4.2) can still be used to simulate $\ns'\asymp \ns 2^\numbits/\ab$ samples from $\p$ at the server. The server (which \emph{does} know $\q$, even if it is the only one to do so) can then convert these $\ns'$ \iid samples into $\ns'$ \iid samples from $\Phi_\q(\p)$, performing the reduction to uniformity testing in a centralized fashion.
+	\item In the public-coin case, domain compression (Theorem~2.12) is used to convert the $\ns$ \iid samples from $\p$ into $\ns$ \iid samples from some (randomly chosen) $\p_{\Pi}$ on a domain of size $L \eqdef 2^\numbits$. This still works and can be done without knowledge of $\q$; then, the guarantee of Theorem~2.12 ensures that $\totalvardist{\p_{\Pi}}{\q_{\Pi}} \gtrsim \sqrt{{L}/{\ab}}\cdot\totalvardist{\p}{\q}$. This means that the server (which knows $\q$ as well as the public randomness used to choose $\Pi$, and thus can compute what the ``new reference'' $\q_{\Pi}$ is) can apply the reduction from identity testing (with reference $\q_{\Pi}$ over $[L]$) to uniformity testing locally, since it has all it needs for this: $\ns$ \iid samples from $\p_{\Pi}$, and knowledge of $\q_{\Pi}$ and $\dst' \asymp \sqrt{{L}/{\ab}}\cdot\dst$.
+\end{itemize}
+\end{solution}
+
+\begin{question}[$\star$]\label{exo:simulate:infer}
+Extend the argument of Lemma~4.3 to $\numbits\geq 1$, to establish the more general Theorem~4.2. \emph{(Hint: suppose that $2^\numbits -1$ divides $\ab$, and partition the domain in $m\eqdef \ab/(2^\numbits -1)$ sets. Each pair of users is ``assigned'' one of these sets.)}
+\end{question}
+\begin{solution}
+\tbc
+\end{solution}
+
+\begin{question}[$\star\star$]\label{exo:heterogeneous}
+Extend the argument of Theorem~4.2 further to apply to the case where user has a communication constraint $\numbits_i$ (heterogeneous constraints among users). Establish an analogous bound, with $2^\numbits$ replaced by $\frac{1}{\ns}\sum_{j=1}^\ns 2^{\numbits_j}$. \emph{(Hint: consider a dyadic partition of the domain $[\ab]$. It \emph{should} work.)}
+\end{question}
+\begin{solution}\itshape
+No solution for this one (for now at least). Feel free to contact me if you've tried and are stuck!
+\end{solution}
+  
+  
+\printbibliography
+
+\end{document}
