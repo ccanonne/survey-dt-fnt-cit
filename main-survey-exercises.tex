@@ -765,24 +765,90 @@ which is optimal.}
 \begin{question}\label{exo:notrealproba:lb}
 Let $\p$ be a measure (not necessarily a probability measure) such that the $\lp[1]$ distance between $\p$ and $\property_\ab$ satisfies $\lp[1](\p,\property_\ab)>2\dst$, and $1/2\leq \normone{\p} \leq 3/2$. Defining $\p' \eqdef \p/\normone{\p}$ (an actual probability distribution), provide a lower bound on $\totalvardist{\p}{\property_\ab}$. Moreover, show that obtaining $\ns$ ``samples'' from the Poisson process with measure $\p$ is equivalent to getting $\poisson{\ns\normone{\p}}$ samples from the distribution $\p'$.
 
-Conclude with how one could use a testing algorithm $\Algo$ for property $\property_\ab$ given $\poisson{\ns}$ samples (\ie in the Poissonized sampling model) to distinguish between two families of measures (\yes- and \no-instances) far in $\lp[1]$ distance, thus justifying the relaxed assumption from~\cref{ssec:dk16}.
+Conclude with how one could use a testing algorithm $\Algo$ for property $\property_\ab$ given $\poisson{\ns}$ samples (\ie in the Poissonized sampling model) to distinguish between two families of measures (\yes- and \no-instances) far in $\lp[1]$ distance, thus justifying the relaxed assumption from Section~3.2.
 \end{question}
 \begin{solution}
 \tbc
 \end{solution}
 
 \begin{question}[$\star$]\label{exo:paninski:mi:lb}
-Recall that we defined the \no-instances in~\cref{ssec:dk16} by~\cref{eq:notpaninski:construction} (measures, instead of \emph{bona fide} probability measures) in order to guarantee mutual independence of $\occur_1,\dots,\occur_\ab$ (conditioned on $\mathbf{b}$. Check the argument to see which part of the argument would fail if we had used~\cref{eq:paninski:construction} instead. Then, modify the argument to fix this, and obtain the same sample complexity lower bound. \textit{(Hint: we still have mutual independence of the $\ab/2$ random variables $(\occur_1, \occur_2),\dots,(\occur_{\ab-1}, \occur_\ab)$ conditioned on $\mathbf{b}$. Establish the analogue of~\cref{eq:mutualinfobound} with $\occur_1=j,\occur_2=\ell$ instead of $\occur_1=j$, and proceed from there.}
+Recall that we defined the \no-instances in Section~3.2 by Eq.~(3.17) (measures, instead of \emph{bona fide} probability measures) in order to guarantee mutual independence of $\occur_1,\dots,\occur_\ab$ (conditioned on $\mathbf{b}$. Check the argument to see which part of the argument would fail if we had used Eq.~(3.11) instead. Then, modify the argument to fix this, and obtain the same sample complexity lower bound. \textit{(Hint: we still have mutual independence of the $\ab/2$ random variables $(\occur_1, \occur_2),\dots,(\occur_{\ab-1}, \occur_\ab)$ conditioned on $\mathbf{b}$. Establish the analogue of Eq.~(3.20) with $\occur_1=j,\occur_2=\ell$ instead of $\occur_1=j$, and proceed from there.}
 \end{question}
 \begin{solution}
-\tbc
+We can proceed as in Section~3.2 to bound $\mutualinfo{\mathbf{b}}{X}$, but now keeping in mind (as per the hint) that only the pairs $(\occur_{2i-1}, \occur_{2i})$ are mutually independent conditioned on $\mathbf{b}$, not the $\occur_i$ themselves. We can adapt the argument, and write
+\begin{align*}
+\mutualinfo{\mathbf{b}}{X} 
+&= \entropy{\occur_1,\dots,\occur_\ab} - \entropy{(\occur_1,\dots,\occur_\ab) \mid \mathbf{b}}  \\
+&= \entropy{\occur_1,\dots,\occur_\ab} - \sum_{i=1}^{\ab/2} \entropy{(\occur_{2i-1}, \occur_{2i}) \mid \mathbf{b}}  \tag{conditional independence}\\
+&\leq \sum_{i=1}^{\ab/2} \entropy{(\occur_{2i-1}, \occur_{2i})} - \sum_{i=1}^{\ab/2} \entropy{(\occur_{2i-1}, \occur_{2i}) \mid \mathbf{b}}  \tag{subadditivity}\\
+&= \sum_{i=1}^{\ab/2}\mutualinfo{\mathbf{b}}{(\occur_{2i-1}, \occur_{2i})}\,,
+\end{align*}
+leading to an analogue of Eq.~(3.19):
+\begin{equation}
+	\mutualinfo{\mathbf{b}}{X} \leq \frac{\ab}{2} \mutualinfo{\mathbf{b}}{(\occur_{1}, \occur_{2})}\,.
+\end{equation}
+Building towards the counterpart of Eq.~(3.20), we then have
+\begin{align*}
+	&\!\!\mutualinfo{\mathbf{b}}{(\occur_{1}, \occur_{2})} \\
+	&= \bE{\mathbf{b}}{\kldiv{P_{(\occur_1,\occur_2)\mid \mathbf{b}}}{P_{(\occur_1,\occur_2)}}} \notag\\
+	&\leq \bE{\mathbf{b}}{\chisquare{P_{(\occur_1,\occur_2)\mid \mathbf{b}}}{P_{(\occur_1,\occur_2)}}} \notag\\
+	&= \frac{1}{2}\Paren{\chisquare{P_{(\occur_1,\occur_2)\mid \mathbf{b}=\accept}}{P_{(\occur_1,\occur_2)}} + \chisquare{P_{(\occur_1,\occur_2)\mid \mathbf{b}=\reject}}{P_{(\occur_1,\occur_2)}}}\notag\\
+	&= \frac{1}{2}\Big(\sum_{j=0}^\infty\sum_{\ell=0}^\infty \frac{\Paren{\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\accept }-\bPr{\occur_1=j, \occur_2 = \ell }}^2}{\bPr{\occur_1=j, \occur_2 = \ell}}  \notag\\
+	&\qquad+ \sum_{j=0}^\infty\sum_{\ell=0}^\infty \frac{\Paren{\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\reject }-\bPr{\occur_1=j, \occur_2 = \ell }}^2}{\bPr{\occur_1=j, \occur_2 = \ell}} \Big) \notag\\
+	&=\frac{1}{2} \sum_{j=0}^\infty\sum_{\ell=0}^\infty \frac{\Paren{\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\reject }-\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\accept }}^2}{\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\reject }+\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\accept }} \notag\\
+	%&= \frac{\ab}{2} \sum_{j=0}^\infty\sum_{\ell=0}^\infty \bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\accept }\frac{ \Paren{1-  \frac{\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\reject }}{\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\accept }}  }^2}{1+\frac{\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\reject }}{\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\accept }}} \notag\\
+	&\leq \frac{1}{2} \sum_{j=0}^\infty\sum_{\ell=0}^\infty \bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\accept }\Paren{1-  \frac{\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\reject }}{\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\accept }}  }^2
+\end{align*}
+using as before for the second-to-last equality that, $\mathbf{b}$ being a uniform bit, $\bPr{\occur_1=j, \occur_2 = \ell} = \frac{1}{2}( \bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\accept }+ \bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\reject })$ for all $j, \ell\geq 0$.
+
+This gives us~\cref{eq:analogue:320}, our ``new Eq.~(3.20):''
+\begin{equation}
+	\label{eq:analogue:320}
+	\mutualinfo{\mathbf{b}}{X} \leq \frac{\ab}{4} \sum_{j=0}^\infty\sum_{\ell=0}^\infty \bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\accept }\Paren{1-  \tfrac{\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\reject }}{\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\accept }}  }^2\,.
+\end{equation}
+
+ To bound it, we need to compute $\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\accept }$ and $\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\reject }$ for arbitrary integers $j,\ell\geq 0$. Thankfully, this is not too difficult (recall that we still work in the Poissonized sampling model):
+\begin{align*}
+\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\accept }
+&= e^{-\frac{\ns}{\ab}} \frac{(\ns/\ab)^j}{j!}\cdot e^{-\frac{\ns}{\ab}} \frac{(\ns/\ab)^\ell}{\ell!}
+= e^{-\frac{2\ns}{\ab}} \frac{(\ns/\ab)^{j+\ell}}{j!\ell!} \\
+\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\reject } \\
+&\hspace{-6em}= \frac{1}{2} e^{-\frac{\ns(1+3\dst)}{\ab}} \frac{(\ns(1+3\dst)/\ab)^j}{j!} e^{-\frac{\ns(1-3\dst)}{\ab}} \frac{(\ns(1-3\dst)/\ab)^\ell}{\ell!}  \\
+&\hspace{-6em}+ \frac{1}{2} e^{-\frac{\ns(1-3\dst)}{\ab}} \frac{(\ns(1-3\dst)/\ab)^j}{j!} e^{-\frac{\ns(1+3\dst)}{\ab}} \frac{(\ns(1+3\dst)/\ab)^\ell}{\ell!} \\
+&\hspace{-6em}=  e^{-\frac{2\ns}{\ab}} \frac{(\ns/\ab)^{j+\ell}}{j!\ell!} \cdot \frac{(1+3\dst)^j(1-3\dst)^\ell+(1-3\dst)^j(1+3\dst)^\ell}{2}\,,
+\end{align*}
+and so, for all $j,\ell\geq 0$,
+\begin{equation}
+\frac{\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\reject }}{\bPr{\occur_1=j, \occur_2 = \ell\mid \mathbf{b}=\accept }} = \frac{1}{2}\Paren{(1+3\dst)^j(1-3\dst)^\ell+(1-3\dst)^j(1+3\dst)^\ell}
+\end{equation}
+\emph{(Compare this to Eq.~(3.22)!)}. Plugging this into~\cref{eq:analogue:320} leads to
+\begin{align}
+	\mutualinfo{\mathbf{b}}{X} 
+	&\leq \frac{\ab}{4} \sum_{j=0}^\infty\sum_{\ell=0}^\infty e^{-\frac{2\ns}{\ab}} \frac{(\ns/\ab)^{j+\ell}}{j!\ell!}\Paren{1- \tfrac{(1+3\dst)^j(1-3\dst)^\ell+(1-3\dst)^j(1+3\dst)^\ell}{2} }^2 \notag\\
+	&=  \frac{\ab}{2} \sinh^2 \frac{9\ns \dst^2}{\ab} \notag\\
+	&\leq \frac{81\ns^2 \dst^4}{2\ab} \cdot e^{\frac{3\ns \dst^2}{\ab}}
+\end{align}
+the last equality again following either by somewhat tedious series computations, or a symbolic computation system such as Julia, Mathematica, or Maple; and the inequality being $\sinh u \leq u e^{u^2/6}$ (for $u\in\R$.)\footnote{See, \eg \url{https://math.stackexchange.com/a/1759409/75808}.} We can then conclude as in Section~3.2: since we must have $\mutualinfo{\mathbf{b}}{X}  \gtrsim 1$ by Fact~3.1, we must have $\frac{\ns^2 \dst^4}{\ab} \gtrsim 1$, showing the $\ns = \bigOmega{\sqrt{\ab}/\dst^2}$ lower bound.
 \end{solution}
 
 \begin{question}\label{ex:2/3:lb:applications}
-Verify that applying~\cref{theo:2/3:lb:vv} to (i)~the uniform distribution $\uniform_\ab$ and (ii)~the ``Zipf'' distribution $\q\in\distribs{\ab}$ such that $\q(i) \propto 1/\sqrt{i}$ leads, in both cases, to an $\Omega(\sqrt{\ab}/\dst^2)$ sample complexity lower bound for identity testing.
+Verify that applying Theorem~3.9 to (i)~the uniform distribution $\uniform_\ab$ and (ii)~the ``Zipf'' distribution $\q\in\distribs{\ab}$ such that $\q(i) \propto 1/\sqrt{i}$ leads, in both cases, to an $\Omega(\sqrt{\ab}/\dst^2)$ sample complexity lower bound for identity testing.
 \end{question}
 \begin{solution}
-\tbc
+(i)~When applying Theorem~3.9 to the uniform distribution (\ie $\q=\uniformOn{\ab}$), for any given $\dst \in (0,1/4)$ the vector $\tilde{\q}^{-\max}_{-4\dst}$ is the $m$-dimensional vector with all coordinates equal to $1/\ab$, where $m \eqdef \ab-(1+\flr{4\dst\ab}) \geq (1-4\dst-1/\ab)\ab$ (since we removed the first coordinate, as well as the last $\flr{4\dst\ab}$). Then,
+\[
+	\norm{\tilde{\q}^{-\max}_{-4\dst}}_{2/3} = \Paren{m \cdot \frac{1}{\ab^{2/3}}}^{3/2} = \frac{m^{3/2}}{\ab}
+	\geq (1/2-4\dst)^{3/2} \sqrt{\ab} \geq \frac{\sqrt{\ab}}{4^{3/2}}
+\]
+the first inequality as $\ab \geq 2$, and the second for $\dst \leq 1/16$. This gives the lower bound $\bigOmega{\norm{\tilde{\q}^{-\max}_{-4\dst}}_{2/3}/\dst^2} = \bigOmega{\sqrt{\ab}/\dst^2}$ we wanted.\medskip
+
+(ii)~When applying the theorem with $\q$ set to be the Zipf distribution, that is, $\q(i) = \frac{1}{H_{\ab, 1/2}\sqrt{i}}$ for every $i\in [\ab]$ with $H_{\ab, 1/2}  = \sum_{i=1}^\ab \frac{1}{\sqrt{i}} = \bigTheta{\sqrt{\ab}}$, for any given $\dst\in(0,1/4)$ we get
+\[
+	\norm{\tilde{\q}^{-\max}_{-4\dst}}_{2/3}
+	= H_{\ab, 1/2}^{-1}  \Paren{ \sum_{i=2}^{\ell} \frac{1}{i^{1/3}} }^{3/2} \asymp \frac{\Paren{ \ell^{2/3} }^{3/2}}{H_{\ab, 1/2}}
+	\asymp \frac{\ell}{\sqrt{\ab}}
+\]
+where $\ell$ is the smallest integer such that $H_{\ab, 1/2}^{-1}\sum_{i=\ell}^\ab 1/\sqrt{i} \leq 4\dst$. Computing the asymptotics of the sum shows that $\ell$ satisfies $\sqrt{\ab}-\sqrt{\ell} \sim 4\dst\sqrt{\ab}$, leading to $\ell \sim (1-4\dst)^2 \ab$. For $\dst \leq 1/5$ (for instance), this again gives $\norm{\tilde{\q}^{-\max}_{-4\dst}}_{2/3} = \bigTheta{\sqrt{\ab}}$, and Theorem~3.9 then yields the same (tight, in view of the identity testing upper bound) sample complexity lower bound $\bigOmega{\sqrt{\ab}/\dst^2}$.
 \end{solution}
 
 \begin{question}\label{exo:reexpress:algos:frequency:only}
@@ -793,7 +859,7 @@ Check that you can express several of the algorithms in~\cref{sec:uniformity} as
 \end{solution}
 
 \begin{question}[$\star$]\label{ex:reduction:monotone}
-  Prove that the mapping $\Phi$ defined in~\cref{eq:reduction:monotonicity} does satisfy the requirements of a reduction, for $\ab'=2\ab$ and $\dst'=\dst/2$. That is, if $\p\in\distribs{\ab}$ is $\dst$-far from $\uniform_\ab$, then $\Phi(\p)\in\distribs{2\ab}$ is $\dst'$-far from every distribution $\q\in\property^{\searrow}_{2\ab}$. \textit{(Hint: for any given monotone $\q$, analyse the distance $\totalvardist{\Phi(\p)}{\q}$ according to whether $\q(\ab) > 1/(2\ab)$ or not, relating this to the set $S\subseteq[\ab]$ on which $\p$ is greater than $\uniform_\ab$.)} Moreover, show that this loss by a factor $1/2$ in the distance is necessary.
+  Prove that the mapping $\Phi$ defined in Eq.~(3.40) does satisfy the requirements of a reduction, for $\ab'=2\ab$ and $\dst'=\dst/2$. That is, if $\p\in\distribs{\ab}$ is $\dst$-far from $\uniform_\ab$, then $\Phi(\p)\in\distribs{2\ab}$ is $\dst'$-far from every distribution $\q\in\property^{\searrow}_{2\ab}$. \textit{(Hint: for any given monotone $\q$, analyse the distance $\totalvardist{\Phi(\p)}{\q}$ according to whether $\q(\ab) > 1/(2\ab)$ or not, relating this to the set $S\subseteq[\ab]$ on which $\p$ is greater than $\uniform_\ab$.)} Moreover, show that this loss by a factor $1/2$ in the distance is necessary.
 \end{question}
 \begin{solution}
 Fix any $\p\in\distribs{\ab}$ such that $\totalvardist{\p}{\uniform_\ab}>\dst$, and let $S\subseteq [\ab]$ the set which witnesses it:
@@ -821,12 +887,55 @@ Now, fix any monotone distribution $\q\in\property^{\searrow}_{2\ab}$. We have t
 This shows that $\totalvardist{\Phi(\p)}{\q} > \dst/2$. For the ``necessary'' part, consider $\p$ such that $\p(1)=1$.
 \end{solution}
 
-\begin{question}\label{ex:testing:pbd}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\pbd}{\hspace{1pt}{\cdot}\kern -4pt {\subset}\kern -3pt {\rtimes}}
-  A \emph{Poisson Binomial Distribution} (PBD) with parameters $\ab$ and $\vec{p}=(p_1,\dots,p_\ab)$ is the distribution of the sum of $\ab$ independent Bernoulli random variables $X_1,\dots,X_\ab$, where $X_i \sim \bernoulli{p_i}$. (This is a generalization of Binomial distributions, which correspond to $p_1=\dots=p_\ab$.) Let $\property^{\pbd}_{\ab}$ denote the class of all PBDs with parameter $\ab$. Using the facts that (1)~$\property^{\pbd}_{\ab}$ can be agnostically learned with $O(\log^2(1/\dst)/\dst^2)$ samples (independent of $\ab$)~\citep{DDS:PBD:15}, and (2)~the ``standard'' Binomial distribution $\binomial{\ab}{1/2}$ is a PBD, show that testing $\property^{\pbd}_{\ab}$ has sample complexity $\Omega(\ab^{1/4}/\dst^2)$ (as long as $\dst \geq 1/2^{O(\ab^{1/8})}$). \textit{(Hint: combine the results of~\cref{ssec:vv:instancebyinstance,ssec:lb:reductions}.)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{question}\label{ex:testing:pbd}
+  A \emph{Poisson Binomial Distribution} (PBD) with parameters $\ab$ and $\vec{p}=(p_1,\dots,p_\ab)$ is the distribution of the sum of $\ab$ independent Bernoulli random variables $X_1,\dots,X_\ab$, where $X_i \sim \bernoulli{p_i}$. (This is a generalization of Binomial distributions, which correspond to $p_1=\dots=p_\ab$.) Let $\property^{\pbd}_{\ab}$ denote the class of all PBDs with parameter $\ab$. Using the facts that (1)~$\property^{\pbd}_{\ab}$ can be agnostically learned with $O(\log^2(1/\dst)/\dst^2)$ samples (independent of $\ab$)~\citep{DDS:PBD:15}, and (2)~the ``standard'' Binomial distribution $\binomial{\ab}{1/2}$ is a PBD, show that testing $\property^{\pbd}_{\ab}$ has sample complexity $\Omega(\ab^{1/4}/\dst^2)$ (as long as $\dst \geq 1/2^{O(\ab^{1/8})}$). \textit{(Hint: combine the results of Sections~3.4 and~3.5.)}
 \end{question}
 \begin{solution}
-\tbc
+For convenience, denote by $\q$ the Binomial $\binomial{\ab}{1/2}$, and fix $\errprob = 1/3$. We will apply Theorem~3.11 with $\property' \eqdef \{\q\}$ and $\property \eqdef \property^{\pbd}_{\ab}$, so that $\property' \subseteq \property$.
+
+From the statement of the exercise, from~\citep{DDS:PBD:15}\footnote{This is not explicit in the paper, but their cover-based approach implies agnostic learning, for a (large, but constant) $C\geq 1$.} we know that the sample complexity of agnostically learning $\property^{\pbd}_{\ab}$ is
+\[
+	\ns_{\mathcal{L}}(\ab,\dst,1/3) = \bigO{\frac{\log^2(1/\dst)}{\dst^2}}
+\]
+so to apply the theorem it remains to give a lower bound on $\ns_{\mathcal{T}}(\ab,\dst,1/3)$ (sample complexity of testing $\property'$) and comparing the two. But testing our $\property'$ is by definition testing identity to $\q$, for which we can apply Theorem~3.9: for all $\dst\in(0,1/4)$, 
+\[
+		\ns_{\mathcal{T}}(\ab,\dst,1/3) = \bigOmega{\norm{\tilde{\q}^{-\max}_{-4\dst}}_{2/3}/\dst^2}\,,
+\]
+where $\tilde{\q}^{-\max}_{-4\dst}$ is as defined in the statement of Theorem~3.9. In our case, to get a hold of 
+$
+	\norm{\tilde{\q}^{-\max}_{-4\dst}}_{2/3}
+$, we will make three observations. \emph{(The argument below is heuristic and informal, but can be made rigorous).} First, the maximum probability value of $\q$ is $\frac{1}{2^n}\binom{\ab}{\ab/2} = \bigTheta{\frac{1}{\sqrt{\ab}}}$, so removing it will be negligible. Second, to remove the $4\dst$ probability mass from the tails of $\q$, we can use Hoeffding's inequality (Corollary~A.4) as heuristic, since even though it provides an upper bound instead of a lower bound, Hoeffding's inequality is essentially tight for the standard Binomial. Working it out, this then tells us that
+\[
+	\bPr{ \abs{X - \frac{\ab}{2}} \geq m } \approx 4\dst 
+\]
+for $m \asymp \sqrt{\ab \log\frac{1}{\dst}}$, which means that we only keep $2m = \bigTheta{\sqrt{\ab \log\frac{1}{\dst}}}$ coordinates in our vector $\tilde{\q}^{-\max}_{-4\dst}$ (since $\q$ is symmetric around its expectation, those are the $2m$ middle elements of the domain, centered at $\ab/2$). That is quite difficult to bound, though, so since we are only aiming to \emph{lower bound} $\norm{\tilde{\q}^{-\max}_{-4\dst}}_{2/3}$ we can remove more elements, and only keep the middle $2m'$ for say $m' \eqdef \sqrt{\ab} \leq m$.
+
+
+Finally, since $\q$ is unimodal, among those $2\sqrt{\ab}$ elements the minimum probability is $\q(\ab/2+\sqrt{\ab})$, which by Stirling can be bounded as
+\[
+	\q(\ab/2+m') = \frac{1}{2^\ab} \binom{\ab}{\frac{\ab}{2}+\sqrt{\ab}} \asymp \frac{1}{\sqrt{\ab}}  \,.
+\]
+Thus, we can bound
+\begin{align*}
+	\norm{\tilde{\q}^{-\max}_{-4\dst}}_{2/3} 
+	&\geq \Paren{ 2m'\cdot \q(\ab/2+m')^{2/3} }^{3/2}  \\
+	&\asymp \ab^{3/4} \cdot \q(\ab/2+\sqrt{\ab})  \\
+	&\asymp \ab^{1/4}
+\end{align*}
+and Theorem~3.9 then tells us that $\ns_{\mathcal{T}}(\ab,\dst,1/3) = \bigOmega{\ab^{1/4}/\dst^2}$. \emph{(Intuitively: the standard Binomial distribution is ``roughly flat'' within a few standard deviations of its expectation, which means it is sort-of-uniform on a domain of size $\Theta(\sqrt{\ab})$. So we get ``the uniformity testing lower bound'' but on a domain of size $\Theta(\sqrt{\ab})$, not $\ab$: hence the $\ab^{1/4}$.}
+
+To conclude and apply Theorem~3.11, we just need to check the third item, and see if there is a range of parameters for which
+\[
+		\ns_{\mathcal{L}}(\ab,C\dst,1/3)  \leq \frac{1}{2}\ns_{\mathcal{T}}(\ab,3C\dst,1/3) 
+\]
+(where again, $C\geq 1$ is a constant, implicit in~\citep{DDS:PBD:15}). This boils down to checking when
+\[
+		\frac{\log^2(1/\dst)}{\dst^2} \ll \frac{\ab^{1/4}}{\dst^2}
+\]
+which is true for $\dst \geq 1/2^{O(\ab^{1/8})}$.  Theorem~3.11 then yields the $\Omega(\ab^{1/4}/\dst^2)$ lower bound for testing $\property^{\pbd}_{\ab}$ in that parameter regime. 
 \end{solution}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

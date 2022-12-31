@@ -261,8 +261,8 @@ To see where this comes from, recall that mutual information is expected KL dive
 	&= \frac{1}{2}\Paren{\chisquare{P_{\occur_1\mid \mathbf{b}=\accept}}{P_{\occur_1}} + \chisquare{P_{\occur_1\mid \mathbf{b}=\reject}}{P_{\occur_1}}}\notag\\
 	&= \frac{1}{2}\Big(\sum_{j=0}^\infty \frac{\Paren{\bPr{\occur_1=j\mid \mathbf{b}=\accept }-\bPr{\occur_1=j }}^2}{\bPr{\occur_1=j}}  \notag\\
 	&\qquad+ \sum_{j=0}^\infty \frac{\Paren{\bPr{\occur_1=j\mid \mathbf{b}=\reject }-\bPr{\occur_1=j }}^2}{\bPr{\occur_1=j}} \Big) \notag\\
-	&=\frac{\ab}{2} \sum_{j=0}^\infty \frac{\Paren{\bPr{\occur_1=j\mid \mathbf{b}=\reject }-\bPr{\occur_1=j\mid \mathbf{b}=\accept }}^2}{\bPr{\occur_1=j\mid \mathbf{b}=\reject }+\bPr{\occur_1=j\mid \mathbf{b}=\accept }} \\
-	&= \frac{\ab}{2} \sum_{j=0}^\infty \bPr{\occur_1=j\mid \mathbf{b}=\accept }\frac{ \Paren{1-  \frac{\bPr{\occur_1=j\mid \mathbf{b}=\reject }}{\bPr{\occur_1=j\mid \mathbf{b}=\accept }}  }^2}{1+\frac{\bPr{\occur_1=j\mid \mathbf{b}=\reject }}{\bPr{\occur_1=j\mid \mathbf{b}=\accept }}}  \notag
+	&=\frac{1}{2} \sum_{j=0}^\infty \frac{\Paren{\bPr{\occur_1=j\mid \mathbf{b}=\reject }-\bPr{\occur_1=j\mid \mathbf{b}=\accept }}^2}{\bPr{\occur_1=j\mid \mathbf{b}=\reject }+\bPr{\occur_1=j\mid \mathbf{b}=\accept }} \\
+	&= \frac{1}{2}\sum_{j=0}^\infty \bPr{\occur_1=j\mid \mathbf{b}=\accept }\frac{ \Paren{1-  \frac{\bPr{\occur_1=j\mid \mathbf{b}=\reject }}{\bPr{\occur_1=j\mid \mathbf{b}=\accept }}  }^2}{1+\frac{\bPr{\occur_1=j\mid \mathbf{b}=\reject }}{\bPr{\occur_1=j\mid \mathbf{b}=\accept }}}  \notag
 \end{align}
 using for the second-to-last equality that, since $\mathbf{b}$ is a uniform bit, $\bPr{\occur_1=j} = \frac{1}{2}\bPr{\occur_1=j\mid \mathbf{b}=\accept }+\frac{1}{2}\bPr{\occur_1=j\mid \mathbf{b}=\reject }$ for all $j\geq 0$.\smallskip
 
@@ -720,7 +720,7 @@ In other terms, an agnostic learning algorithm works even in the unrealizable se
 	\label{theo:hardness:subclass}
   Fix any property $\property$, and suppose there exists $\property'\subseteq \property$ such that the following holds.
   \begin{enumerate}
-    \item\label{theo:hardness:subclass:item1} Agnostic learning of $\property$ (with a given ``agnostic constant'' $C\geq 1$) has sample complexity at most $\ns_{\mathcal{L}}(\ab,\dst,\delta)$;
+    \item\label{theo:hardness:subclass:item1} Agnostic learning of $\property$ (with a given ``agnostic constant'' $C\geq 1$) has sample complexity at most $\ns_{\mathcal{L}}(\ab,\dst,\errprob)$;
     \item\label{theo:hardness:subclass:item2} Testing $\property'$ has sample complexity at least $\ns_{\mathcal{T}}(\ab,\dst,\errprob)$;
     \item\label{theo:hardness:subclass:item3} There exists a range of parameters $\ab,\dst,\errprob$ for which learning $\property$ is easier than testing $\property'$: 
     	\[
