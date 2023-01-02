@@ -1293,13 +1293,21 @@
 
 \theoremstyle{now}
 \ifbool{@nowfntplain}
-{\newtheorem{theorem}{Theorem}[section]
+{ % Changes by Clement
+ \newtheorem{theorem}{Theorem}[chapter]
  \newtheorem{lemma}[theorem]{Lemma}
  \newtheorem{corollary}[theorem]{Corollary}
- \newtheorem{proposition}{Proposition}[section]
- \newtheorem{remark}{Remark}[section]
- \newtheorem{definition}{Definition}[section]
- \newtheorem{example}{Example}[section]
+ \newtheorem{proposition}{Proposition}[chapter]
+ \newtheorem{remark}{Remark}[chapter]
+ \newtheorem{definition}{Definition}[chapter]
+ \newtheorem{example}{Example}[chapter]
+%\newtheorem{theorem}{Theorem}[section]
+%\newtheorem{lemma}[theorem]{Lemma}
+%\newtheorem{corollary}[theorem]{Corollary}
+%\newtheorem{proposition}{Proposition}[section]
+%\newtheorem{remark}{Remark}[section]
+%\newtheorem{definition}{Definition}[section]
+%\newtheorem{example}{Example}[section]
  }
 {
  \newtheorem{theorem}{Theorem}[chapter]
@@ -1318,8 +1326,8 @@
 
 % page geometry
 \RequirePackage[vcentering,hcentering]{geometry}
-\ifbool{@nowfntplain}
-{}
+\ifbool{@nowfntplain}  %% % Changes by Clement: Was {}
+{\geometry{papersize={156mm,234mm},total={118mm,180mm},headheight=14.4pt}}
 {\geometry{papersize={156mm,234mm},total={118mm,180mm},headheight=14.4pt}}
 
 \normalsize

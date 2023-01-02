@@ -23,14 +23,15 @@
 \clearthms{theorem,lemma,corollary,proposition,remark,definition,example}
 \theoremstyle{now}
 \ifbool{@nowfntplain}
-{\newtheorem{theorem}{Theorem}[section]
+{
+ \newtheorem{theorem}{Theorem}[chapter]
  \newtheorem{lemma}[theorem]{Lemma}
  \newtheorem{corollary}[theorem]{Corollary}
- \newtheorem{proposition}{Proposition}[section]
- \newtheorem{remark}{Remark}[section]
- \newtheorem{definition}{Definition}[section]
- \newtheorem{example}{Example}[section]
- \newtheorem{claim}{Claim}[section] % New
+ \newtheorem{proposition}{Proposition}[chapter]
+ \newtheorem{remark}{Remark}[chapter]
+ \newtheorem{definition}{Definition}[chapter]
+ \newtheorem{example}{Example}[chapter]
+ \newtheorem{claim}{Claim}[chapter] % New
  \newtheorem{fact}{Fact}[chapter] % New
  \newtheorem{openproblem}{Open Question}[chapter] % New
  }
