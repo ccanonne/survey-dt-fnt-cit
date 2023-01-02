@@ -156,7 +156,7 @@ Verify that the error amplification technique discussed in~\cref{lemma:error:pro
 Verify that the reduction from identity to uniformity testing discussed in~\cref{ssec:l1:reduction} still goes through in the communication-constrained distributed setting, both in the private- and public-coin settings. Do the users need to know the reference distribution $\q$?
 \end{question}
 \begin{question}[$\star$]\label{exo:simulate:infer}
-Extend the argument of~\cref{theo:simulate:infer:babyversion} to $\numbits\geq 1$, to establish the more general~\cref{theo:simulate:infer}. \emph{(Hint: suppose that $2^\numbits -1$ divides $\ab$, and partition the domain in $m\eqdef \ab/(2^\numbits -1)$ sets. Each pair of users know is ``assigned'' one of these sets.)}
+Extend the argument of~\cref{theo:simulate:infer:babyversion} to $\numbits\geq 1$, to establish the more general~\cref{theo:simulate:infer}. \emph{(Hint: suppose that $2^\numbits -1$ divides $\ab$, and partition the domain in $m\eqdef \ab/(2^\numbits -1)$ sets. Each pair of users is now ``assigned'' one of these sets.)}
 \end{question}
 \begin{question}[$\star\star$]\label{exo:heterogeneous}
 Extend the argument of~\cref{theo:simulate:infer} further to apply to the case where user has a communication constraint $\numbits_i$ (heterogeneous constraints among users). Establish an analogous bound, with $2^\numbits$ replaced by $\frac{1}{\ns}\sum_{j=1}^\ns 2^{\numbits_j}$. \emph{(Hint: consider a dyadic partition of the domain $[\ab]$. It \emph{should} work.)}

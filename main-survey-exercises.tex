@@ -6,6 +6,7 @@
 %
 %
 %JOURNAL CODE  SEE DOCUMENTATION
+%\documentclass[biber,plain]{nowfnt} % creates the journal version, needs biber version
 \documentclass[biber]{nowfnt} % creates the journal version, needs biber version
 %wrapper for book and ebook are created automatically.
 \usepackage{imakeidx}
@@ -121,6 +122,7 @@ clement.canonne@sydney.edu.au
 
 %BIBLIOGRAPHY FILE
 \addbibresource{bibliography.bib}
+\addbibresource{citation.bib}
 
 % \usepackage{mwe}
 
@@ -134,7 +136,7 @@ clement.canonne@sydney.edu.au
 \begin{document}
 \makeabstracttitle
 \begin{abstract}
-Solutions to exercises.
+Solutions to the exercises from~\citet{CIT-114}.
 \end{abstract}
 
 \setcounter{chapter}{1}
@@ -608,7 +610,7 @@ the last step again using $\p(j)+\q(j)\leq \norminf{\p}+\norminf{\q} \leq \normt
 \end{itemize}
 This establishes the first bound from the exercise.\medskip
 
-The second is a little trickier, and we here only provide an outline.\footnote{If you have a fully written solution you'd like to include, or if you think something isn't quite right, do contact me!} It will relies on the following lemma (which will not be proven here, but can be shown by, \eg adapting~\cite[Lemma~3.1]{BatuC17}):
+The second is a little trickier, and we here only provide an outline.\footnote{If you have a fully written solution you'd like to include, or if you think something isn't quite right, do contact me!} It will relies on the following lemma (which will not be proven here, but can be shown by, \eg adapting~\citet[Lemma~3.1]{BatuC17}):
 \begin{lemma}[{Constant-factor estimate of the $\lp[2]$ norm}]
 There exists an algorithm which, given $\ns$ \iid samples from an unknown distribution $\p\in\distribs{\N}$ and a parameter $\tau\in(0,1]$, outputs a value $\hat{\rho}\in(\tau,1]\cup\{\bot\}$ and has the following guarantees:
 \begin{itemize}
@@ -762,13 +764,34 @@ that is, $\ns \geq \frac{ \sqrt{ \ab \log(1/(4\errprob)) } }{ 9\dst^2 }$; provin
 which is optimal.}
 \end{solution}
 
+\noindent \textcolor{red}{Erratum: The first part of the next exercise (about the distance to $\property_\ab$) was incorrectly stated in the published version.}
 \begin{question}\label{exo:notrealproba:lb}
-Let $\p$ be a measure (not necessarily a probability measure) such that the $\lp[1]$ distance between $\p$ and $\property_\ab$ satisfies $\lp[1](\p,\property_\ab)>2\dst$, and $1/2\leq \normone{\p} \leq 3/2$. Defining $\p' \eqdef \p/\normone{\p}$ (an actual probability distribution), provide a lower bound on $\totalvardist{\p}{\property_\ab}$. Moreover, show that obtaining $\ns$ ``samples'' from the Poisson process with measure $\p$ is equivalent to getting $\poisson{\ns\normone{\p}}$ samples from the distribution $\p'$.
+Fix a property $\property_\ab \subseteq \distribs{\ab}$ of distributions, and denote by $\tilde{\property}_\ab$ its ``extension to probability measures'' (not just probability distributions) defined as follows:
+\begin{equation}
+	\tilde{\property}_\ab \eqdef \setOfSuchThat{ \alpha\q }{ \q\in\property_\ab, \alpha \geq 0 }
+\end{equation}
+(for instance, for uniformity, $\property_\ab=\{\uniformOn{\ab}\}$ and $\tilde{\property}_\ab = \{\alpha \textbf{1}_\ab\}_{\alpha \geq 0}$.) 
+Let $\p$ be a measure (not necessarily a probability measure) such that the $\lp[1]$ distance between $\p$ and $\tilde{\property}_\ab$ satisfies $\lp[1](\p,\tilde{\property}_\ab) > 2\dst$, and $1/2\leq \normone{\p} \leq 3/2$. Defining $\p' \eqdef \p/\normone{\p}$ (an actual probability distribution), provide a lower bound on $\totalvardist{\p'}{\property_\ab}$. Moreover, show that obtaining $\ns$ ``samples'' from the Poisson process with measure $\p$ is equivalent to getting $\poisson{\ns\normone{\p}}$ samples from the distribution $\p'$.
 
 Conclude with how one could use a testing algorithm $\Algo$ for property $\property_\ab$ given $\poisson{\ns}$ samples (\ie in the Poissonized sampling model) to distinguish between two families of measures (\yes- and \no-instances) far in $\lp[1]$ distance, thus justifying the relaxed assumption from Section~3.2.
 \end{question}
 \begin{solution}
-\tbc
+Let $\p$, $\property_\ab$, $\tilde{\property}_\ab$, and $\p'$ as above. Fix any $\q\in \property_\ab$; we have
+\begin{align*}
+\normone{\p' - \q}
+&= \normone{\frac{\p}{\normone{\p}} - \q} 
+= \frac{1}{\normone{\p}}\normone{\p - \normone{\p}\q} \\
+&\geq \frac{2}{3}\normone{\p - \normone{\p}\q} > \frac{2}{3}\cdot 2\dst
+\end{align*}
+using for the last inequality that $\normone{\p}\q \in \tilde{\property}_\ab$, as a (positive) rescaling of $\q\in \property_\ab$. As $\q$ was arbitrary, this implies $\totalvardist{\p'}{\property_\ab} > \frac{2}{3}\dst$.
+
+Then, the output of a Poisson process with parameter $\ns\p$ (\ie parameter $\ns$ and underlying measure $\p$) is by definition a set of mutually independent values $\occur_1,\dots, \occur_\ab$, where $\occur_i$ is distributed as $\poisson{\ns\p(i)} = \poisson{\ns\normone{\p}\p'(i)}$. Which is exactly what one get by drawing $\poisson{\ns'}$ \iid samples from $\p'$ for $\ns'\eqdef \ns\normone{\p}$ (not necessarily an integer).
+
+Finally, suppose we have a testing algorithm $\Algo$ for property $\property_\ab$, which succeeds when given $\poisson{\ns}$ samples for $\ns=\ns(\ab, \dst, \errprob)$. Then we can use it to distinguish whether the unknown measure $\p$ is a  \yes- ($\p/\normone{\p}\in \property_\ab$) or a \no- instance ($\p/\normone{\p}$ $2\dst$-far in $\lp[1]$ distance, or equivalently $\dst$-far in TV distance) in our ``relaxed,'' ``Poisson process'' setting by feeding the output of our Poisson process with parameter $\ns'\p$ for $\ns' \eqdef 2\ns(\ab, \frac{2}{3}\dst, \errprob)$. By the above, this corresponds to $\poisson{\ns'\normone{\p}}$ samples from $\p'$, which (i)~in the $\yes$ case is in $\property_\ab$, and (ii)~in \no case will be $\frac{2}{3}\dst$-far from $\property_\ab$, and
+\[
+	\ns'\normone{\p} = 2\normone{\p} \cdot \ns(\ab, \frac{2}{3}\dst, \errprob) \geq \ns(\ab, \frac{2}{3}\dst, \errprob)
+\]
+since $\normone{\p} \geq 1/2$; so $\Algo$ will be correct with probability at least $1-\errprob$. This implies that any lower bound in this ``relaxed'' setting carries over, with only constant-factor losses in the parameters, to the Poissonized setting.
 \end{solution}
 
 \begin{question}[$\star$]\label{exo:paninski:mi:lb}
@@ -852,10 +875,32 @@ where $\ell$ is the smallest integer such that $H_{\ab, 1/2}^{-1}\sum_{i=\ell}^\
 \end{solution}
 
 \begin{question}\label{exo:reexpress:algos:frequency:only}
-Check that you can express several of the algorithms in~\cref{sec:uniformity} as a function of $\freq$ only (as defined in~\cref{ssec:momentmatching}). Specifically, verify this for~\cref{algo:collision-based,algo:unique-elements,algo:empirical:plugin}. Verify this also for~\cref{algo:chisquare}, keeping in mind that this algorithm was stated and analyzed in the Poissonized setting: what does it change?
+Check that you can express several of the algorithms in Section~2.1 as a function of $\freq$ only (as defined in Section~3.3). Specifically, verify this for Algorithms~1,~2 and~4. Verify this also for Algorithm~3, keeping in mind that this algorithm was stated and analyzed in the Poissonized setting: what does it change?
 \end{question}
 \begin{solution}
-\tbc
+We can rewrite $Z_1$, from Algorithm~1, as
+\begin{align*}
+	Z_1  &= \frac{1}{\binom{\ns}{2}} \sum_{i\in\domain} \binom{\occur_i}{2} 
+		= \frac{1}{\binom{\ns}{2}} \sum_{i\in\domain} \sum_{j=0}^{\ns} \binom{j}{2} \indic{\occur_i=j}
+		= \frac{1}{\binom{\ns}{2}} \sum_{j=0}^{\ns} \binom{j}{2} \sum_{i\in\domain}\indic{\occur_i=j} \\
+		&= \frac{1}{\binom{\ns}{2}} \sum_{j=0}^{\ns} \binom{j}{2} \freq_j\,.
+\end{align*}
+Similarly, $Z_2$, from Algorithm~2, is given by
+\[
+	Z_2 = \frac{1}{\ns} \freq_1
+\]
+while $Z_4$, from Algorithm~4, can be written as
+\[
+	Z_4 = \frac{1}{2}\sum_{j=0}^{\ns} \abs{\frac{j}{\ns}-\frac{1}{\ab}} \freq_j\,.
+\]
+We can also rewrite $Z_3$ as a function of the fingerprint $\freq$; however, in the Poissonized setting, $\freq\in \N^{\N}$ (it is no longer a finite-dimensional vector, but a sequence) and does not necessarily sum to $\ns$ anymore. With this in mind, we get
+\begin{align*}
+	Z_3 
+	&= \sum_{i\in\domain} \frac{\Paren{\occur_i-\ns/\ab}^2-\occur_i}{\ns/\ab} \\
+	&= \sum_{i\in\domain} \sum_{j=0}^{\infty} \frac{\Paren{j-\ns/\ab}^2-j}{\ns/\ab} \indic{\occur_i=j} \\
+	&= \sum_{j=0}^{\infty} \frac{\Paren{j-\ns/\ab}^2-j}{\ns/\ab} \freq_j\,.
+\end{align*}
+Note that we now have to sum over all integers, not just up to $\ns$.
 \end{solution}
 
 \begin{question}[$\star$]\label{ex:reduction:monotone}
@@ -954,7 +999,7 @@ Regardless of the specific distributed setting (private-coin, public-coin, or se
 Verify that the reduction from identity to uniformity testing discussed in Section~2.2.3 still goes through in the communication-constrained distributed setting, both in the private- and public-coin settings. Do the users need to know the reference distribution $\q$?
 \end{question}
 \begin{solution}
-As described in \cite[Proposition~A.16]{AcharyaCT19b}, the reduction does go through, as each user can ``locally'' and independently apply the mapping $\Psi_\q$ to their sample, to get a draw from the distribution $\Phi_\q(\p)$. This preserves the setting of randomness (private- or public-coin), as it only require private randomness; however, as mentioned in~\cite[Remark~A.17]{AcharyaCT19b}, all users \emph{do} need to know the reference distribution $\q$ (in order to be able to compute the mapping~$\Psi_\q$.
+As described in \citet[Proposition~A.16]{AcharyaCT19b}, the reduction does go through, as each user can ``locally'' and independently apply the mapping $\Psi_\q$ to their sample, to get a draw from the distribution $\Phi_\q(\p)$. This preserves the setting of randomness (private- or public-coin), as it only require private randomness; however, as mentioned in~\citet[Remark~A.17]{AcharyaCT19b}, all users \emph{do} need to know the reference distribution $\q$ (in order to be able to compute the mapping~$\Psi_\q$.
 
 However, the two specific approaches seen in Section~4, for private-coin protocols (Section~4.2) and public-coin protocols (Section~4.3) can be used to perform identity testing \emph{even if the users do not know the reference $\q$}. Namely:
 \begin{itemize}
@@ -964,10 +1009,48 @@ However, the two specific approaches seen in Section~4, for private-coin protoco
 \end{solution}
 
 \begin{question}[$\star$]\label{exo:simulate:infer}
-Extend the argument of Lemma~4.3 to $\numbits\geq 1$, to establish the more general Theorem~4.2. \emph{(Hint: suppose that $2^\numbits -1$ divides $\ab$, and partition the domain in $m\eqdef \ab/(2^\numbits -1)$ sets. Each pair of users is ``assigned'' one of these sets.)}
+Extend the argument of Lemma~4.3 to $\numbits\geq 1$, to establish the more general Theorem~4.2. \emph{(Hint: suppose that $2^\numbits -1$ divides $\ab$, and partition the domain in $m\eqdef \ab/(2^\numbits -1)$ sets. Each pair of users is now ``assigned'' one of these sets.)}
 \end{question}
 \begin{solution}
-\tbc
+As suggested, partition the domain into $m\eqdef \clg{\ab/2^\numbits -1}$ sets (\eg intervals) $S_1,\dots, S_m$, each of size $\ab' \eqdef 2^\numbits -1$ except at most one possibly smaller (if $2^\numbits -1$ does not divide $\ab$). As in the proof of Lemma~4.3, we first show how to generate one sample from $2m$ users.
+
+Divide these $2m$ users into $m$ pairs, where users of the pair $(2i-1, 2i)$ are ``assigned'' set $S_i$. The $\numbits$-bit message these two users send is defined as follows: either the all-zero sequence $\textbf{0}_\numbits$ if their sample did not fall in $S_i$, or, if it did, the exact value of the sample (they can do so, as $|S_i| \leq 2^\numbits -1$, as long as the protocol specified an encoding beforehand):
+\begin{align*}
+	Y_{2i-1} &= 
+		\begin{cases}
+			\textrm{encode}(X_{2i-1}) &\text{ if } X_{2i-1} \in S_i\\
+			\textbf{0}_\numbits &\text{ otherwise.}
+		\end{cases} \\
+	Y_{2i} &= 
+		\begin{cases}
+			\textrm{encode}(X_{2i}) &\text{ if } X_{2i} \in S_i\\
+			\textbf{0}_\numbits &\text{ otherwise.}
+		\end{cases}
+\end{align*}
+As in the single-bit ($\numbits=1$) case, the server, upon receiving these $2m$ messages, will check the following
+two conditions:
+\begin{itemize}
+	\item there exists one, and only one, pair $(2i - 1, 2i)$ of users for which the ``even'' user sent a non-zero value (that is, $Y_{2i}\neq  \textbf{0}_\numbits$); and
+	\item for this pair $(2i - 1, 2i)$, the ``odd'' user sent the all-zero sequence ($Y_{2i}=\textbf{0}_\numbits$).
+\end{itemize}
+If those two conditions do not simultaneously hold, then the server aborts (does not output any sample, but instead the special symbol $\bot$). Otherwise, the server outputs (the decoding of) $Y_{2i}$, which is $X_{2i}$, as its sample.
+Then, analogously to the proof of Lemma~4.3, for any $j\in[\ab]$, letting $i(j)$ be the index of the set such that $j\in S_{i(j)}$, the probability to output $j$ is
+\[
+	\bPr{\text{output is } j } = \p(j)\cdot (1-\p(S_{i(j)})) \prod_{\substack{1\leq i\leq m\\ i\neq i(j)}} (1-\p(S_i)) = \p(j) \prod_{i=1}^m (1-\p(S_i))\,.
+\]
+We have $\bPr{\text{output is } j }\propto \p(j)$ for all $j\in[\ab]$, so all we need to prove, as before, is that $\bPr{\text{output is } \bot }$ is not too close to one, or, equivalently, that $\prod_{i=1}^m (1-\p(S_i))$ is not vanishingly small. The exact same argument as the one leading to Eq.~(4.4) shows that 
+\[
+	\prod_{i=1}^m (1-\p(S_i)) \geq \frac{1}{4}
+\]
+as long as $\max_{1\leq i\leq m} \p(S_i) \leq \frac{1}{2}$, which is implied by $\norminf{\p} \leq 1/2$ and thus can be ensured by using the same trick as in Lemma~4.3 (only losing, as we did there, a factor 2 in the number of users). Altogether, this establishes that we can generate (on expectation) \emph{one} sample from $\p$ using the $\numbits$-bits messages from
+\[
+		4 \cdot 4m = 16\clg{\frac{\ab}{2^\numbits -1}}
+\]
+users. By repeating this on disjoint groups of users, this yields Theorem~4.2, showing that we can generate an expected
+\[
+	\ns' \geq \frac{1}{16}\cdot \frac{\ns}{\clg{\frac{\ab}{2^\numbits -1}}} \asymp \frac{2^\numbits\ns}{\ab}
+\]
+\iid samples, using the $\numbits$-bits messages from $\ns$ users. For a more detailed proof and discussion of~Theorem~4.2, see~\citet[Theorem~IV.9]{AcharyaCT19b}.
 \end{solution}
 
 \begin{question}[$\star\star$]\label{exo:heterogeneous}
